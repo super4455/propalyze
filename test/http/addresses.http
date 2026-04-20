@@ -1,0 +1,13 @@
+### %20 er i http et mellemrum
+
+### Søg efter adresse - normal case
+GET http://localhost:3000/api/addresses/search?q=jagtvej%2010
+
+### Søg efter adresse - dansk specialtegn
+GET http://localhost:3000/api/addresses/search?q=Solbjerg%20Plads
+
+### Fejl: Manglende søgeord (forventer 400)
+GET http://localhost:3000/api/addresses/search
+
+### Fejl: For kort søgeord (forventer 400)
+GET http://localhost:3000/api/addresses/search?q=a

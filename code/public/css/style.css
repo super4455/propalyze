@@ -1,0 +1,32 @@
+/* Global styling - basis for hele siden */
+body {
+  font-family: sans-serif;
+  max-width: 600px;
+  margin: 2em auto;
+  padding: 1em;
+}
+
+/* Søgefeltet skal være bredt og tydeligt */
+#soegefelt {
+  width: 100%;
+  padding: 0.8em;
+  font-size: 1em;
+  box-sizing: border-box;
+}
+
+/* Container for resultater - lidt luft over */
+#resultater {
+  margin-top: 1em;
+}
+
+/* Hvert resultat-element */
+.resultat {
+  padding: 0.6em;
+  border-bottom: 1px solid #ddd;
+  cursor: pointer;
+}
+
+/* Når brugeren holder musen over et resultat */
+.resultat:hover {
+  background-color: #f0f0f0;
+}

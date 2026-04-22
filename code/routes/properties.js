@@ -36,14 +36,18 @@ router.get('/lookup', async (req, res) => {
     const dawaRaa = await dawaSvar.json();
     const adgangsadresse = erAdgangsadresse ? dawaRaa : dawaRaa.adgangsadresse;
 
+    // etage og doer findes kun paa lejligheder (type: adresse).
+    // Huse (type: adgangsadresse) har ikke de felter overhovedet.
     const dawa = {
       id: dawaRaa.id,
       adgangsadresseid: adgangsadresse.id,
+      adresse: dawaRaa.adressebetegnelse,
       vejnavn: adgangsadresse.vejstykke.navn,
       husnummer: adgangsadresse.husnr,
       postnummer: adgangsadresse.postnummer.nr,
       bynavn: adgangsadresse.postnummer.navn,
-      etage: erAdgangsadresse ? null : dawaRaa.etage
+      etage: erAdgangsadresse ? null : dawaRaa.etage,
+      doer: erAdgangsadresse ? null : dawaRaa.dør
     };
 
     console.log('Slår ejendom op. Etage:', dawa.etage);

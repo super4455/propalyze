@@ -14,7 +14,9 @@ CREATE TABLE Propalyze.ejendomsprofil (
 	sidste_data_hentning DATETIME2,
 	dawaID VARCHAR(50) UNIQUE,
     vejnavn VARCHAR(255) NOT NULL
- 
+	doer VARCHAR(10),
+	etage INT
+
 )
 
 -- Dannelse af Investeringscase table:

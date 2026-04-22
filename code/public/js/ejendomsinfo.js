@@ -31,16 +31,19 @@ async function indlaes() {
   }
 }
 
-// Udfylder felterne i DOM'en med data fra DAWA og BBR
+// Gemmer det samlede ejendomsobjekt saa vi kan sende det videre
+// til fx databasen senere. Kun adresse + BBR-felter vises i UI.
+let ejendom = null;
+
 function vis(dawa, bbr) {
-  document.getElementById('vejnavn').textContent = dawa.vejnavn;
-  document.getElementById('husnummer').textContent = dawa.husnummer;
-  document.getElementById('postnummer').textContent = dawa.postnummer;
-  document.getElementById('bynavn').textContent = dawa.bynavn;
-  document.getElementById('dawaID').textContent = dawa.id;
+  ejendom = { dawa: dawa, bbr: bbr };
+
+  document.getElementById('adresse').textContent = dawa.adresse;
   document.getElementById('ejendomstype').textContent = bbr.ejendomstype;
   document.getElementById('byggeaar').textContent = bbr.byggeaar;
   document.getElementById('vaerelser').textContent = bbr.vaerelser;
+  console.log(bbr);
+  console.log(dawa)
 }
 
 indlaes();

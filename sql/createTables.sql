@@ -7,7 +7,7 @@ CREATE TABLE Propalyze.ejendomsprofil (
 	ejendomstype VARCHAR(30) NOT NULL,
 	byggeaar INT NOT NULL CHECK (byggeaar BETWEEN 1000 AND 2100),
 	boligareal INT NOT NULL CHECK (boligareal > 0),
-	grundareal INT NOT NULL CHECK (grundareal > 0),
+	grundareal INT,
 	vaerelser INT  NOT NULL CHECK (vaerelser > 0),
 	postnummer CHAR(4)  NOT NULL,
 	oprettet_dato DATETIME2 NOT NULL DEFAULT GETDATE(),

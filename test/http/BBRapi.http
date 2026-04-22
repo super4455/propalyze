@@ -1,3 +1,5 @@
 ## Test for om BBR returnerer noget
 ### Test BBR bygning med kendt husnummer-ID
 GET https://services.datafordeler.dk/BBR/BBRPublic/1/rest/bygning?username=LFESAEPKGQ&password=Mikkel2217!&Format=JSON&Husnummer=0a3f5095-9005-32b8-e044-0003ba298018
+
+

@@ -6,31 +6,52 @@ const router = express.Router();
 const database = require('../database/database');
 const { hentBBR } = require('../logic/BBRapi');
 
-// GET /api/properties/lookup
-// Slår en ejendom op via BBR baseret på DAWA-data
-// Frontend sender DAWA-felter som query-parametre
+// GET /api/properties/lookup?dawaId=...
+// Slår en ejendom op via DAWA + BBR og returnerer begge dele samlet
 // Gemmer IKKE noget i databasen - bruges til preview
 router.get('/lookup', async (req, res) => {
   try {
-    // Saml DAWA-data fra query-parametre
-    const dawaData = {
-      id: req.query.dawaId,
-      adgangsadresseid: req.query.adgangsadresseId,
-      etage: req.query.etage || null
-    };
+    const dawaId = req.query.dawaId;
 
-    // Validér at vi har de nødvendige felter
-    if (!dawaData.id || !dawaData.adgangsadresseid) {
-      res.status(400).json({ fejl: 'Manglende DAWA-parametre' });
+    if (!dawaId) {
+      res.status(400).json({ fejl: 'Manglende dawaId' });
       return;
     }
 
-    console.log('Slår ejendom op. Etage:', dawaData.etage);
+    // Slå adressen op i DAWA. Prøv /adresser først (specifik adresse
+    // med etage/dør), fald tilbage til /adgangsadresser (hus-niveau).
+    let dawaSvar = await fetch('https://api.dataforsyningen.dk/adresser/' + dawaId);
+    let erAdgangsadresse = false;
+
+    if (dawaSvar.status === 404) {
+      dawaSvar = await fetch('https://api.dataforsyningen.dk/adgangsadresser/' + dawaId);
+      erAdgangsadresse = true;
+    }
+
+    if (!dawaSvar.ok) {
+      res.status(502).json({ fejl: 'DAWA kunne ikke finde adressen' });
+      return;
+    }
+
+    const dawaRaa = await dawaSvar.json();
+    const adgangsadresse = erAdgangsadresse ? dawaRaa : dawaRaa.adgangsadresse;
+
+    const dawa = {
+      id: dawaRaa.id,
+      adgangsadresseid: adgangsadresse.id,
+      vejnavn: adgangsadresse.vejstykke.navn,
+      husnummer: adgangsadresse.husnr,
+      postnummer: adgangsadresse.postnummer.nr,
+      bynavn: adgangsadresse.postnummer.navn,
+      etage: erAdgangsadresse ? null : dawaRaa.etage
+    };
+
+    console.log('Slår ejendom op. Etage:', dawa.etage);
 
     // Hent BBR-data med den rigtige strategi (hus vs. lejlighed)
-    const bbrData = await hentBBR(dawaData);
+    const bbr = await hentBBR(dawa);
 
-    res.status(200).json({ bbr: bbrData });
+    res.status(200).json({ dawa: dawa, bbr: bbr });
 
   } catch (err) {
     console.log('Fejl ved ejendomsopslag:', err.message);

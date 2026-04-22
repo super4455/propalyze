@@ -75,10 +75,9 @@ function visForslag(forslag) {
     div.className = 'resultat';
     div.textContent = f.tekst;
 
-    // Naar brugeren klikker paa et forslag, log det (vi udvider senere)
+    // Naar brugeren klikker paa et forslag, gaa til ejendomsinfo-siden
     div.addEventListener('click', function() {
-      console.log('Valgt adresse:', f);
-      alert('Du valgte: ' + f.tekst);
+      window.location.href = 'ejendomsinfo.html?dawaId=' + f.data.id;
     });
 
     resultater.appendChild(div);

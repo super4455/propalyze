@@ -1,0 +1,5 @@
+### Test lookup for hus
+GET http://localhost:3000/api/properties/lookup?dawaId=0a3f50a7-3c12-32b8-e044-0003ba298018&adgangsadresseId=0a3f5095-9005-32b8-e044-0003ba298018
+
+### Lookup lejlighed (Hendonvej 4, st. th)
+GET http://localhost:3000/api/properties/lookup?dawaId=0a3f509e-9ff8-32b8-e044-0003ba298018&adgangsadresseId=0a3f507a-8b05-32b8-e044-0003ba298018&etage=st

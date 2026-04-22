@@ -1,49 +1,63 @@
 // properties.js - Routes til ejendomsprofiler
-// Håndterer CRUD for ejendomme i Propalyze.ejendomsprofil
+// Håndterer opslag (DAWA+BBR) og CRUD for ejendomme
 
 const express = require('express');
 const router = express.Router();
 const database = require('../database/database');
+const { hentBBR } = require('../logic/BBRapi');
+
+// GET /api/properties/lookup
+// Slår en ejendom op via BBR baseret på DAWA-data
+// Frontend sender DAWA-felter som query-parametre
+// Gemmer IKKE noget i databasen - bruges til preview
+router.get('/lookup', async (req, res) => {
+  try {
+    // Saml DAWA-data fra query-parametre
+    const dawaData = {
+      id: req.query.dawaId,
+      adgangsadresseid: req.query.adgangsadresseId,
+      etage: req.query.etage || null
+    };
+
+    // Validér at vi har de nødvendige felter
+    if (!dawaData.id || !dawaData.adgangsadresseid) {
+      res.status(400).json({ fejl: 'Manglende DAWA-parametre' });
+      return;
+    }
+
+    console.log('Slår ejendom op. Etage:', dawaData.etage);
+
+    // Hent BBR-data med den rigtige strategi (hus vs. lejlighed)
+    const bbrData = await hentBBR(dawaData);
+
+    res.status(200).json({ bbr: bbrData });
+
+  } catch (err) {
+    console.log('Fejl ved ejendomsopslag:', err.message);
+    res.status(502).json({ fejl: 'Kunne ikke hente ejendomsdata: ' + err.message });
+  }
+});
 
 // POST /api/properties
-// Opretter en ny ejendomsprofil med data fra DAWA + manuelle felter
+// Opretter en ny ejendomsprofil med data fra DAWA + BBR
 router.post('/', async (req, res) => {
   try {
-    // Hent alle felter fra request body
     const data = req.body;
     console.log('Opretter ejendom:', data);
 
-    // Validering: tjek at alle påkrævede felter er der
-    // Vi tjekker eksplicit for hver - så vi kan give præcise fejlbeskeder
-    if (!data.vejnavn || !data.husnummer || !data.postnummer || !data.bynavn) {
-      res.status(400).json({ fejl: 'Adresse-felter er påkrævede' });
+    // Validér at vi har adressedata
+    if (!data.dawaID || !data.vejnavn || !data.husnummer || !data.postnummer || !data.bynavn) {
+      res.status(400).json({ fejl: 'Adressedata mangler' });
       return;
     }
 
-    if (!data.ejendomstype) {
-      res.status(400).json({ fejl: 'Ejendomstype er påkrævet' });
+    // Validér at vi har ejendomsdata
+    if (!data.ejendomstype || !data.byggeaar || !data.boligareal || !data.vaerelser) {
+      res.status(400).json({ fejl: 'Ejendomsdata mangler' });
       return;
     }
 
-    if (!data.byggeaar || !data.boligareal || !data.grundareal || !data.vaerelser) {
-      res.status(400).json({ fejl: 'Byggeår, areal og værelser er påkrævede' });
-      return;
-    }
-
-    // Tjek at numeriske felter giver mening
-    // Database har CHECK constraints, men vi vil gerne fange det her med en pænere fejl
-    if (data.byggeaar < 1000 || data.byggeaar > 2100) {
-      res.status(400).json({ fejl: 'Byggeår skal være mellem 1000 og 2100' });
-      return;
-    }
-
-    if (data.boligareal <= 0 || data.grundareal <= 0 || data.vaerelser <= 0) {
-      res.status(400).json({ fejl: 'Areal og værelser skal være positive tal' });
-      return;
-    }
-
-    // Bemærk: vi bruger parameteriserede queries (@navn) for at undgå SQL injection
-    // Hvert @-navn matcher en nøgle i parametre-objektet vi sender med
+    // Parameteriseret query for at undgå SQL injection
     const sqlTekst = `
       INSERT INTO Propalyze.ejendomsprofil
         (vejnavn, husnummer, postnummer, bynavn, ejendomstype,
@@ -62,16 +76,14 @@ router.post('/', async (req, res) => {
       ejendomstype: data.ejendomstype,
       byggeaar: data.byggeaar,
       boligareal: data.boligareal,
-      grundareal: data.grundareal,
+      grundareal: data.grundareal || 0,
       vaerelser: data.vaerelser,
       dawaID: data.dawaID
     };
 
     const resultat = await database.query(sqlTekst, parametre);
-
-    // OUTPUT INSERTED.ejendomID giver os det auto-genererede ID retur
     const nytID = resultat[0].ejendomID;
-    console.log(`Ejendom oprettet med ID ${nytID}`);
+    console.log('Ejendom oprettet med ID:', nytID);
 
     res.status(201).json({
       besked: 'Ejendomsprofil oprettet',
@@ -79,10 +91,9 @@ router.post('/', async (req, res) => {
     });
 
   } catch (err) {
-    console.log('Fejl ved oprettelse af ejendom:', err.message);
+    console.log('Fejl ved oprettelse:', err.message);
 
-    // Hvis dawaID allerede findes, returnerer SQL en fejl pga UNIQUE constraint
-    // Vi tjekker fejlbeskeden og giver en pænere besked til brugeren
+    // UNIQUE constraint på dawaID fanger duplikater
     if (err.message.includes('UNIQUE')) {
       res.status(409).json({ fejl: 'Denne ejendom er allerede oprettet' });
       return;

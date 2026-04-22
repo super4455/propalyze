@@ -3,6 +3,7 @@
 const express = require('express');
 const database = require('./database/database');
 const addressesRouter = require('./routes/addresses');
+const propertiesRouter = require('./routes/properties');
 
 const app = express();
 const PORT = 3000;
@@ -13,18 +14,12 @@ app.use(express.static('public'));
 
 // Routes
 app.use('/api/addresses', addressesRouter);
+app.use('/api/properties', propertiesRouter);
 
-
-
-
-// Start serveren EFTER databaseforbindelsen er oprettet.
-// Vi pakker det ind i en async-funktion så vi kan bruge await.
+// Start serveren efter databaseforbindelsen er oprettet
 async function start() {
   try {
-    // Forbind til databasen først
     await database.connect();
-
-    // Når databasen er klar, start serveren
     app.listen(PORT, () => {
       console.log(`Server koerer paa http://localhost:${PORT}`);
     });

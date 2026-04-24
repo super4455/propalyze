@@ -50,4 +50,43 @@ router.post('/', async (req, res) => {
   }
 });
 
+
+// PUT /api/finansiering/:caseID
+// Opdaterer finansieringsoplysninger for en eksisterende case
+router.put('/:caseID', async (req, res) => {
+  try {
+    const data = req.body;
+    const caseID = req.params.caseID;
+
+    if (!data.laanebeloeb || !data.rente || !data.loebetid_aar || !data.laanetype) {
+      res.status(400).json({ fejl: 'Manglende felter' });
+      return;
+    }
+
+    await database.query(
+      `UPDATE Propalyze.finansiering
+       SET laanebeloeb = @laanebeloeb,
+           rente = @rente,
+           loebetid_aar = @loebetid_aar,
+           afdragsfriaar = @afdragsfriaar,
+           laanetype = @laanetype
+       WHERE caseID = @caseID`,
+      {
+        caseID: caseID,
+        laanebeloeb: data.laanebeloeb,
+        rente: data.rente,
+        loebetid_aar: data.loebetid_aar,
+        afdragsfriaar: data.afdragsfriaar || 0,
+        laanetype: data.laanetype
+      }
+    );
+
+    res.status(200).json({ besked: 'Finansiering opdateret' });
+
+  } catch (err) {
+    console.log('Fejl ved opdatering af finansiering:', err.message);
+    res.status(500).json({ fejl: err.message });
+  }
+});
+
 module.exports = router;

@@ -1,0 +1,15 @@
+### Sammenlign to cases
+GET http://localhost:3000/api/cases/sammenlign?ids=1,2
+
+### For få cases (forventer 400)
+GET http://localhost:3000/api/cases/sammenlign?ids=1
+
+### Ingen IDs (forventer 400)
+GET http://localhost:3000/api/cases/sammenlign
+
+
+### Dupliker case med ID 1
+POST http://localhost:3000/api/cases/15/duplikoer
+
+### Dupliker ikke-eksisterende case (forventer 404)
+POST http://localhost:3000/api/cases/999/duplikoer

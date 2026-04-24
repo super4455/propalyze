@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8">
+  <title>Sammenligning - Propalyze</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <h1>Propalyze</h1>
+  <a href="/">← Tilbage til forsiden</a>
+
+  <h2>Sammenlign investeringscases</h2>
+  <p>Vælg mindst to cases for at sammenligne deres nøgletal.</p>
+
+  <div id="fejl"></div>
+
+  <!-- Liste af alle cases med checkboxes -->
+  <div id="valg_sektion">
+    <h3>Vælg cases</h3>
+    <div id="case_valg_liste"></div>
+    <div class="knapper">
+      <button id="sammenlign_knap">Sammenlign valgte</button>
+    </div>
+  </div>
+
+  <!-- Sammenligningsresultat -->
+  <div id="resultat_sektion" style="display: none;">
+    <h3>Sammenligning</h3>
+    <div id="sammenligning_tabel_container"></div>
+  </div>
+
+  <script src="/js/sammenligning.js"></script>
+</body>
+</html>

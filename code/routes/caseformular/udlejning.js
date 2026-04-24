@@ -46,4 +46,34 @@ router.post('/', async (req, res) => {
   }
 });
 
+// PUT /api/udlejning/:caseID
+// Opdaterer udlejningsoplysninger for en eksisterende case
+router.put('/:caseID', async (req, res) => {
+  try {
+    const data = req.body;
+    const caseID = req.params.caseID;
+
+    await database.query(
+      `UPDATE Propalyze.udlejning
+       SET udlejning_status = @udlejning_status,
+           maanedlig_husleje = @maanedlig_husleje,
+           maanedlig_udgifter = @maanedlig_udgifter
+       WHERE caseID = @caseID`,
+      {
+        caseID: caseID,
+        udlejning_status: data.udlejning_status ? 1 : 0,
+        maanedlig_husleje: data.maanedlig_husleje || 0,
+        maanedlig_udgifter: data.maanedlig_udgifter || 0
+      }
+    );
+
+    res.status(200).json({ besked: 'Udlejning opdateret' });
+
+  } catch (err) {
+    console.log('Fejl ved opdatering af udlejning:', err.message);
+    res.status(500).json({ fejl: err.message });
+  }
+});
+
+
 module.exports = router;

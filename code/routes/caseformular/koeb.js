@@ -52,4 +52,45 @@ router.post('/', async (req, res) => {
   }
 });
 
+
+// PUT /api/koeb/:caseID
+// Opdaterer købsoplysninger for en eksisterende case
+router.put('/:caseID', async (req, res) => {
+  try {
+    const data = req.body;
+    const caseID = req.params.caseID;
+
+    if (!data.ejendomspris || !data.koeb_omkostninger || !data.advokat_udgifter || !data.tinglysning) {
+      res.status(400).json({ fejl: 'Manglende felter' });
+      return;
+    }
+
+    await database.query(
+      `UPDATE Propalyze.koeb
+       SET ejendomspris = @ejendomspris,
+           koeb_omkostninger = @koeb_omkostninger,
+           advokat_udgifter = @advokat_udgifter,
+           tinglysning = @tinglysning,
+           koeber_raadgivning = @koeber_raadgivning
+       WHERE caseID = @caseID`,
+      {
+        caseID: caseID,
+        ejendomspris: data.ejendomspris,
+        koeb_omkostninger: data.koeb_omkostninger,
+        advokat_udgifter: data.advokat_udgifter,
+        tinglysning: data.tinglysning,
+        koeber_raadgivning: data.koeber_raadgivning ? 1 : 0
+      }
+    );
+
+    res.status(200).json({ besked: 'Køb opdateret' });
+
+  } catch (err) {
+    console.log('Fejl ved opdatering af køb:', err.message);
+    res.status(500).json({ fejl: err.message });
+  }
+});
+
+
+
 module.exports = router;

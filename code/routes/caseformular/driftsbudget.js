@@ -114,4 +114,74 @@ router.post('/indtaegt', async (req, res) => {
   }
 });
 
+
+// PUT /api/driftsbudget/:caseID
+// Erstatter alle udgifter og indtægter for en case
+router.put('/:caseID', async (req, res) => {
+  try {
+    const caseID = req.params.caseID;
+    const udgifter = req.body.udgifter;
+    const indtaegter = req.body.indtaegter;
+
+    // Find driftsbudgetID for denne case
+    const driftsbudget = await database.query(
+      'SELECT driftsbudgetID FROM Propalyze.driftsbudget WHERE caseID = @caseID',
+      { caseID: caseID }
+    );
+
+    if (driftsbudget.length === 0) {
+      res.status(404).json({ fejl: 'Driftsbudget ikke fundet' });
+      return;
+    }
+
+    const driftsbudgetID = driftsbudget[0].driftsbudgetID;
+
+    // Slet eksisterende udgifter og indtægter
+    await database.query(
+      'DELETE FROM Propalyze.udgift WHERE driftsbudgetID = @id',
+      { id: driftsbudgetID }
+    );
+
+    await database.query(
+      'DELETE FROM Propalyze.indtaegt WHERE driftsbudgetID = @id',
+      { id: driftsbudgetID }
+    );
+
+    // Indsæt nye udgifter
+    for (const u of udgifter) {
+      await database.query(
+        `INSERT INTO Propalyze.udgift (driftsbudgetID, kategori, beloeb, frekvens)
+         VALUES (@driftsbudgetID, @kategori, @beloeb, @frekvens)`,
+        {
+          driftsbudgetID: driftsbudgetID,
+          kategori: u.kategori,
+          beloeb: u.beloeb,
+          frekvens: u.frekvens
+        }
+      );
+    }
+
+    // Indsæt nye indtægter
+    for (const i of indtaegter) {
+      await database.query(
+        `INSERT INTO Propalyze.indtaegt (driftsbudgetID, kategori, beloeb, frekvens)
+         VALUES (@driftsbudgetID, @kategori, @beloeb, @frekvens)`,
+        {
+          driftsbudgetID: driftsbudgetID,
+          kategori: i.kategori,
+          beloeb: i.beloeb,
+          frekvens: i.frekvens
+        }
+      );
+    }
+
+    res.status(200).json({ besked: 'Driftsbudget opdateret' });
+
+  } catch (err) {
+    console.log('Fejl ved opdatering af driftsbudget:', err.message);
+    res.status(500).json({ fejl: err.message });
+  }
+});
+
+
 module.exports = router;

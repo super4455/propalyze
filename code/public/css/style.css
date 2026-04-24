@@ -634,3 +634,116 @@ input[type="checkbox"] {
 #simulering_tabel tr:hover td {
   background-color: var(--hover-bg);
 }
+
+
+
+/* ==========================================
+   SAMMENLIGNING
+   ========================================== */
+
+/* Liste af cases med checkboxes */
+.case_valg_item {
+  padding: 0.8em 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.case_valg_item:last-child {
+  border-bottom: none;
+}
+
+.case_valg_item label {
+  display: flex;
+  align-items: baseline;
+  gap: 0.8em;
+  cursor: pointer;
+  font-size: 0.9em;
+}
+
+.case_valg_item input[type="checkbox"] {
+  width: auto;
+  flex-shrink: 0;
+}
+
+.case_valg_navn {
+  font-weight: 500;
+  color: var(--tekst);
+}
+
+.case_valg_ejendom {
+  color: var(--tekst-lys);
+  font-size: 0.85em;
+}
+
+/* Sammenlignings-tabel */
+#sammenligning_tabel {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1.5em;
+  font-size: 0.85em;
+}
+
+#sammenligning_tabel thead {
+  border-bottom: 2px solid var(--tekst);
+}
+
+#sammenligning_tabel th {
+  padding: 1em;
+  text-align: left;
+  background-color: transparent;
+  color: var(--tekst);
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  vertical-align: top;
+}
+
+.tabel_case_navn {
+  display: block;
+  font-size: 0.9em;
+  font-weight: 500;
+  color: var(--tekst);
+}
+
+.tabel_case_ejendom {
+  display: block;
+  font-size: 0.78em;
+  color: var(--tekst-lys);
+  margin-top: 0.2em;
+}
+
+/* Række-labels i venstre kolonne */
+.raekke_label {
+  font-size: 0.78em;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--tekst-dæmpet);
+  white-space: nowrap;
+  padding-right: 2em;
+}
+
+#sammenligning_tabel td {
+  padding: 0.7em 1em;
+  border-bottom: 1px solid var(--border);
+  color: var(--tekst-dæmpet);
+  font-weight: 300;
+  text-align: right;
+}
+
+#sammenligning_tabel td.raekke_label {
+  text-align: left;
+}
+
+#sammenligning_tabel tr:hover td {
+  background-color: var(--hover-bg);
+}
+
+/* Cashflow farver */
+.positiv {
+  color: var(--succes);
+  font-weight: 500;
+}
+
+.negativ {
+  color: var(--fejl);
+  font-weight: 500;
+}

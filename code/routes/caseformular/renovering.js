@@ -48,4 +48,42 @@ router.post('/', async (req, res) => {
   }
 });
 
+
+// PUT /api/renovering/:caseID
+// Erstatter alle renoveringer for en case - sletter eksisterende og indsætter nye
+router.put('/:caseID', async (req, res) => {
+  try {
+    const caseID = req.params.caseID;
+    const renoveringer = req.body.renoveringer;
+
+    // Slet alle eksisterende renoveringer for denne case
+    await database.query(
+      'DELETE FROM Propalyze.renovering WHERE caseID = @caseID',
+      { caseID: caseID }
+    );
+
+    // Indsæt de nye
+    for (const r of renoveringer) {
+      await database.query(
+        `INSERT INTO Propalyze.renovering
+           (caseID, type_renovering, renovering_omkostninger, planlagt_aar)
+         VALUES (@caseID, @type_renovering, @renovering_omkostninger, @planlagt_aar)`,
+        {
+          caseID: caseID,
+          type_renovering: r.type_renovering,
+          renovering_omkostninger: r.renovering_omkostninger,
+          planlagt_aar: r.planlagt_aar
+        }
+      );
+    }
+
+    res.status(200).json({ besked: 'Renoveringer opdateret' });
+
+  } catch (err) {
+    console.log('Fejl ved opdatering af renovering:', err.message);
+    res.status(500).json({ fejl: err.message });
+  }
+});
+
+
 module.exports = router;

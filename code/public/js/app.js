@@ -54,7 +54,7 @@ function visForslag(forslag) {
     div.className = 'resultat';
     div.textContent = f.tekst;
 
-    div.addEventListener('click', function () {
+    div.addEventListener('click', function() {
       window.location.href = 'ejendomsinfo.html?dawaId=' + f.data.id;
     });
 
@@ -100,15 +100,23 @@ async function hentGemteProfiler() {
       const caseKnap = document.createElement('button');
       caseKnap.className = 'case_knap';
       caseKnap.textContent = 'Opret investeringscase';
-      caseKnap.addEventListener('click', function () {
-        visOpretCase(p.ejendomID);
+      caseKnap.addEventListener('click', function() {
+        visOpretCase(p.ejendomID, div);
+      });
+
+      // Knap til at se investeringscases for profilen
+      const caserKnap = document.createElement('button');
+      caserKnap.className = 'caser_knap';
+      caserKnap.textContent = 'Se investeringscases';
+      caserKnap.addEventListener('click', function() {
+        visCases(p.ejendomID, div);
       });
 
       // Knap til at redigere ejendomsprofilen
       const redigerKnap = document.createElement('button');
       redigerKnap.className = 'rediger_knap';
       redigerKnap.textContent = 'Rediger';
-      redigerKnap.addEventListener('click', function () {
+      redigerKnap.addEventListener('click', function() {
         visRedigerFormular(p);
       });
 
@@ -116,7 +124,7 @@ async function hentGemteProfiler() {
       const seKnap = document.createElement('button');
       seKnap.className = 'se_knap';
       seKnap.textContent = 'Se ejendomsprofil';
-      seKnap.addEventListener('click', function () {
+      seKnap.addEventListener('click', function() {
         window.location.href = 'ejendomsinfo.html?dawaId=' + p.dawaID;
       });
 
@@ -124,7 +132,7 @@ async function hentGemteProfiler() {
       const sletKnap = document.createElement('button');
       sletKnap.className = 'slet_knap';
       sletKnap.textContent = 'Slet';
-      sletKnap.addEventListener('click', async function () {
+      sletKnap.addEventListener('click', async function() {
         const bekraeft = confirm('Er du sikker på du vil slette denne ejendomsprofil?');
         if (!bekraeft) {
           return;
@@ -144,14 +152,6 @@ async function hentGemteProfiler() {
         } catch (fejl) {
           alert('Kunne ikke kontakte serveren');
         }
-      });
-
-      // Knap til at se investeringscases for profilen
-      const caserKnap = document.createElement('button');
-      caserKnap.className = 'caser_knap';
-      caserKnap.textContent = 'Se investeringscases';
-      caserKnap.addEventListener('click', function () {
-        visCases(p.ejendomID, div);
       });
 
       // Wrap knapper i en flex-række
@@ -214,11 +214,11 @@ function visRedigerFormular(profil) {
 
   profilListe.appendChild(formular);
 
-  document.getElementById('gem_redigering_knap').addEventListener('click', function () {
+  document.getElementById('gem_redigering_knap').addEventListener('click', function() {
     gemRedigering(profil.ejendomID);
   });
 
-  document.getElementById('annuller_redigering_knap').addEventListener('click', function () {
+  document.getElementById('annuller_redigering_knap').addEventListener('click', function() {
     formular.remove();
   });
 }
@@ -263,7 +263,7 @@ async function gemRedigering(ejendomID) {
 
 // === OPRET INVESTERINGSCASE ===
 
-function visOpretCase(ejendomID) {
+function visOpretCase(ejendomID, profilDiv) {
   const eksisterende = document.getElementById('case_formular');
   if (eksisterende) {
     eksisterende.remove();
@@ -284,9 +284,10 @@ function visOpretCase(ejendomID) {
     + '</div>'
     + '<div id="case_besked"></div>';
 
-  profilListe.appendChild(formular);
+  // Tilføj direkte under den rigtige profil
+  profilDiv.appendChild(formular);
 
-  document.getElementById('gem_case_knap').addEventListener('click', function () {
+  document.getElementById('gem_case_knap').addEventListener('click', function() {
     const navn = document.getElementById('case_navn').value;
     const beskrivelse = document.getElementById('case_beskrivelse').value;
     const caseBesked = document.getElementById('case_besked');
@@ -297,9 +298,7 @@ function visOpretCase(ejendomID) {
       return;
     }
 
-    // Gem midlertidigt i sessionStorage så vi kan bruge det på næste side
-    // sessionStorage lever kun i den aktuelle browser-session
-    // Ingen database kald her - al persistering sker i trin 5
+    // Gem midlertidigt i sessionStorage - ingen database kald endnu
     sessionStorage.setItem('caseNavn', navn);
     sessionStorage.setItem('caseBeskrivelse', beskrivelse);
     sessionStorage.setItem('ejendomsID', ejendomID);
@@ -307,14 +306,16 @@ function visOpretCase(ejendomID) {
     window.location.href = '/investeringscase.html';
   });
 
-  document.getElementById('annuller_case_knap').addEventListener('click', function () {
+  document.getElementById('annuller_case_knap').addEventListener('click', function() {
     formular.remove();
   });
 }
 
+// === SE INVESTERINGSCASES ===
+
 // Henter og viser investeringscases for en ejendomsprofil
 async function visCases(ejendomID, profilDiv) {
-  // Fjern eksisterende case-liste hvis den er åben
+  // Fjern eksisterende case-liste hvis den er åben (toggle)
   const eksisterende = profilDiv.querySelector('.cases_liste');
   if (eksisterende) {
     eksisterende.remove();
@@ -341,7 +342,7 @@ async function visCases(ejendomID, profilDiv) {
       // Case-info
       const info = document.createElement('p');
       info.innerHTML = '<strong>' + c.navn + '</strong>'
-        + (c.beskrivelse ? ' - ' + c.beskrivelse : '')
+        + (c.beskrivelse ? ' — ' + c.beskrivelse : '')
         + '<br><small>Oprettet: '
         + new Date(c.start_dato).toLocaleDateString('da-DK') + '</small>';
 
@@ -349,15 +350,47 @@ async function visCases(ejendomID, profilDiv) {
       const simuleringKnap = document.createElement('button');
       simuleringKnap.className = 'simulering_knap';
       simuleringKnap.textContent = 'Kør simulering';
-      simuleringKnap.addEventListener('click', function () {
+      simuleringKnap.addEventListener('click', function() {
         window.location.href = '/simulering.html?caseID=' + c.caseID;
+      });
+
+      // Knap til at redigere investeringscasen
+      const redigerCaseKnap = document.createElement('button');
+      redigerCaseKnap.textContent = 'Rediger';
+      redigerCaseKnap.addEventListener('click', function() {
+        sessionStorage.setItem('redigerCaseID', c.caseID);
+        window.location.href = '/rediger-case.html';
+      });
+
+      // Knap til at duplikere investeringscasen
+      const duplikerKnap = document.createElement('button');
+      duplikerKnap.textContent = 'Dupliker';
+      duplikerKnap.addEventListener('click', async function() {
+        try {
+          const svar = await fetch('/api/cases/' + c.caseID + '/duplikoer', {
+            method: 'POST'
+          });
+
+          const resultat = await svar.json();
+
+          if (svar.ok) {
+            // Genindlæs listen - kald to gange for at toggle
+            visCases(ejendomID, profilDiv);
+            visCases(ejendomID, profilDiv);
+          } else {
+            alert('Fejl: ' + resultat.fejl);
+          }
+
+        } catch (fejl) {
+          alert('Kunne ikke kontakte serveren');
+        }
       });
 
       // Knap til at slette investeringscasen
       const sletCaseKnap = document.createElement('button');
       sletCaseKnap.className = 'slet_knap';
       sletCaseKnap.textContent = 'Slet';
-      sletCaseKnap.addEventListener('click', async function () {
+      sletCaseKnap.addEventListener('click', async function() {
         const bekraeft = confirm('Er du sikker på du vil slette "' + c.navn + '"?');
         if (!bekraeft) {
           return;
@@ -369,7 +402,6 @@ async function visCases(ejendomID, profilDiv) {
           });
 
           if (svar.ok) {
-            // Genindlæs case-listen for denne profil
             visCases(ejendomID, profilDiv);
             visCases(ejendomID, profilDiv);
           } else {
@@ -383,6 +415,8 @@ async function visCases(ejendomID, profilDiv) {
 
       caseDiv.appendChild(info);
       caseDiv.appendChild(simuleringKnap);
+      caseDiv.appendChild(redigerCaseKnap);
+      caseDiv.appendChild(duplikerKnap);
       caseDiv.appendChild(sletCaseKnap);
       liste.appendChild(caseDiv);
     }
@@ -393,7 +427,6 @@ async function visCases(ejendomID, profilDiv) {
     console.log('Fejl ved hentning af cases:', fejl);
   }
 }
-
 
 // Kør når siden loader
 hentGemteProfiler();

@@ -42,7 +42,8 @@ CREATE TABLE Propalyze.koeb (
 	ejendomspris DECIMAL(10,2) NOT NULL CHECK (ejendomspris > 0),
 	koeb_omkostninger DECIMAL(10,2) NOT NULL CHECK (koeb_omkostninger > 0),
 	advokat_udgifter DECIMAL(10,2) NOT NULL CHECK (advokat_udgifter > 0),
-	koeber_raadgivning BIT NOT NULL DEFAULT 0
+	koeber_raadgivning BIT NOT NULL DEFAULT 0,
+	tinglysning DECIMAL(10,2) NOT NULL
  
 	CONSTRAINT fk_koeb_caseID
 	FOREIGN KEY (caseID)
@@ -124,3 +125,15 @@ CREATE TABLE Propalyze.indtaegt (
 	REFERENCES Propalyze.driftsbudget(driftsbudgetID)
 )
 
+-- Dannelse af finansiering
+CREATE TABLE Propalyze.finansiering (
+  finansieringID INT IDENTITY(1,1) PRIMARY KEY NOT NULL,
+  caseID INT NOT NULL,
+  laanebeloeb DECIMAL(10,2) NOT NULL,
+  rente DECIMAL(5,2) NOT NULL,
+  loebetid_aar INT NOT NULL,
+  afdragsfriaar INT NOT NULL,
+  laanetype VARCHAR(50) NOT NULL,
+  CONSTRAINT fk_finansiering_caseID
+  FOREIGN KEY (caseID) REFERENCES Propalyze.investeringscase(caseID)
+);

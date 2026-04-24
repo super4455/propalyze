@@ -17,8 +17,30 @@
   <dl id="ejendom">
     <dt>Ejendomstype</dt><dd id="ejendomstype">—</dd>
     <dt>Byggeår</dt><dd id="byggeaar">—</dd>
+    <dt>Boligareal</dt><dd id="boligareal">—</dd>
+    <dt>Grundareal</dt><dd id="grundareal">—</dd>
     <dt>Værelser</dt><dd id="vaerelser">—</dd>
+    <dt>Antal etager</dt><dd id="antalEtager">—</dd>
   </dl>
+
+  <!-- Kortvisning: begge kort vises samtidig -->
+  <div id="kort_sektion">
+    <h3>Luftfoto</h3>
+    <img id="luftfoto_billede" style="display: none; max-width: 100%;">
+    <p id="luftfoto_loading">Henter luftfoto...</p>
+
+    <h3>Matrikelkort</h3>
+    <img id="matrikel_billede" style="display: none; max-width: 100%;">
+    <p id="matrikel_loading">Henter matrikelkort...</p>
+  </div>
+
+  <!-- Knap til at gemme ejendomsprofilen -->
+  <div class="knapper">
+    <button id="gem_knap" style="display: none;">Gem ejendomsprofil</button>
+  </div>
+
+  <!-- Besked efter gem -->
+  <div id="besked"></div>
 
   <script src="/js/ejendomsinfo.js"></script>
 </body>

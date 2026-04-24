@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8">
+  <title>Investeringscase - Propalyze</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <h1>Propalyze</h1>
+  <a href="/">← Tilbage til forsiden</a>
+
+  <h2 id="case_titel">Investeringscase</h2>
+
+  <!-- Fremskridtsindikator -->
+  <div id="fremskridt">
+    <span id="trin_indikator">Trin 1 af 5</span>
+  </div>
+
+  <!-- Fejlbesked -->
+  <div id="fejl"></div>
+
+  <!-- ==================== TRIN 1: KØB ==================== -->
+  <div id="trin1">
+    <h3>Trin 1 - Køb og omkostninger</h3>
+    <p>Angiv de økonomiske parametre for købet af ejendommen.</p>
+
+    <label for="ejendomspris">Ejendomspris (kr.):</label>
+    <input type="number" id="ejendomspris" placeholder="fx 3000000" min="0">
+
+    <label for="koeb_omkostninger">Købsomkostninger (kr.):</label>
+    <input type="number" id="koeb_omkostninger" placeholder="fx 50000" min="0">
+
+    <label for="advokat_udgifter">Advokatudgifter (kr.):</label>
+    <input type="number" id="advokat_udgifter" placeholder="fx 15000" min="0">
+
+    <label for="tinglysning">Tinglysning (kr.):</label>
+    <input type="number" id="tinglysning" placeholder="fx 12000" min="0">
+
+    <label>
+      <input type="checkbox" id="koeber_raadgivning">
+      Køberrådgivning inkluderet
+    </label>
+
+    <!-- Beregnet overblik -->
+    <div id="koeb_overblik" class="overblik">
+      <p>Samlet købsudgift: <strong id="samlet_koeb">0 kr.</strong></p>
+    </div>
+
+    <div class="knapper">
+      <button id="gem_koeb_knap">Gem og fortsæt</button>
+    </div>
+    <div id="koeb_besked"></div>
+  </div>
+
+  <!-- ==================== TRIN 2: FINANSIERING ==================== -->
+  <div id="trin2" style="display: none;">
+    <h3>Trin 2 - Finansiering og lån</h3>
+    <p>Angiv lånedetaljer for finansiering af købet.</p>
+
+    <label for="laanebeloeb">Lånebeløb (kr.):</label>
+    <input type="number" id="laanebeloeb" placeholder="fx 2500000" min="0">
+
+    <label for="rente">Rente (%):</label>
+    <input type="number" id="rente" placeholder="fx 3.75" step="0.01" min="0">
+
+    <label for="loebetid_aar">Løbetid (år):</label>
+    <input type="number" id="loebetid_aar" placeholder="fx 30" min="1" max="50">
+
+    <label for="afdragsfriaar">Afdragsfri periode (år):</label>
+    <input type="number" id="afdragsfriaar" placeholder="fx 0" min="0">
+
+    <label for="laanetype">Lånetype:</label>
+    <select id="laanetype">
+      <option value="">Vælg lånetype...</option>
+      <option value="Annuitetslaan">Annuitetslån</option>
+      <option value="Serielaan">Serielån</option>
+      <option value="Staaende laan">Stående lån</option>
+    </select>
+
+    <!-- Beregnet månedlig ydelse vises live -->
+    <div id="finansiering_overblik" class="overblik">
+      <p>Månedlig ydelse: <strong id="maanedlig_ydelse">0 kr.</strong></p>
+      <p>Total renteomkostning: <strong id="total_rente">0 kr.</strong></p>
+    </div>
+
+    <div class="knapper">
+      <button id="forrige_trin2">← Tilbage</button>
+      <button id="gem_finansiering_knap">Gem og fortsæt</button>
+    </div>
+    <div id="finansiering_besked"></div>
+  </div>
+
+  <!-- ==================== TRIN 3: RENOVERING ==================== -->
+  <div id="trin3" style="display: none;">
+    <h3>Trin 3 - Renovering og forbedringer</h3>
+    <p>Tilføj én eller flere planlagte renoveringer. Trin kan springes over.</p>
+
+    <div id="renovering_liste"></div>
+
+    <div class="renovering_formular">
+      <label for="type_renovering">Type:</label>
+      <input type="text" id="type_renovering" placeholder="fx Køkken, Badeværelse">
+
+      <label for="renovering_omkostninger">Omkostning (kr.):</label>
+      <input type="number" id="renovering_omkostninger" placeholder="fx 150000" min="0">
+
+      <label for="planlagt_aar">Planlagt år:</label>
+      <input type="number" id="planlagt_aar" placeholder="fx 2027" min="2024">
+
+      <button id="tilfoej_renovering_knap">Tilføj renovering</button>
+    </div>
+
+    <div id="renovering_besked"></div>
+
+    <div class="knapper">
+      <button id="forrige_trin3">← Tilbage</button>
+      <button id="naeste_trin3">Fortsæt →</button>
+    </div>
+  </div>
+
+  <!-- ==================== TRIN 4: DRIFTSBUDGET ==================== -->
+  <div id="trin4" style="display: none;">
+    <h3>Trin 4 - Driftsbudget</h3>
+    <p>Angiv løbende udgifter og indtægter. Trin kan springes over.</p>
+
+    <!-- Udgifter -->
+    <h4>Udgifter</h4>
+    <div id="udgift_liste"></div>
+
+    <div class="drifts_formular">
+      <label for="udgift_kategori">Kategori:</label>
+      <input type="text" id="udgift_kategori" placeholder="fx Ejerforening, Forsikring">
+
+      <label for="udgift_beloeb">Beløb (kr.):</label>
+      <input type="number" id="udgift_beloeb" placeholder="fx 1500" min="0">
+
+      <label for="udgift_frekvens">Frekvens:</label>
+      <select id="udgift_frekvens">
+        <option value="maanedlig">Månedlig</option>
+        <option value="aarlig">Årlig</option>
+      </select>
+
+      <button id="tilfoej_udgift_knap">Tilføj udgift</button>
+    </div>
+
+    <!-- Indtægter -->
+    <h4>Indtægter</h4>
+    <div id="indtaegt_liste"></div>
+
+    <div class="drifts_formular">
+      <label for="indtaegt_kategori">Kategori:</label>
+      <input type="text" id="indtaegt_kategori" placeholder="fx Lejeindtægt">
+
+      <label for="indtaegt_beloeb">Beløb (kr.):</label>
+      <input type="number" id="indtaegt_beloeb" placeholder="fx 8000" min="0">
+
+      <label for="indtaegt_frekvens">Frekvens:</label>
+      <select id="indtaegt_frekvens">
+        <option value="maanedlig">Månedlig</option>
+        <option value="aarlig">Årlig</option>
+      </select>
+
+      <button id="tilfoej_indtaegt_knap">Tilføj indtægt</button>
+    </div>
+
+    <!-- Overblik over månedlig og årlig total -->
+    <div id="drifts_overblik" class="overblik">
+      <p>Månedlige udgifter: <strong id="maanedlig_udgift_total">0 kr.</strong></p>
+      <p>Månedlige indtægter: <strong id="maanedlig_indtaegt_total">0 kr.</strong></p>
+      <p>Årlige udgifter: <strong id="aarlig_udgift_total">0 kr.</strong></p>
+      <p>Årlige indtægter: <strong id="aarlig_indtaegt_total">0 kr.</strong></p>
+    </div>
+
+    <div id="driftsbudget_besked"></div>
+
+    <div class="knapper">
+      <button id="forrige_trin4">← Tilbage</button>
+      <button id="gem_driftsbudget_knap">Gem og fortsæt</button>
+    </div>
+  </div>
+
+  <!-- ==================== TRIN 5: UDLEJNING ==================== -->
+  <div id="trin5" style="display: none;">
+    <h3>Trin 5 - Udlejning</h3>
+    <p>Angiv om ejendommen skal bruges til udlejning.</p>
+
+    <label>
+      <input type="checkbox" id="udlejning_status">
+      Ejendommen bruges til udlejning
+    </label>
+
+    <!-- Vises kun hvis udlejning er valgt -->
+    <div id="udlejning_detaljer" style="display: none;">
+      <label for="maanedlig_husleje">Månedlig husleje (kr.):</label>
+      <input type="number" id="maanedlig_husleje" placeholder="fx 8000" min="0">
+
+      <label for="maanedlig_udlejning_udgifter">Månedlige udgifter ved udlejning (kr.):</label>
+      <input type="number" id="maanedlig_udlejning_udgifter" placeholder="fx 500" min="0">
+
+      <!-- Overblik over cashflow-påvirkning -->
+      <div id="udlejning_overblik" class="overblik">
+        <p>Månedligt cashflow fra udlejning:
+          <strong id="maanedlig_cashflow">0 kr.</strong></p>
+        <p>Årligt cashflow fra udlejning:
+          <strong id="aarlig_cashflow">0 kr.</strong></p>
+      </div>
+    </div>
+
+    <div class="knapper">
+      <button id="forrige_trin5">← Tilbage</button>
+      <button id="gem_udlejning_knap">Afslut og gem</button>
+    </div>
+    <div id="udlejning_besked"></div>
+  </div>
+
+  <script src="/js/investeringscase.js"></script>
+</body>
+</html>

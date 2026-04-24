@@ -1,32 +1,636 @@
-/* Global styling - basis for hele siden */
-body {
-  font-family: sans-serif;
-  max-width: 600px;
-  margin: 2em auto;
-  padding: 1em;
+/* ==========================================
+   PROPALYZE — Editorial CSS
+   Æstetik: Eksklusiv, redaktionel, rolig
+   Inspireret af eltoftnielsen.dk
+   ========================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Montserrat:wght@300;400;500&display=swap');
+
+/* ==========================================
+   CSS VARIABLER
+   ========================================== */
+
+:root {
+  --baggrund: #F9F8F6;
+  --tekst: #2A2A2A;
+  --tekst-dæmpet: #7A7A7A;
+  --tekst-lys: #AEAEAE;
+  --border: #E2E0DC;
+  --border-fin: #EDED0;
+  --accent: #2A2A2A;
+  --hvid: #FDFDFC;
+  --hover-bg: #F3F2EF;
+  --fejl: #8B3A3A;
+  --succes: #2E5E3E;
 }
 
-/* Søgefeltet skal være bredt og tydeligt */
-#soegefelt {
-  width: 100%;
-  padding: 0.8em;
-  font-size: 1em;
+/* ==========================================
+   GLOBAL
+   ========================================== */
+
+*, *::before, *::after {
   box-sizing: border-box;
 }
 
-/* Container for resultater - lidt luft over */
-#resultater {
-  margin-top: 1em;
+body {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 300;
+  font-size: 15px;
+  line-height: 1.7;
+  background-color: var(--baggrund);
+  color: var(--tekst);
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 4em 2.5em 6em 2.5em;
 }
 
-/* Hvert resultat-element */
-.resultat {
-  padding: 0.6em;
-  border-bottom: 1px solid #ddd;
+/* Serif til alle overskrifter */
+h1, h2, h3, h4 {
+  font-family: 'Playfair Display', serif;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  line-height: 1.25;
+  margin: 0 0 0.5em 0;
+  color: var(--tekst);
+}
+
+h1 {
+  font-size: 2.8em;
+  letter-spacing: -0.02em;
+}
+
+h2 {
+  font-size: 1.6em;
+  margin-top: 2.5em;
+}
+
+h3 {
+  font-size: 1.2em;
+}
+
+h4 {
+  font-size: 1em;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.72em;
+  color: var(--tekst-dæmpet);
+}
+
+p {
+  margin: 0.4em 0;
+  color: var(--tekst-dæmpet);
+  font-size: 0.9em;
+}
+
+a {
+  color: var(--tekst);
+  text-decoration: none;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 1px;
+  transition: border-color 0.2s;
+}
+
+a:hover {
+  border-color: var(--tekst);
+}
+
+/* Diskret divider */
+hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 2.5em 0;
+}
+
+/* ==========================================
+   KNAPPER — Ghost-stil, ingen tunge skygger
+   ========================================== */
+
+button {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 0.78em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.6em 1.3em;
+  border: 1px solid var(--border);
+  border-radius: 0;
+  background-color: transparent;
+  color: var(--tekst-dæmpet);
   cursor: pointer;
+  transition: background-color 0.15s, color 0.15s, border-color 0.15s;
 }
 
-/* Når brugeren holder musen over et resultat */
+button:hover {
+  background-color: var(--tekst);
+  color: var(--hvid);
+  border-color: var(--tekst);
+}
+
+/* Primær CTA — fyldt men stadig diskret */
+.case_knap,
+#gem_case_knap,
+#start_simulering_knap,
+#gem_koeb_knap,
+#gem_finansiering_knap,
+#naeste_trin3,
+#gem_driftsbudget_knap,
+#gem_udlejning_knap,
+.simulering_knap {
+  background-color: var(--tekst);
+  color: var(--hvid);
+  border-color: var(--tekst);
+}
+
+.case_knap:hover,
+#gem_case_knap:hover,
+#start_simulering_knap:hover,
+#gem_koeb_knap:hover,
+#gem_finansiering_knap:hover,
+#naeste_trin3:hover,
+#gem_driftsbudget_knap:hover,
+#gem_udlejning_knap:hover,
+.simulering_knap:hover {
+  background-color: #444;
+  border-color: #444;
+  color: var(--hvid);
+}
+
+/* Slet — tekst-knap, ingen ramme */
+.slet_knap {
+  border-color: transparent;
+  color: var(--tekst-lys);
+}
+
+.slet_knap:hover {
+  background-color: transparent;
+  color: var(--fejl);
+  border-color: transparent;
+}
+
+/* Tilbageknapper */
+#forrige_trin2,
+#forrige_trin3,
+#forrige_trin4,
+#forrige_trin5 {
+  background-color: transparent;
+  color: var(--tekst-dæmpet);
+  border-color: var(--border);
+}
+
+/* Flex-gruppe af knapper */
+.knapper {
+  display: flex;
+  gap: 0.6em;
+  margin-top: 1.5em;
+  flex-wrap: wrap;
+}
+
+.knapper_rad {
+  display: flex;
+  gap: 0.5em;
+  margin-top: 1em;
+  flex-wrap: wrap;
+}
+
+/* ==========================================
+   SØGNING
+   ========================================== */
+
+#soegefelt {
+  width: 100%;
+  padding: 0.9em 0;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 300;
+  font-size: 1em;
+  border: none;
+  border-bottom: 1px solid var(--tekst);
+  border-radius: 0;
+  background-color: transparent;
+  color: var(--tekst);
+}
+
+#soegefelt::placeholder {
+  color: var(--tekst-lys);
+  font-style: italic;
+}
+
+#soegefelt:focus {
+  outline: none;
+  border-bottom-color: var(--tekst);
+}
+
+#resultater {
+  margin-top: 0;
+  background-color: var(--hvid);
+  border: 1px solid var(--border);
+  border-top: none;
+}
+
+#resultater:empty {
+  border: none;
+}
+
+.resultat {
+  padding: 0.9em 1em;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  font-size: 0.88em;
+  font-weight: 300;
+  color: var(--tekst-dæmpet);
+  transition: background-color 0.1s;
+}
+
+.resultat:last-child {
+  border-bottom: none;
+}
+
 .resultat:hover {
-  background-color: #f0f0f0;
+  background-color: var(--hover-bg);
+  color: var(--tekst);
+}
+
+/* ==========================================
+   GEMTE PROFILER (forsiden)
+   ========================================== */
+
+#profil_liste {
+  margin-top: 2em;
+}
+
+.profil_kort {
+  background-color: var(--hvid);
+  border: 1px solid var(--border);
+  padding: 2em 2.5em;
+  margin-bottom: 1.5em;
+}
+
+.profil_kort h3 {
+  font-size: 1.35em;
+  margin-bottom: 0.6em;
+}
+
+.profil_kort p {
+  font-size: 0.85em;
+  color: var(--tekst-dæmpet);
+  margin: 0.2em 0;
+}
+
+.profil_dato {
+  font-size: 0.78em;
+  color: var(--tekst-lys);
+  margin-top: 0.4em;
+}
+
+/* ==========================================
+   INVESTERINGSCASES UNDER PROFIL
+   ========================================== */
+
+.cases_liste {
+  margin-top: 1.5em;
+  padding-top: 1.5em;
+  border-top: 1px solid var(--border);
+}
+
+.case_kort {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1em 0;
+  border-bottom: 1px solid var(--border);
+  gap: 1em;
+}
+
+.case_kort:last-child {
+  border-bottom: none;
+}
+
+.case_kort p {
+  margin: 0;
+  font-size: 0.88em;
+  color: var(--tekst);
+  font-weight: 400;
+}
+
+.case_kort small {
+  display: block;
+  color: var(--tekst-lys);
+  font-size: 0.78em;
+  margin-top: 0.1em;
+}
+
+.case_kort_knapper {
+  display: flex;
+  gap: 0.4em;
+  flex-shrink: 0;
+}
+
+/* ==========================================
+   FORMULARER
+   ========================================== */
+
+.case_formular {
+  background-color: var(--hvid);
+  border: 1px solid var(--border);
+  padding: 2em 2.5em;
+  margin-top: 1.5em;
+}
+
+.case_formular h3 {
+  margin-top: 0;
+  margin-bottom: 1.5em;
+  padding-bottom: 1em;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Labels */
+.case_formular label,
+#trin1 label,
+#trin2 label,
+#trin3 label,
+#trin4 label,
+#trin5 label {
+  display: block;
+  font-size: 0.72em;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--tekst-dæmpet);
+  margin-top: 1.2em;
+  margin-bottom: 0.4em;
+}
+
+/* Inputs og selects */
+.case_formular input,
+.case_formular select,
+#trin1 input,
+#trin2 input,
+#trin2 select,
+#trin3 input,
+#trin4 input,
+#trin4 select,
+#trin5 input {
+  width: 100%;
+  padding: 0.65em 0;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 300;
+  font-size: 0.95em;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  background-color: transparent;
+  color: var(--tekst);
+}
+
+.case_formular input:focus,
+#trin1 input:focus,
+#trin2 input:focus,
+#trin2 select:focus,
+#trin3 input:focus,
+#trin4 input:focus,
+#trin5 input:focus {
+  outline: none;
+  border-bottom-color: var(--tekst);
+}
+
+/* Checkbox - inline */
+input[type="checkbox"] {
+  width: auto;
+  margin-right: 0.5em;
+  accent-color: var(--tekst);
+}
+
+/* Overblik-boks */
+.overblik {
+  border-top: 1px solid var(--border);
+  padding: 1.2em 0 0.5em 0;
+  margin: 1.5em 0 0.5em 0;
+}
+
+.overblik p {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.88em;
+  color: var(--tekst-dæmpet);
+  margin: 0.3em 0;
+}
+
+.overblik strong {
+  color: var(--tekst);
+  font-weight: 500;
+}
+
+/* Sub-formularer */
+.renovering_formular,
+.drifts_formular {
+  border-top: 1px solid var(--border);
+  padding-top: 1.2em;
+  margin: 1.5em 0;
+}
+
+/* ==========================================
+   FREMSKRIDT-INDIKATOR
+   ========================================== */
+
+#fremskridt {
+  display: inline-block;
+  font-size: 0.72em;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--tekst-lys);
+  padding: 0;
+  margin: 0 0 2em 0;
+}
+
+/* ==========================================
+   BESKEDER
+   ========================================== */
+
+.succes {
+  font-size: 0.82em;
+  color: var(--succes);
+  margin-top: 0.6em;
+  font-style: italic;
+}
+
+.fejl {
+  font-size: 0.82em;
+  color: var(--fejl);
+  margin-top: 0.6em;
+}
+
+/* ==========================================
+   EJENDOMSINFO-SIDEN
+   ========================================== */
+
+#ejendomsdata {
+  margin: 2em 0;
+  padding: 2em 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+#ejendomsdata p {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.88em;
+  padding: 0.5em 0;
+  border-bottom: 1px solid var(--border);
+  color: var(--tekst-dæmpet);
+  margin: 0;
+}
+
+#ejendomsdata p:last-child {
+  border-bottom: none;
+}
+
+#ejendomsdata strong {
+  color: var(--tekst);
+  font-weight: 400;
+  font-size: 0.85em;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Kortvisning side om side */
+#kort_sektion {
+  display: flex;
+  gap: 1.5em;
+  margin: 2em 0;
+  flex-wrap: wrap;
+}
+
+#kort_sektion div {
+  flex: 1;
+  min-width: 200px;
+}
+
+#kort_sektion img {
+  width: 100%;
+  display: block;
+  border: 1px solid var(--border);
+}
+
+#kort_sektion p {
+  font-size: 0.75em;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--tekst-lys);
+  margin-top: 0.6em;
+}
+
+/* ==========================================
+   SIMULERING
+   ========================================== */
+
+#simulering_input {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  max-width: 380px;
+  margin: 2em 0;
+}
+
+#simulering_input label {
+  display: block;
+  font-size: 0.72em;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--tekst-dæmpet);
+  margin-top: 1.2em;
+  margin-bottom: 0.4em;
+}
+
+#simulering_input input {
+  width: 100%;
+  padding: 0.65em 0;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 300;
+  font-size: 0.95em;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  background-color: transparent;
+  color: var(--tekst);
+}
+
+#simulering_input input:focus {
+  outline: none;
+  border-bottom-color: var(--tekst);
+}
+
+#simulering_input button {
+  margin-top: 2em;
+  align-self: flex-start;
+}
+
+#parametre_sektion {
+  margin: 2em 0;
+  padding: 2em 0;
+  border-top: 1px solid var(--border);
+}
+
+#parametre_liste p {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.88em;
+  padding: 0.5em 0;
+  border-bottom: 1px solid var(--border);
+  color: var(--tekst-dæmpet);
+  margin: 0;
+}
+
+#parametre_liste p strong {
+  font-weight: 400;
+  font-size: 0.85em;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--tekst);
+}
+
+#simulering_tabel {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1.5em;
+  font-size: 0.85em;
+}
+
+#simulering_tabel thead {
+  border-bottom: 2px solid var(--tekst);
+}
+
+#simulering_tabel th {
+  background-color: transparent;
+  color: var(--tekst);
+  padding: 0.8em 1em;
+  text-align: right;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 0.72em;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+#simulering_tabel th:first-child {
+  text-align: left;
+}
+
+#simulering_tabel td {
+  padding: 0.7em 1em;
+  text-align: right;
+  border-bottom: 1px solid var(--border);
+  color: var(--tekst-dæmpet);
+  font-weight: 300;
+}
+
+#simulering_tabel td:first-child {
+  text-align: left;
+  color: var(--tekst);
+  font-weight: 400;
+}
+
+#simulering_tabel tr:hover td {
+  background-color: var(--hover-bg);
 }

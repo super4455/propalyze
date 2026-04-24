@@ -1,0 +1,12 @@
+### Opret køb
+POST http://localhost:3000/api/koeb
+Content-Type: application/json
+
+{
+  "caseID": 1,
+  "ejendomspris": 3000000,
+  "koeb_omkostninger": 50000,
+  "advokat_udgifter": 15000,
+  "tinglysning": 12000,
+  "koeber_raadgivning": true
+}

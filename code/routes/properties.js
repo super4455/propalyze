@@ -47,7 +47,9 @@ router.get('/lookup', async (req, res) => {
       postnummer: adgangsadresse.postnummer.nr,
       bynavn: adgangsadresse.postnummer.navn,
       etage: erAdgangsadresse ? null : dawaRaa.etage,
-      doer: erAdgangsadresse ? null : dawaRaa.dør
+      doer: erAdgangsadresse ? null : dawaRaa.dør,
+      // Koordinater i WGS84 [longitude, latitude]
+      koordinater: adgangsadresse.adgangspunkt.koordinater
     };
 
     console.log('Slår ejendom op. Etage:', dawa.etage);
@@ -62,6 +64,58 @@ router.get('/lookup', async (req, res) => {
     res.status(502).json({ fejl: 'Kunne ikke hente ejendomsdata: ' + err.message });
   }
 });
+
+
+// GET /api/properties
+// Henter alle gemte ejendomsprofiler fra databasen
+router.get('/', async (req, res) => {
+  try {
+    const sqlTekst = `
+  SELECT e.ejendomID, e.vejnavn, e.husnummer, e.postnummer, e.bynavn,
+         e.ejendomstype, e.byggeaar, e.boligareal, e.grundareal, e.vaerelser,
+         e.oprettet_dato, e.sidste_data_hentning, e.dawaID,
+         COUNT(c.caseID) AS antal_cases
+  FROM Propalyze.ejendomsprofil e
+  LEFT JOIN Propalyze.investeringscase c ON e.ejendomID = c.ejendomsID
+  GROUP BY e.ejendomID, e.vejnavn, e.husnummer, e.postnummer, e.bynavn,
+           e.ejendomstype, e.byggeaar, e.boligareal, e.grundareal, e.vaerelser,
+           e.oprettet_dato, e.sidste_data_hentning, e.dawaID
+  ORDER BY e.oprettet_dato DESC
+`;
+
+    const ejendomme = await database.query(sqlTekst);
+    res.status(200).json(ejendomme);
+
+  } catch (err) {
+    console.log('Fejl ved hentning af ejendomme:', err.message);
+    res.status(500).json({ fejl: err.message });
+  }
+});
+
+
+// DELETE /api/properties/:id
+// Sletter en ejendomsprofil fra databasen
+router.delete('/:id', async (req, res) => {
+  try {
+    const id = req.params.id;
+    console.log('Sletter ejendom med ID:', id);
+
+    const sqlTekst = `
+      DELETE FROM Propalyze.ejendomsprofil
+      WHERE ejendomID = @id
+    `;
+
+    await database.query(sqlTekst, { id: id });
+
+    res.status(200).json({ besked: 'Ejendomsprofil slettet' });
+
+  } catch (err) {
+    console.log('Fejl ved sletning:', err.message);
+    res.status(500).json({ fejl: err.message });
+  }
+});
+
+
 
 // POST /api/properties
 // Opretter en ny ejendomsprofil med data fra DAWA + BBR
@@ -127,5 +181,64 @@ router.post('/', async (req, res) => {
     res.status(500).json({ fejl: err.message });
   }
 });
+
+
+
+// PUT /api/properties/:id
+// Opdaterer en eksisterende ejendomsprofil i databasen
+router.put('/:id', async (req, res) => {
+  try {
+    const id = req.params.id;
+    const data = req.body;
+    console.log('Opdaterer ejendom med ID:', id);
+
+    // Validér at vi har de nødvendige felter
+    if (!data.vejnavn || !data.husnummer || !data.postnummer || !data.bynavn) {
+      res.status(400).json({ fejl: 'Adressedata mangler' });
+      return;
+    }
+
+    if (!data.ejendomstype || !data.byggeaar || !data.boligareal || !data.vaerelser) {
+      res.status(400).json({ fejl: 'Ejendomsdata mangler' });
+      return;
+    }
+
+    const sqlTekst = `
+      UPDATE Propalyze.ejendomsprofil
+      SET vejnavn = @vejnavn,
+          husnummer = @husnummer,
+          postnummer = @postnummer,
+          bynavn = @bynavn,
+          ejendomstype = @ejendomstype,
+          byggeaar = @byggeaar,
+          boligareal = @boligareal,
+          grundareal = @grundareal,
+          vaerelser = @vaerelser
+      WHERE ejendomID = @id
+    `;
+
+    const parametre = {
+      id: id,
+      vejnavn: data.vejnavn,
+      husnummer: data.husnummer,
+      postnummer: data.postnummer,
+      bynavn: data.bynavn,
+      ejendomstype: data.ejendomstype,
+      byggeaar: data.byggeaar,
+      boligareal: data.boligareal,
+      grundareal: data.grundareal || 0,
+      vaerelser: data.vaerelser
+    };
+
+    await database.query(sqlTekst, parametre);
+
+    res.status(200).json({ besked: 'Ejendomsprofil opdateret' });
+
+  } catch (err) {
+    console.log('Fejl ved opdatering:', err.message);
+    res.status(500).json({ fejl: err.message });
+  }
+});
+
 
 module.exports = router;

@@ -10,13 +10,16 @@
   <h1>Propalyze</h1>
   <p>Søg efter en dansk adresse for at oprette en ejendomsprofil</p>
 
-  <!-- Søgefelt: brugeren skriver her -->
+  <!-- Søgefelt og resultater -->
   <input type="text" id="soegefelt" placeholder="Skriv en adresse...">
-
-  <!-- Container hvor søgeresultater bliver vist -->
   <div id="resultater"></div>
 
-  <!-- Vores JavaScript kører efter HTML er indlæst -->
+  <!-- Gemte ejendomsprofiler -->
+  <div id="profiler_sektion">
+    <h2>Gemte ejendomsprofiler</h2>
+    <div id="profil_liste"></div>
+  </div>
+
   <script src="/js/app.js"></script>
 </body>
 </html>

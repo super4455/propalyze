@@ -4,6 +4,8 @@
 const express = require('express');
 const router = express.Router();
 const database = require('../database/database');
+const { beregnYdelse, beregnRestgaeld } = require('../logic/laan');
+const { beregnMaanedligDrift, beregnMaanedligIndtaegt, beregnRenoveringForAar, beregnAarligCashflow, beregnEjendomsvaerdi, beregnEgenkapital } = require('../logic/cashflow');
 
 // POST /api/cases
 // Opretter en ny investeringscase for en ejendom
@@ -346,6 +348,121 @@ router.get('/:id/data', async (req, res) => {
     res.status(500).json({ fejl: err.message });
   }
 });
+
+// GET /api/cases/:id/simuler?periode=X&vaerdistigning=Y
+// Kører år-for-år simulering med brugerens valgte periode og værdistigning
+// periode angives i antal år (min 30), vaerdistigning i procent (f.eks. 2 for 2%)
+router.get('/:id/simuler', async (req, res) => {
+  try {
+    const caseID = req.params.id;
+    const periode = parseInt(req.query.periode);
+    const vaerdistigning = parseFloat(req.query.vaerdistigning) / 100;
+
+    if (!periode || periode < 30) {
+      res.status(400).json({ fejl: 'periode skal være mindst 30 år' });
+      return;
+    }
+
+    if (isNaN(vaerdistigning)) {
+      res.status(400).json({ fejl: 'vaerdistigning skal være et tal' });
+      return;
+    }
+
+    const caseSvar = await database.query(
+      'SELECT * FROM Propalyze.investeringscase WHERE caseID = @caseID',
+      { caseID: caseID }
+    );
+
+    if (caseSvar.length === 0) {
+      res.status(404).json({ fejl: 'Case ikke fundet' });
+      return;
+    }
+
+    const koeb = await database.query(
+      'SELECT * FROM Propalyze.koeb WHERE caseID = @caseID',
+      { caseID: caseID }
+    );
+
+    const finansiering = await database.query(
+      'SELECT * FROM Propalyze.finansiering WHERE caseID = @caseID',
+      { caseID: caseID }
+    );
+
+    if (koeb.length === 0 || finansiering.length === 0) {
+      res.status(400).json({ fejl: 'Case mangler køb eller finansiering' });
+      return;
+    }
+
+    const renoveringer = await database.query(
+      'SELECT * FROM Propalyze.renovering WHERE caseID = @caseID',
+      { caseID: caseID }
+    );
+
+    const driftsbudget = await database.query(
+      'SELECT * FROM Propalyze.driftsbudget WHERE caseID = @caseID',
+      { caseID: caseID }
+    );
+
+    let udgifter = [];
+    let indtaegter = [];
+    if (driftsbudget.length > 0) {
+      const driftsbudgetID = driftsbudget[0].driftsbudgetID;
+      udgifter = await database.query(
+        'SELECT * FROM Propalyze.udgift WHERE driftsbudgetID = @driftsbudgetID',
+        { driftsbudgetID: driftsbudgetID }
+      );
+      indtaegter = await database.query(
+        'SELECT * FROM Propalyze.indtaegt WHERE driftsbudgetID = @driftsbudgetID',
+        { driftsbudgetID: driftsbudgetID }
+      );
+    }
+
+    const udlejning = await database.query(
+      'SELECT * FROM Propalyze.udlejning WHERE caseID = @caseID',
+      { caseID: caseID }
+    );
+
+    const k = koeb[0];
+    const f = finansiering[0];
+    const ejendomspris  = parseFloat(k.ejendomspris);
+    const laanebeloeb   = parseFloat(f.laanebeloeb);
+    const rente         = parseFloat(f.rente);
+    const loebetid      = parseInt(f.loebetid_aar);
+    const afdragsfriaar = parseInt(f.afdragsfriaar) || 0;
+    const laanetype     = f.laanetype;
+
+    const maanedligLeje = udlejning.length > 0 && udlejning[0].udlejning_status
+      ? parseFloat(udlejning[0].maanedlig_husleje)
+      : 0;
+
+    const maanedligUdlejningUdgift = udlejning.length > 0 && udlejning[0].udlejning_status
+      ? parseFloat(udlejning[0].maanedlig_udgifter)
+      : 0;
+
+    const maanedligDrift         = beregnMaanedligDrift(udgifter);
+    const maanedligDriftsIndtaegt = beregnMaanedligIndtaegt(indtaegter);
+    const startAar = new Date().getFullYear();
+    const resultater = [];
+
+    for (let aar = 1; aar <= periode; aar++) {
+      const ejendomsvaerdi  = beregnEjendomsvaerdi(ejendomspris, vaerdistigning, aar);
+      const restgaeld       = beregnRestgaeld(laanebeloeb, rente, loebetid, laanetype, aar);
+      const egenkapital     = beregnEgenkapital(ejendomsvaerdi, restgaeld);
+      const maanedligYdelse = beregnYdelse(laanebeloeb, rente, loebetid, afdragsfriaar, laanetype, aar - 1);
+      const aarligRenovering = beregnRenoveringForAar(renoveringer, aar, startAar);
+      const aarligCashflow  = beregnAarligCashflow(maanedligLeje, maanedligUdlejningUdgift, maanedligYdelse, maanedligDrift, maanedligDriftsIndtaegt, aarligRenovering);
+
+      resultater.push({ aar, ejendomsvaerdi, restgaeld, egenkapital, aarligCashflow });
+    }
+
+    res.status(200).json(resultater);
+
+  } catch (err) {
+    console.log('Fejl ved simulering:', err.message);
+    res.status(500).json({ fejl: err.message });
+  }
+});
+
 
 // GET /api/cases/sammenlign?ids=1,2,3
 // Henter nøgletal for flere cases til sammenligning

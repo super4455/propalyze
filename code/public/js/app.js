@@ -117,7 +117,7 @@ async function hentGemteProfiler() {
       redigerKnap.className = 'rediger_knap';
       redigerKnap.textContent = 'Rediger';
       redigerKnap.addEventListener('click', function() {
-        visRedigerFormular(p);
+        visRedigerFormular(p, div);
       });
 
       // Knap til at se ejendomsprofilen
@@ -177,7 +177,7 @@ async function hentGemteProfiler() {
 
 // === REDIGER EJENDOMSPROFIL ===
 
-function visRedigerFormular(profil) {
+function visRedigerFormular(profil, profilDiv) {
   const eksisterende = document.getElementById('rediger_formular');
   if (eksisterende) {
     eksisterende.remove();
@@ -212,7 +212,7 @@ function visRedigerFormular(profil) {
     + '</div>'
     + '<div id="rediger_besked"></div>';
 
-  profilListe.appendChild(formular);
+  profilDiv.appendChild(formular);
 
   document.getElementById('gem_redigering_knap').addEventListener('click', function() {
     gemRedigering(profil.ejendomID);

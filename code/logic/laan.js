@@ -1,147 +1,124 @@
-// laan.js - Beregninger for alle lånetyper
-// Understøtter annuitetslån, serielån og stående lån
-// Hver lånetype har to funktioner: beregnYdelse og beregnRestgaeld
+// laan.js - Låneberegninger for annuitetslån, serielån og stående lån
 
-// ==========================================
-// ANNUITETSLÅN
-// Fast ydelse hver måned - renteandel falder, afdrag stiger over tid
-// Formel: M = L * (r*(1+r)^n) / ((1+r)^n - 1)
-// L = lånebeløb, r = månedlig rente, n = antal måneder
-// ==========================================
+class LoanCalculator {
 
-function beregnYdelseAnnuitet(laanebeloeb, renteAarlig, loebetidAar) {
-  const r = renteAarlig / 100 / 12;
-  const n = loebetidAar * 12;
+  // Annuitetslån: fast månedlig ydelse, faldende renteandel
+  static beregnYdelseAnnuitet(laanebeloeb, renteAarlig, loebetidAar) {
+    const r = renteAarlig / 100 / 12;
+    const n = loebetidAar * 12;
 
-  if (r === 0) return laanebeloeb / n;
+    if (r === 0) return laanebeloeb / n;
 
-  return laanebeloeb * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
-}
+    return laanebeloeb * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+  }
 
-function beregnRestgaeldAnnuitet(laanebeloeb, renteAarlig, loebetidAar, betalteAar) {
-  if (betalteAar >= loebetidAar) return 0;
+  static beregnRestgaeldAnnuitet(laanebeloeb, renteAarlig, loebetidAar, betalteAar) {
+    if (betalteAar >= loebetidAar) return 0;
 
-  const r = renteAarlig / 100 / 12;
-  const n = loebetidAar * 12;
-  const t = betalteAar * 12;
+    const r = renteAarlig / 100 / 12;
+    const n = loebetidAar * 12;
+    const t = betalteAar * 12;
 
-  if (r === 0) return Math.max(0, laanebeloeb - (laanebeloeb / n) * t);
+    if (r === 0) return Math.max(0, laanebeloeb - (laanebeloeb / n) * t);
 
-  return laanebeloeb * (Math.pow(1 + r, n) - Math.pow(1 + r, t)) / (Math.pow(1 + r, n) - 1);
-}
+    return laanebeloeb * (Math.pow(1 + r, n) - Math.pow(1 + r, t)) / (Math.pow(1 + r, n) - 1);
+  }
 
-// ==========================================
-// SERIELÅN
-// Fast afdrag hver måned - ydelsen falder over tid fordi renteandelen falder
-// Fast afdrag = L / n
-// Månedlig ydelse = fast afdrag + (restgæld * månedlig rente)
-// ==========================================
+  // ==========================================
+  // SERIELÅN
+  // Fast afdrag hver måned - ydelsen falder over tid fordi renteandelen falder
+  // Fast afdrag = L / n
+  // Månedlig ydelse = fast afdrag + (restgæld * månedlig rente)
+  // ==========================================
 
-function beregnYdelseSerie(laanebeloeb, renteAarlig, loebetidAar, betalteAar) {
-  if (betalteAar >= loebetidAar) return 0;
+  static beregnYdelseSerie(laanebeloeb, renteAarlig, loebetidAar, betalteAar) {
+    if (betalteAar >= loebetidAar) return 0;
 
-  const r = renteAarlig / 100 / 12;
-  const n = loebetidAar * 12;
+    const r = renteAarlig / 100 / 12;
+    const n = loebetidAar * 12;
+    const fastAfdrag = laanebeloeb / n;
+    const restgaeld = LoanCalculator.beregnRestgaeldSerie(laanebeloeb, loebetidAar, betalteAar);
 
-  // Fast månedligt afdrag
-  const fastAfdrag = laanebeloeb / n;
+    return fastAfdrag + restgaeld * r;
+  }
 
-  // Restgæld ved starten af dette år
-  const restgaeld = beregnRestgaeldSerie(laanebeloeb, loebetidAar, betalteAar);
+  static beregnRestgaeldSerie(laanebeloeb, loebetidAar, betalteAar) {
+    if (betalteAar >= loebetidAar) return 0;
 
-  // Ydelse = fast afdrag + rente på restgæld
-  return fastAfdrag + restgaeld * r;
-}
+    const n = loebetidAar * 12;
+    const t = betalteAar * 12;
 
-function beregnRestgaeldSerie(laanebeloeb, loebetidAar, betalteAar) {
-  if (betalteAar >= loebetidAar) return 0;
+    return laanebeloeb * (1 - t / n);
+  }
 
-  const n = loebetidAar * 12;
-  const t = betalteAar * 12;
+  // ==========================================
+  // STÅENDE LÅN
+  // Ingen afdrag i løbetiden - kun renter betales løbende
+  // Hele lånebeløbet tilbagebetales som ét beløb ved udløb
+  // ==========================================
 
-  // Restgæld falder lineært fordi afdragene er faste
-  return laanebeloeb * (1 - t / n);
-}
+  static beregnYdelseStaaende(laanebeloeb, renteAarlig, loebetidAar, betalteAar) {
+    if (betalteAar >= loebetidAar) return 0;
 
-// ==========================================
-// STÅENDE LÅN
-// Ingen afdrag i løbetiden - kun renter betales løbende
-// Hele lånebeløbet tilbagebetales som ét beløb ved udløb
-// Månedlig ydelse = L * månedlig rente (konstant)
-// ==========================================
-
-function beregnYdelseStaaende(laanebeloeb, renteAarlig, loebetidAar, betalteAar) {
-  // Lånet er udløbet - hele beløbet er tilbagebetalt
-  if (betalteAar >= loebetidAar) return 0;
-
-  const r = renteAarlig / 100 / 12;
-
-  // Kun renter - ingen afdrag
-  return laanebeloeb * r;
-}
-
-function beregnRestgaeldStaaende(laanebeloeb, loebetidAar, betalteAar) {
-  // Restgæld er uændret indtil lånet udløber
-  if (betalteAar >= loebetidAar) return 0;
-
-  return laanebeloeb;
-}
-
-// ==========================================
-// FÆLLES INTERFACE
-// Kalder den rigtige lånetype baseret på laanetype-parameteret
-// Dette er det eneste der importeres fra resten af systemet
-// ==========================================
-
-// Returnerer månedlig ydelse for det givne år
-function beregnYdelse(laanebeloeb, renteAarlig, loebetidAar, afdragsfriAar, laanetype, betalteAar) {
-
-  // Afdragsfri periode gælder for alle lånetyper
-  // I afdragsfri periode betales kun renter uanset lånetype
-  if (betalteAar < afdragsfriAar) {
     const r = renteAarlig / 100 / 12;
     return laanebeloeb * r;
   }
 
-  // Lånet er udløbet
-  if (betalteAar > loebetidAar) return 0;
+  static beregnRestgaeldStaaende(laanebeloeb, loebetidAar, betalteAar) {
+    if (betalteAar >= loebetidAar) return 0;
 
-  if (laanetype === 'Annuitetslaan') {
-    return beregnYdelseAnnuitet(laanebeloeb, renteAarlig, loebetidAar);
+    return laanebeloeb;
   }
 
-  if (laanetype === 'Serielaan') {
-    return beregnYdelseSerie(laanebeloeb, renteAarlig, loebetidAar, betalteAar);
+  // ==========================================
+  // FÆLLES INTERFACE
+  // Kalder den rigtige lånetype baseret på laanetype-parameteret
+  // ==========================================
+
+  // Returnerer månedlig ydelse for det givne år
+  static beregnYdelse(laanebeloeb, renteAarlig, loebetidAar, afdragsfriAar, laanetype, betalteAar) {
+
+    // I afdragsfri periode betales kun renter uanset lånetype
+    if (betalteAar < afdragsfriAar) {
+      const r = renteAarlig / 100 / 12;
+      return laanebeloeb * r;
+    }
+
+    if (betalteAar > loebetidAar) return 0;
+
+    if (laanetype === 'Annuitetslaan') {
+      return LoanCalculator.beregnYdelseAnnuitet(laanebeloeb, renteAarlig, loebetidAar);
+    }
+
+    if (laanetype === 'Serielaan') {
+      return LoanCalculator.beregnYdelseSerie(laanebeloeb, renteAarlig, loebetidAar, betalteAar);
+    }
+
+    if (laanetype === 'Staaende laan') {
+      return LoanCalculator.beregnYdelseStaaende(laanebeloeb, renteAarlig, loebetidAar, betalteAar);
+    }
+
+    console.log('Ukendt lånetype:', laanetype, '- falder tilbage til annuitetslån');
+    return LoanCalculator.beregnYdelseAnnuitet(laanebeloeb, renteAarlig, loebetidAar);
   }
 
-  if (laanetype === 'Staaende laan') {
-    return beregnYdelseStaaende(laanebeloeb, renteAarlig, loebetidAar, betalteAar);
-  }
+  // Returnerer restgæld efter det givne antal betalte år
+  static beregnRestgaeld(laanebeloeb, renteAarlig, loebetidAar, laanetype, betalteAar) {
 
-  // Fallback til annuitetslån hvis ukendt lånetype
-  console.log('Ukendt lånetype:', laanetype, '- falder tilbage til annuitetslån');
-  return beregnYdelseAnnuitet(laanebeloeb, renteAarlig, loebetidAar);
+    if (laanetype === 'Annuitetslaan') {
+      return LoanCalculator.beregnRestgaeldAnnuitet(laanebeloeb, renteAarlig, loebetidAar, betalteAar);
+    }
+
+    if (laanetype === 'Serielaan') {
+      return LoanCalculator.beregnRestgaeldSerie(laanebeloeb, loebetidAar, betalteAar);
+    }
+
+    if (laanetype === 'Staaende laan') {
+      return LoanCalculator.beregnRestgaeldStaaende(laanebeloeb, loebetidAar, betalteAar);
+    }
+
+    return LoanCalculator.beregnRestgaeldAnnuitet(laanebeloeb, renteAarlig, loebetidAar, betalteAar);
+  }
 }
 
-// Returnerer restgæld efter det givne antal betalte år
-function beregnRestgaeld(laanebeloeb, renteAarlig, loebetidAar, laanetype, betalteAar) {
-
-  if (laanetype === 'Annuitetslaan') {
-    return beregnRestgaeldAnnuitet(laanebeloeb, renteAarlig, loebetidAar, betalteAar);
-  }
-
-  if (laanetype === 'Serielaan') {
-    return beregnRestgaeldSerie(laanebeloeb, loebetidAar, betalteAar);
-  }
-
-  if (laanetype === 'Staaende laan') {
-    return beregnRestgaeldStaaende(laanebeloeb, loebetidAar, betalteAar);
-  }
-
-  // Fallback
-  return beregnRestgaeldAnnuitet(laanebeloeb, renteAarlig, loebetidAar, betalteAar);
-}
-
-module.exports = { beregnYdelse, beregnRestgaeld };
-
-
+module.exports = LoanCalculator;

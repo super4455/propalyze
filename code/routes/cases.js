@@ -4,8 +4,7 @@
 const express = require('express');
 const router = express.Router();
 const database = require('../database/database');
-const { beregnYdelse, beregnRestgaeld } = require('../logic/laan');
-const { beregnMaanedligDrift, beregnMaanedligIndtaegt, beregnRenoveringForAar, beregnAarligCashflow, beregnEjendomsvaerdi, beregnEgenkapital } = require('../logic/cashflow');
+const InvesteringsBeregner = require('../logic/InvesteringsBeregner');
 
 // POST /api/cases
 // Opretter en ny investeringscase for en ejendom
@@ -422,40 +421,19 @@ router.get('/:id/simuler', async (req, res) => {
       { caseID: caseID }
     );
 
-    const k = koeb[0];
-    const f = finansiering[0];
-    const ejendomspris  = parseFloat(k.ejendomspris);
-    const laanebeloeb   = parseFloat(f.laanebeloeb);
-    const rente         = parseFloat(f.rente);
-    const loebetid      = parseInt(f.loebetid_aar);
-    const afdragsfriaar = parseInt(f.afdragsfriaar) || 0;
-    const laanetype     = f.laanetype;
+    const beregner = new InvesteringsBeregner(
+      finansiering[0],
+      koeb[0],
+      udgifter,
+      indtaegter,
+      renoveringer,
+      udlejning[0] || null
+    );
 
-    const maanedligLeje = udlejning.length > 0 && udlejning[0].udlejning_status
-      ? parseFloat(udlejning[0].maanedlig_husleje)
-      : 0;
+    beregner.beregnDrift();
+    beregner.simuler(periode, vaerdistigning);
 
-    const maanedligUdlejningUdgift = udlejning.length > 0 && udlejning[0].udlejning_status
-      ? parseFloat(udlejning[0].maanedlig_udgifter)
-      : 0;
-
-    const maanedligDrift         = beregnMaanedligDrift(udgifter);
-    const maanedligDriftsIndtaegt = beregnMaanedligIndtaegt(indtaegter);
-    const startAar = new Date().getFullYear();
-    const resultater = [];
-
-    for (let aar = 1; aar <= periode; aar++) {
-      const ejendomsvaerdi  = beregnEjendomsvaerdi(ejendomspris, vaerdistigning, aar);
-      const restgaeld       = beregnRestgaeld(laanebeloeb, rente, loebetid, laanetype, aar);
-      const egenkapital     = beregnEgenkapital(ejendomsvaerdi, restgaeld);
-      const maanedligYdelse = beregnYdelse(laanebeloeb, rente, loebetid, afdragsfriaar, laanetype, aar - 1);
-      const aarligRenovering = beregnRenoveringForAar(renoveringer, aar, startAar);
-      const aarligCashflow  = beregnAarligCashflow(maanedligLeje, maanedligUdlejningUdgift, maanedligYdelse, maanedligDrift, maanedligDriftsIndtaegt, aarligRenovering);
-
-      resultater.push({ aar, ejendomsvaerdi, restgaeld, egenkapital, aarligCashflow });
-    }
-
-    res.status(200).json(resultater);
+    res.status(200).json(beregner.hentResultater());
 
   } catch (err) {
     console.log('Fejl ved simulering:', err.message);

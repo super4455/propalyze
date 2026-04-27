@@ -1,0 +1,77 @@
+// InvesteringsBeregner.js
+// Orkestrator-klasse der kombinerer lån- og cashflow-beregninger for én investeringscase
+// Holder case-data og beregnede resultater som state
+
+const LoanCalculator = require('./laan');
+const CashflowCalculator = require('./cashflow');
+
+class InvesteringsBeregner {
+
+  constructor(finansiering, koeb, udgifter, indtaegter, renoveringer, udlejning) {
+    // Case-data
+    this.finansiering = finansiering;
+    this.koeb = koeb;
+    this.udgifter = udgifter;
+    this.indtaegter = indtaegter;
+    this.renoveringer = renoveringer;
+    this.udlejning = udlejning;
+
+    // Beregnede resultater — udfyldes af metoderne nedenfor
+    this.maanedligDrift = null;
+    this.maanedligDriftsIndtaegt = null;
+    this.simuleringsResultater = null;
+  }
+
+  // Beregner og gemmer månedlige driftsudgifter og driftsindtægter
+  beregnDrift() {
+    this.maanedligDrift = CashflowCalculator.beregnMaanedligDrift(this.udgifter);
+    this.maanedligDriftsIndtaegt = CashflowCalculator.beregnMaanedligIndtaegt(this.indtaegter);
+    return this;
+  }
+
+  // Kører år-for-år simulering og gemmer resultater
+  // vaerdistigning angives som decimaltal, f.eks. 0.02 for 2%
+  simuler(periode, vaerdistigning) {
+    const f = this.finansiering;
+    const laanebeloeb  = parseFloat(f.laanebeloeb);
+    const rente        = parseFloat(f.rente);
+    const loebetid     = parseInt(f.loebetid_aar);
+    const afdragsfriaar = parseInt(f.afdragsfriaar) || 0;
+    const laanetype    = f.laanetype;
+    const ejendomspris = parseFloat(this.koeb.ejendomspris);
+
+    const maanedligLeje = this.udlejning && this.udlejning.udlejning_status
+      ? parseFloat(this.udlejning.maanedlig_husleje)
+      : 0;
+
+    const maanedligUdlejningUdgift = this.udlejning && this.udlejning.udlejning_status
+      ? parseFloat(this.udlejning.maanedlig_udgifter)
+      : 0;
+
+    const startAar = new Date().getFullYear();
+    this.simuleringsResultater = [];
+
+    for (let aar = 1; aar <= periode; aar++) {
+      const maanedligYdelse  = LoanCalculator.beregnYdelse(laanebeloeb, rente, loebetid, afdragsfriaar, laanetype, aar - 1);
+      const ejendomsvaerdi   = CashflowCalculator.beregnEjendomsvaerdi(ejendomspris, vaerdistigning, aar);
+      const restgaeld        = LoanCalculator.beregnRestgaeld(laanebeloeb, rente, loebetid, laanetype, aar);
+      const egenkapital      = CashflowCalculator.beregnEgenkapital(ejendomsvaerdi, restgaeld);
+      const aarligRenovering = CashflowCalculator.beregnRenoveringForAar(this.renoveringer, aar, startAar);
+      const aarligCashflow   = CashflowCalculator.beregnAarligCashflow(
+        maanedligLeje, maanedligUdlejningUdgift, maanedligYdelse,
+        this.maanedligDrift, this.maanedligDriftsIndtaegt, aarligRenovering
+      );
+
+      this.simuleringsResultater.push({ aar, ejendomsvaerdi, restgaeld, egenkapital, aarligCashflow });
+    }
+
+    return this;
+  }
+
+  // Returnerer simuleringsresultaterne
+  hentResultater() {
+    return this.simuleringsResultater;
+  }
+}
+
+module.exports = InvesteringsBeregner;

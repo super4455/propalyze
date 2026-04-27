@@ -4,7 +4,7 @@
 const express = require('express');
 const router = express.Router();
 const database = require('../database/database');
-const { hentBBR } = require('../logic/BBRapi');
+const BBRService = require('../logic/BBRapi');
 
 // GET /api/properties/lookup?dawaId=...
 // Slår en ejendom op via DAWA + BBR og returnerer begge dele samlet
@@ -55,7 +55,7 @@ router.get('/lookup', async (req, res) => {
     console.log('Slår ejendom op. Etage:', dawa.etage);
 
     // Hent BBR-data med den rigtige strategi (hus vs. lejlighed)
-    const bbr = await hentBBR(dawa);
+    const bbr = await BBRService.hentBBR(dawa);
 
     res.status(200).json({ dawa: dawa, bbr: bbr });
 

@@ -4,7 +4,7 @@ CREATE TABLE Propalyze.ejendomsprofil (
 	ejendomID INT IDENTITY(1,1) PRIMARY KEY,
 	husnummer VARCHAR(10) NOT NULL,
 	bynavn VARCHAR(50) NOT NULL,
-	ejendomstype VARCHAR(30) NOT NULL,
+	ejendomstype VARCHAR(50) NOT NULL,
 	byggeaar INT NOT NULL CHECK (byggeaar BETWEEN 1000 AND 2100),
 	boligareal INT NOT NULL CHECK (boligareal > 0),
 	grundareal INT,

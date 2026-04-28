@@ -49,10 +49,13 @@ router.get('/lookup', async (req, res) => {
       etage: erAdgangsadresse ? null : dawaRaa.etage,
       doer: erAdgangsadresse ? null : dawaRaa.dør,
       // Koordinater i WGS84 [longitude, latitude]
-      koordinater: adgangsadresse.adgangspunkt.koordinater
+      koordinater: adgangsadresse.adgangspunkt.koordinater,
+      matrikelnr: adgangsadresse.jordstykke ? adgangsadresse.jordstykke.matrikelnr : null,
+      ejerlavskode: adgangsadresse.jordstykke ? adgangsadresse.jordstykke.ejerlav.kode : null
     };
 
-    console.log('Slår ejendom op. Etage:', dawa.etage);
+    console.log('Slår ejendom op. Etage:', dawa.etage, '| matrikelnr:', dawa.matrikelnr, '| ejerlavskode:', dawa.ejerlavskode);
+    console.log('DAWA jordstykker rådata:', JSON.stringify(adgangsadresse.jordstykker));
 
     // Hent BBR-data med den rigtige strategi (hus vs. lejlighed)
     const bbr = await BBRService.hentBBR(dawa);
@@ -71,13 +74,13 @@ router.get('/lookup', async (req, res) => {
 router.get('/', async (req, res) => {
   try {
     const sqlTekst = `
-  SELECT e.ejendomID, e.vejnavn, e.husnummer, e.postnummer, e.bynavn,
+  SELECT e.ejendomID, e.vejnavn, e.husnummer, e.etage, e.doer, e.postnummer, e.bynavn,
          e.ejendomstype, e.byggeaar, e.boligareal, e.grundareal, e.vaerelser,
          e.oprettet_dato, e.sidste_data_hentning, e.dawaID,
          COUNT(c.caseID) AS antal_cases
   FROM Propalyze.ejendomsprofil e
   LEFT JOIN Propalyze.investeringscase c ON e.ejendomID = c.ejendomsID
-  GROUP BY e.ejendomID, e.vejnavn, e.husnummer, e.postnummer, e.bynavn,
+  GROUP BY e.ejendomID, e.vejnavn, e.husnummer, e.etage, e.doer, e.postnummer, e.bynavn,
            e.ejendomstype, e.byggeaar, e.boligareal, e.grundareal, e.vaerelser,
            e.oprettet_dato, e.sidste_data_hentning, e.dawaID
   ORDER BY e.oprettet_dato DESC
@@ -88,6 +91,69 @@ router.get('/', async (req, res) => {
 
   } catch (err) {
     console.log('Fejl ved hentning af ejendomme:', err.message);
+    res.status(500).json({ fejl: err.message });
+  }
+});
+
+
+// GET /api/properties/:id
+// Henter én gemt ejendomsprofil med koordinater til kortvisning
+router.get('/:id', async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    const sqlTekst = `
+      SELECT ejendomID, vejnavn, husnummer, etage, doer, postnummer, bynavn,
+             ejendomstype, byggeaar, boligareal, grundareal, vaerelser, dawaID
+      FROM Propalyze.ejendomsprofil
+      WHERE ejendomID = @id
+    `;
+
+    const rækker = await database.query(sqlTekst, { id: id });
+
+    if (rækker.length === 0) {
+      res.status(404).json({ fejl: 'Ejendomsprofil ikke fundet' });
+      return;
+    }
+
+    const profil = rækker[0];
+
+    let koordinater = null;
+    try {
+      let dawaSvar = await fetch('https://api.dataforsyningen.dk/adresser/' + profil.dawaID);
+      let erAdgangsadresse = false;
+
+      if (dawaSvar.status === 404) {
+        dawaSvar = await fetch('https://api.dataforsyningen.dk/adgangsadresser/' + profil.dawaID);
+        erAdgangsadresse = true;
+      }
+
+      if (dawaSvar.ok) {
+        const dawaRaa = await dawaSvar.json();
+        const adgangsadresse = erAdgangsadresse ? dawaRaa : dawaRaa.adgangsadresse;
+        koordinater = adgangsadresse.adgangspunkt.koordinater;
+      }
+    } catch (dawaFejl) {
+      console.log('Kunne ikke hente koordinater fra DAWA:', dawaFejl.message);
+    }
+
+    res.status(200).json({
+      vejnavn: profil.vejnavn,
+      husnummer: profil.husnummer,
+      etage: profil.etage,
+      doer: profil.doer,
+      postnummer: profil.postnummer,
+      bynavn: profil.bynavn,
+      ejendomstype: profil.ejendomstype,
+      byggeaar: profil.byggeaar,
+      boligareal: profil.boligareal,
+      grundareal: profil.grundareal,
+      vaerelser: profil.vaerelser,
+      koordinater: koordinater
+    });
+
+  } catch (err) {
+    console.log('Fejl ved hentning af ejendomsprofil:', err.message);
     res.status(500).json({ fejl: err.message });
   }
 });
@@ -139,23 +205,25 @@ router.post('/', async (req, res) => {
     // Parameteriseret query for at undgå SQL injection
     const sqlTekst = `
       INSERT INTO Propalyze.ejendomsprofil
-        (vejnavn, husnummer, postnummer, bynavn, ejendomstype,
+        (vejnavn, husnummer, etage, doer, postnummer, bynavn, ejendomstype,
          byggeaar, boligareal, grundareal, vaerelser, dawaID, sidste_data_hentning)
       OUTPUT INSERTED.ejendomID
       VALUES
-        (@vejnavn, @husnummer, @postnummer, @bynavn, @ejendomstype,
+        (@vejnavn, @husnummer, @etage, @doer, @postnummer, @bynavn, @ejendomstype,
          @byggeaar, @boligareal, @grundareal, @vaerelser, @dawaID, GETDATE())
     `;
 
     const parametre = {
       vejnavn: data.vejnavn,
       husnummer: data.husnummer,
+      etage: data.etage,
+      doer: data.doer,
       postnummer: data.postnummer,
       bynavn: data.bynavn,
       ejendomstype: data.ejendomstype,
       byggeaar: data.byggeaar,
       boligareal: data.boligareal,
-      grundareal: data.grundareal || 0,
+      grundareal: data.grundareal,
       vaerelser: data.vaerelser,
       dawaID: data.dawaID
     };
@@ -207,6 +275,8 @@ router.put('/:id', async (req, res) => {
       UPDATE Propalyze.ejendomsprofil
       SET vejnavn = @vejnavn,
           husnummer = @husnummer,
+          etage = @etage,
+          doer = @doer,
           postnummer = @postnummer,
           bynavn = @bynavn,
           ejendomstype = @ejendomstype,
@@ -221,12 +291,14 @@ router.put('/:id', async (req, res) => {
       id: id,
       vejnavn: data.vejnavn,
       husnummer: data.husnummer,
+      etage: data.etage,
+      doer: data.doer,
       postnummer: data.postnummer,
       bynavn: data.bynavn,
       ejendomstype: data.ejendomstype,
       byggeaar: data.byggeaar,
       boligareal: data.boligareal,
-      grundareal: data.grundareal || 0,
+      grundareal: data.grundareal,
       vaerelser: data.vaerelser
     };
 

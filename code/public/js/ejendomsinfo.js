@@ -44,6 +44,7 @@ class EjendomsInfoView {
     document.getElementById('byggeaar').textContent = bbr.byggeaar || '—';
     document.getElementById('boligareal').textContent = bbr.boligareal ? bbr.boligareal + ' m²' : '—';
     document.getElementById('grundareal').textContent = bbr.grundareal ? bbr.grundareal + ' m²' : '—';
+    document.getElementById('grundareal_raekke').style.display = dawa.etage !== null ? 'none' : '';
     document.getElementById('vaerelser').textContent = bbr.vaerelser || '—';
     document.getElementById('antalEtager').textContent = bbr.antalEtager || '—';
 
@@ -84,12 +85,14 @@ class EjendomsInfoView {
       dawaID: this.ejendom.dawa.id,
       vejnavn: this.ejendom.dawa.vejnavn,
       husnummer: this.ejendom.dawa.husnummer,
+      etage: this.ejendom.dawa.etage,
+      doer: this.ejendom.dawa.doer,
       postnummer: this.ejendom.dawa.postnummer,
       bynavn: this.ejendom.dawa.bynavn,
       ejendomstype: this.ejendom.bbr.ejendomstype,
       byggeaar: this.ejendom.bbr.byggeaar,
       boligareal: this.ejendom.bbr.boligareal,
-      grundareal: this.ejendom.bbr.grundareal || 0,
+      grundareal: this.ejendom.bbr.grundareal,
       vaerelser: this.ejendom.bbr.vaerelser
     };
 

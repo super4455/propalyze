@@ -66,6 +66,15 @@ class EjendomsprofilListe {
   constructor() {
     this.profilListe = document.getElementById('profil_liste');
     this.hentGemteProfiler();
+
+    document.getElementById('profil_modal_luk').addEventListener('click', () => {
+      document.getElementById('profil_modal').style.display = 'none';
+    });
+    document.getElementById('profil_modal').addEventListener('click', (e) => {
+      if (e.target === document.getElementById('profil_modal')) {
+        document.getElementById('profil_modal').style.display = 'none';
+      }
+    });
   }
 
   async hentGemteProfiler() {
@@ -91,8 +100,7 @@ class EjendomsprofilListe {
         div.className = 'profil_kort';
 
         const info = document.createElement('div');
-        info.innerHTML = '<h3>' + p.vejnavn + ' ' + p.husnummer + ', '
-          + p.postnummer + ' ' + p.bynavn + '</h3>'
+        info.innerHTML = '<h3>' + this.formaterAdresse(p) + '</h3>'
           + '<p>' + p.ejendomstype + ' · ' + p.byggeaar
           + ' · ' + p.boligareal + ' m² · ' + p.vaerelser + ' værelser</p>'
           + '<p>Investeringscases: ' + p.antal_cases + '</p>'
@@ -117,9 +125,7 @@ class EjendomsprofilListe {
         const seKnap = document.createElement('button');
         seKnap.className = 'se_knap';
         seKnap.textContent = 'Se ejendomsprofil';
-        seKnap.addEventListener('click', function() {
-          window.location.href = 'ejendomsinfo.html?dawaId=' + p.dawaID;
-        });
+        seKnap.addEventListener('click', () => this.visProfilPopup(p));
 
         const sletKnap = document.createElement('button');
         sletKnap.className = 'slet_knap';
@@ -162,6 +168,73 @@ class EjendomsprofilListe {
     }
   }
 
+  formaterAdresse(p) {
+    let adresse = p.vejnavn + ' ' + p.husnummer;
+    if (p.etage !== null || p.doer !== null) {
+      const dele = [];
+      if (p.etage !== null) dele.push(p.etage + '.');
+      if (p.doer !== null) dele.push(p.doer);
+      adresse += ', ' + dele.join(' ');
+    }
+    return adresse + ', ' + p.postnummer + ' ' + p.bynavn;
+  }
+
+  visProfilPopup(p) {
+    document.getElementById('modal_adresse').textContent = this.formaterAdresse(p);
+    document.getElementById('modal_ejendomstype').textContent = p.ejendomstype || '—';
+    document.getElementById('modal_byggeaar').textContent = p.byggeaar || '—';
+    document.getElementById('modal_boligareal').textContent = p.boligareal ? p.boligareal + ' m²' : '—';
+    document.getElementById('modal_grundareal').textContent = p.grundareal ? p.grundareal + ' m²' : '—';
+    document.getElementById('modal_vaerelser').textContent = p.vaerelser || '—';
+
+    const luftfoto = document.getElementById('modal_luftfoto');
+    const matrikel = document.getElementById('modal_matrikel');
+    const luftfotoLoading = document.getElementById('modal_luftfoto_loading');
+    const matrikelLoading = document.getElementById('modal_matrikel_loading');
+
+    luftfoto.style.display = 'none';
+    matrikel.style.display = 'none';
+    luftfotoLoading.textContent = 'Henter luftfoto...';
+    luftfotoLoading.style.display = 'block';
+    matrikelLoading.textContent = 'Henter matrikelkort...';
+    matrikelLoading.style.display = 'block';
+
+    document.getElementById('profil_modal').style.display = 'flex';
+
+    this.indlaesModalKort(p.ejendomID);
+  }
+
+  async indlaesModalKort(ejendomID) {
+    try {
+      const svar = await fetch('/api/properties/' + ejendomID);
+      if (!svar.ok) return;
+      const data = await svar.json();
+      if (!data.koordinater) return;
+
+      const x = data.koordinater[0];
+      const y = data.koordinater[1];
+
+      this.visModalKort('luftfoto', x, y, 'modal_luftfoto', 'modal_luftfoto_loading');
+      this.visModalKort('matrikel', x, y, 'modal_matrikel', 'modal_matrikel_loading');
+    } catch (fejl) {
+      console.log('Kunne ikke hente kortdata:', fejl);
+    }
+  }
+
+  visModalKort(lag, x, y, billedeId, loadingId) {
+    const billede = document.getElementById(billedeId);
+    const loading = document.getElementById(loadingId);
+
+    billede.src = '/api/kort?lag=' + lag + '&x=' + x + '&y=' + y;
+    billede.onload = function() {
+      loading.style.display = 'none';
+      billede.style.display = 'block';
+    };
+    billede.onerror = function() {
+      loading.textContent = 'Kunne ikke hente ' + lag;
+    };
+  }
+
   visRedigerFormular(profil, profilDiv) {
     const eksisterende = document.getElementById('rediger_formular');
     if (eksisterende) eksisterende.remove();
@@ -175,6 +248,10 @@ class EjendomsprofilListe {
       + '<input type="text" id="red_vejnavn" value="' + profil.vejnavn + '">'
       + '<label>Husnummer:</label>'
       + '<input type="text" id="red_husnummer" value="' + profil.husnummer + '">'
+      + '<label>Etage:</label>'
+      + '<input type="text" id="red_etage" value="' + (profil.etage !== null ? profil.etage : '') + '">'
+      + '<label>Dør:</label>'
+      + '<input type="text" id="red_doer" value="' + (profil.doer !== null ? profil.doer : '') + '">'
       + '<label>Postnummer:</label>'
       + '<input type="text" id="red_postnummer" value="' + profil.postnummer + '">'
       + '<label>Bynavn:</label>'
@@ -202,9 +279,14 @@ class EjendomsprofilListe {
   }
 
   async gemRedigering(ejendomID) {
+    const etageVaerdi = document.getElementById('red_etage').value.trim();
+    const doerVaerdi = document.getElementById('red_doer').value.trim();
+
     const data = {
       vejnavn: document.getElementById('red_vejnavn').value,
       husnummer: document.getElementById('red_husnummer').value,
+      etage: etageVaerdi !== '' ? etageVaerdi : null,
+      doer: doerVaerdi !== '' ? doerVaerdi : null,
       postnummer: document.getElementById('red_postnummer').value,
       bynavn: document.getElementById('red_bynavn').value,
       ejendomstype: document.getElementById('red_ejendomstype').value,

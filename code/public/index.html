@@ -21,6 +21,33 @@
     <div id="profil_liste"></div>
   </div>
 
+  <!-- Ejendomsprofil popup -->
+  <div id="profil_modal" style="display: none;">
+    <div id="profil_modal_indhold">
+      <button id="profil_modal_luk">×</button>
+      <h2 id="modal_adresse"></h2>
+      <dl id="modal_data">
+        <div class="modal_raekke"><dt>Ejendomstype</dt><dd id="modal_ejendomstype">—</dd></div>
+        <div class="modal_raekke"><dt>Byggeår</dt><dd id="modal_byggeaar">—</dd></div>
+        <div class="modal_raekke"><dt>Boligareal</dt><dd id="modal_boligareal">—</dd></div>
+        <div class="modal_raekke"><dt>Grundareal</dt><dd id="modal_grundareal">—</dd></div>
+        <div class="modal_raekke"><dt>Værelser</dt><dd id="modal_vaerelser">—</dd></div>
+      </dl>
+      <div id="modal_kort_sektion">
+        <div>
+          <p class="kort_label">Luftfoto</p>
+          <img id="modal_luftfoto" style="display: none;">
+          <p id="modal_luftfoto_loading">Henter luftfoto...</p>
+        </div>
+        <div>
+          <p class="kort_label">Matrikelkort</p>
+          <img id="modal_matrikel" style="display: none;">
+          <p id="modal_matrikel_loading">Henter matrikelkort...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="/js/app.js"></script>
 </body>
 </html>

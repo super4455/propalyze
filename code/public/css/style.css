@@ -522,6 +522,120 @@ input[type="checkbox"] {
 }
 
 /* ==========================================
+   EJENDOMSPROFIL MODAL
+   ========================================== */
+
+#profil_modal {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(42, 42, 42, 0.5);
+  z-index: 100;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 4em 2em;
+  overflow-y: auto;
+}
+
+#profil_modal_indhold {
+  background-color: var(--hvid);
+  max-width: 680px;
+  width: 100%;
+  padding: 3em;
+  position: relative;
+}
+
+#profil_modal_luk {
+  position: absolute;
+  top: 1em;
+  right: 1em;
+  background: transparent;
+  border: none;
+  font-size: 1.4em;
+  color: var(--tekst-lys);
+  cursor: pointer;
+  padding: 0.2em 0.5em;
+  line-height: 1;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+#profil_modal_luk:hover {
+  color: var(--tekst);
+  background: transparent;
+}
+
+#profil_modal_indhold h2 {
+  margin-top: 0;
+  margin-bottom: 1.5em;
+  padding-bottom: 0.8em;
+  border-bottom: 1px solid var(--border);
+  padding-right: 2em;
+}
+
+#modal_data {
+  margin: 0 0 2em 0;
+  padding: 0;
+}
+
+.modal_raekke {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 0.6em 0;
+  border-bottom: 1px solid var(--border);
+  gap: 1em;
+}
+
+.modal_raekke:last-child {
+  border-bottom: none;
+}
+
+#modal_data dt {
+  font-size: 0.72em;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--tekst-dæmpet);
+}
+
+#modal_data dd {
+  font-size: 0.9em;
+  color: var(--tekst);
+  margin: 0;
+  text-align: right;
+}
+
+#modal_kort_sektion {
+  display: flex;
+  gap: 1.5em;
+  flex-wrap: wrap;
+  margin-top: 2em;
+  padding-top: 1.5em;
+  border-top: 1px solid var(--border);
+}
+
+#modal_kort_sektion > div {
+  flex: 1;
+  min-width: 200px;
+}
+
+#modal_kort_sektion img {
+  width: 100%;
+  display: block;
+  border: 1px solid var(--border);
+}
+
+.kort_label {
+  font-size: 0.72em;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--tekst-lys);
+  margin: 0 0 0.5em 0;
+}
+
+/* ==========================================
    SIMULERING
    ========================================== */
 

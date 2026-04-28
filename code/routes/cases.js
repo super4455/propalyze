@@ -5,6 +5,8 @@ const express = require('express');
 const router = express.Router();
 const database = require('../database/database');
 const InvesteringsBeregner = require('../logic/InvesteringsBeregner');
+const LoanCalculator = require('../logic/laan');
+const CashflowCalculator = require('../logic/cashflow');
 
 // POST /api/cases
 // Opretter en ny investeringscase for en ejendom
@@ -505,13 +507,7 @@ router.get('/sammenlign', async (req, res) => {
           { id: driftsbudget[0].driftsbudgetID }
         );
 
-        for (const u of udgifter) {
-          if (u.frekvens === 'maanedlig') {
-            maanedligDrift += parseFloat(u.beloeb);
-          } else {
-            maanedligDrift += parseFloat(u.beloeb) / 12;
-          }
-        }
+        maanedligDrift = CashflowCalculator.beregnMaanedligDrift(udgifter);
       }
 
       // Hent udlejning
@@ -520,22 +516,19 @@ router.get('/sammenlign', async (req, res) => {
         { caseID: caseID }
       );
 
-      // Beregn månedlig ydelse med annuitetsformlen
+      // Beregn månedlig ydelse for år 1 og total rente over hele løbetiden.
+      // Bruger LoanCalculator så alle lånetyper og afdragsfrihed håndteres korrekt
       let maanedligYdelse = 0;
       let totalRente = 0;
       if (finansiering.length > 0) {
         const f = finansiering[0];
-        const r = parseFloat(f.rente) / 100 / 12;
-        const n = parseInt(f.loebetid_aar) * 12;
-        const L = parseFloat(f.laanebeloeb);
+        const laanebeloeb = parseFloat(f.laanebeloeb);
+        const rente = parseFloat(f.rente);
+        const loebetid = parseInt(f.loebetid_aar);
+        const afdragsfri = parseInt(f.afdragsfriaar) || 0;
 
-        if (r === 0) {
-          maanedligYdelse = L / n;
-        } else {
-          maanedligYdelse = L * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
-        }
-
-        totalRente = (maanedligYdelse * n) - L;
+        maanedligYdelse = LoanCalculator.beregnYdelse(laanebeloeb, rente, loebetid, afdragsfri, f.laanetype, 0);
+        totalRente = LoanCalculator.beregnTotalRente(laanebeloeb, rente, loebetid, afdragsfri, f.laanetype);
       }
 
       // Beregn månedligt cashflow

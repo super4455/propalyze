@@ -102,6 +102,26 @@ class LoanCalculator {
     return LoanCalculator.beregnYdelseAnnuitet(laanebeloeb, renteAarlig, loebetidAar);
   }
 
+  // Returnerer total rente betalt over hele lånets løbetid
+  static beregnTotalRente(laanebeloeb, renteAarlig, loebetidAar, afdragsfriAar, laanetype) {
+    let totalBetalt = 0;
+
+    for (let aar = 0; aar < loebetidAar; aar++) {
+      const maanedligYdelse = LoanCalculator.beregnYdelse(
+        laanebeloeb, renteAarlig, loebetidAar, afdragsfriAar, laanetype, aar
+      );
+      totalBetalt += maanedligYdelse * 12;
+    }
+
+    // Stående lån betaler kun renter løbende - hovedstolen tilbagebetales som
+    // engangsbeløb ved udløb og indgår ikke i ydelsen
+    if (laanetype === 'Staaende laan') {
+      return totalBetalt;
+    }
+
+    return totalBetalt - laanebeloeb;
+  }
+
   // Returnerer restgæld efter det givne antal betalte år
   static beregnRestgaeld(laanebeloeb, renteAarlig, loebetidAar, laanetype, betalteAar) {
 

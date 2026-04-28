@@ -93,7 +93,8 @@ class EjendomsInfoView {
       byggeaar: this.ejendom.bbr.byggeaar,
       boligareal: this.ejendom.bbr.boligareal,
       grundareal: this.ejendom.bbr.grundareal,
-      vaerelser: this.ejendom.bbr.vaerelser
+      vaerelser: this.ejendom.bbr.vaerelser,
+      koordinater: this.ejendom.bbr.koordinater
     };
 
     try {

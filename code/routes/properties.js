@@ -104,7 +104,8 @@ router.get('/:id', async (req, res) => {
 
     const sqlTekst = `
       SELECT ejendomID, vejnavn, husnummer, etage, doer, postnummer, bynavn,
-             ejendomstype, byggeaar, boligareal, grundareal, vaerelser, dawaID
+             ejendomstype, byggeaar, boligareal, grundareal, vaerelser, dawaID,
+             koordinat_x, koordinat_y
       FROM Propalyze.ejendomsprofil
       WHERE ejendomID = @id
     `;
@@ -118,24 +119,9 @@ router.get('/:id', async (req, res) => {
 
     const profil = rækker[0];
 
-    let koordinater = null;
-    try {
-      let dawaSvar = await fetch('https://api.dataforsyningen.dk/adresser/' + profil.dawaID);
-      let erAdgangsadresse = false;
-
-      if (dawaSvar.status === 404) {
-        dawaSvar = await fetch('https://api.dataforsyningen.dk/adgangsadresser/' + profil.dawaID);
-        erAdgangsadresse = true;
-      }
-
-      if (dawaSvar.ok) {
-        const dawaRaa = await dawaSvar.json();
-        const adgangsadresse = erAdgangsadresse ? dawaRaa : dawaRaa.adgangsadresse;
-        koordinater = adgangsadresse.adgangspunkt.koordinater;
-      }
-    } catch (dawaFejl) {
-      console.log('Kunne ikke hente koordinater fra DAWA:', dawaFejl.message);
-    }
+    const koordinater = profil.koordinat_x !== null && profil.koordinat_y !== null
+      ? [profil.koordinat_x, profil.koordinat_y]
+      : null;
 
     res.status(200).json({
       vejnavn: profil.vejnavn,
@@ -202,15 +188,21 @@ router.post('/', async (req, res) => {
       return;
     }
 
+    // BBR returnerer koordinater som strings i array [x, y] (UTM 32N)
+    const koordinatX = data.koordinater && data.koordinater[0] ? parseFloat(data.koordinater[0]) : null;
+    const koordinatY = data.koordinater && data.koordinater[1] ? parseFloat(data.koordinater[1]) : null;
+
     // Parameteriseret query for at undgå SQL injection
     const sqlTekst = `
       INSERT INTO Propalyze.ejendomsprofil
         (vejnavn, husnummer, etage, doer, postnummer, bynavn, ejendomstype,
-         byggeaar, boligareal, grundareal, vaerelser, dawaID, sidste_data_hentning)
+         byggeaar, boligareal, grundareal, vaerelser, dawaID,
+         koordinat_x, koordinat_y, sidste_data_hentning)
       OUTPUT INSERTED.ejendomID
       VALUES
         (@vejnavn, @husnummer, @etage, @doer, @postnummer, @bynavn, @ejendomstype,
-         @byggeaar, @boligareal, @grundareal, @vaerelser, @dawaID, GETDATE())
+         @byggeaar, @boligareal, @grundareal, @vaerelser, @dawaID,
+         @koordinat_x, @koordinat_y, GETDATE())
     `;
 
     const parametre = {
@@ -225,7 +217,9 @@ router.post('/', async (req, res) => {
       boligareal: data.boligareal,
       grundareal: data.grundareal,
       vaerelser: data.vaerelser,
-      dawaID: data.dawaID
+      dawaID: data.dawaID,
+      koordinat_x: koordinatX,
+      koordinat_y: koordinatY
     };
 
     const resultat = await database.query(sqlTekst, parametre);

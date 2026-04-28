@@ -15,8 +15,9 @@ CREATE TABLE Propalyze.ejendomsprofil (
 	dawaID VARCHAR(50) UNIQUE,
     vejnavn VARCHAR(255) NOT NULL
 	doer VARCHAR(10),
-	etage INT
-
+	etage INT,
+	koordinat_x DECIMAL(12,4) NULL,
+	koordinat_y DECIMAL(12,4) NULL
 )
 
 -- Dannelse af Investeringscase table:

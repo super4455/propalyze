@@ -1,25 +1,51 @@
-*, *::before, *::after { box-sizing: border-box; }
+/* === GRUNDLAYOUT === */
 
 body {
   font-family: sans-serif;
-  font-size: 15px;
-  line-height: 1.6;
-  max-width: 960px;
+  max-width: 900px;
   margin: 0 auto;
-  padding: 32px;
+  padding: 24px;
   color: #222;
-  background: #fff;
 }
 
-/* === TYPOGRAFI === */
+a { color: #222; }
 
-h1 { font-size: 30px; margin: 0 0 6px; }
-h2 { font-size: 20px; margin: 24px 0 8px; }
-h3 { font-size: 16px; margin: 0 0 6px; }
-h4 { font-size: 11px; text-transform: uppercase; color: #666; margin: 0 0 4px; }
-p  { margin: 4px 0; color: #555; font-size: 13px; }
-hr { border: none; border-top: 1px solid #ddd; margin: 24px 0; }
-a  { color: #222; }
+p { margin: 4px 0; color: #555; }
+
+hr {
+  border: none;
+  border-top: 1px solid #ddd;
+  margin: 24px 0;
+}
+
+/* === OVERSKRIFTER === */
+
+h1 { font-size: 28px; }
+h2 { font-size: 20px; margin-top: 24px; }
+h3 { font-size: 16px; }
+h4 {
+  font-size: 11px;
+  text-transform: uppercase;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+/* === FORSIDE === */
+
+.forside {
+  text-align: center;
+  padding: 24px 0;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 24px;
+}
+
+.forside h1 { font-size: 40px; margin: 0; }
+
+.fremskridt {
+  font-size: 12px;
+  color: #aaa;
+  margin-bottom: 16px;
+}
 
 /* === KNAPPER === */
 
@@ -31,28 +57,35 @@ button {
   font-size: 13px;
 }
 
-button:hover,
+button:hover {
+  background: #222;
+  color: #fff;
+  border-color: #222;
+}
+
 .knap_primaer {
   background: #222;
   color: #fff;
   border-color: #222;
 }
 
-.slet_knap,
-.slet_knap:hover {
+.slet_knap {
   background: transparent;
-  border-color: transparent;
+  border: none;
   color: #aaa;
 }
 
-.slet_knap:hover { color: #900; }
+.slet_knap:hover {
+  background: transparent;
+  color: #900;
+}
 
 .knapper,
 .knapper_rad {
   display: flex;
-  gap: 8px;
   flex-wrap: wrap;
-  margin-top: 16px;
+  gap: 8px;
+  margin-top: 12px;
 }
 
 /* === FORMULARER === */
@@ -64,93 +97,45 @@ label {
   margin: 12px 0 4px;
 }
 
-input:not([type="checkbox"]),
+input,
 select {
   width: 100%;
   padding: 8px;
   border: 1px solid #ccc;
   font-size: 13px;
+  box-sizing: border-box;
 }
-
-input:focus,
-select:focus { outline: 2px solid #222; }
 
 input[type="checkbox"] { width: auto; }
 
-.case_formular {
-  border: 1px solid #ddd;
-  padding: 16px;
-  margin-top: 12px;
-}
-
-.overblik {
-  border-top: 1px solid #ddd;
-  padding-top: 12px;
-  margin-top: 12px;
-}
-
-.overblik p { display: flex; justify-content: space-between; }
-
-#fremskridt {
-  display: inline-block;
-  font-size: 12px;
-  color: #aaa;
-  margin-bottom: 20px;
-}
-
 /* === SØGNING === */
 
-#soegefelt {
-  width: 100%;
-  padding: 8px;
+.resultater {
   border: 1px solid #ccc;
-  font-size: 15px;
+  border-top: none;
 }
-
-#resultater { border: 1px solid #ccc; border-top: none; }
-#resultater:empty { border: none; }
 
 .resultat {
   padding: 10px 14px;
   border-bottom: 1px solid #eee;
   cursor: pointer;
-  font-size: 13px;
 }
 
 .resultat:hover { background: #f5f5f5; }
 
-/* === FORSIDE === */
+/* === KORT (bordede bokse) === */
 
-#forside_header {
-  text-align: center;
-  padding: 32px 0;
-  border-bottom: 1px solid #ddd;
-  margin-bottom: 32px;
-}
-
-#brand   { font-size: 48px; margin: 0; }
-#tagline { font-size: 13px; color: #aaa; margin: 0; }
-
-/* === PROFIL-KORT === */
-
-.profil_kort {
+.profil_kort,
+.case_formular {
   border: 1px solid #ddd;
   padding: 16px;
-  margin-bottom: 10px;
+  margin: 12px 0;
 }
 
-.profil_dato { font-size: 12px; color: #aaa; }
-
-.case_kort {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 0;
-  border-bottom: 1px solid #eee;
-  gap: 12px;
+.profil_dato {
+  font-size: 12px;
+  color: #aaa;
 }
-
-.case_kort p { margin: 0; font-size: 13px; }
 
 .cases_liste {
   border-top: 1px solid #ddd;
@@ -158,7 +143,32 @@ input[type="checkbox"] { width: auto; }
   padding-top: 12px;
 }
 
-/* === EJENDOMSDATA === */
+.case_kort {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.case_valg_item {
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.overblik {
+  border-top: 1px solid #ddd;
+  margin-top: 12px;
+  padding-top: 12px;
+}
+
+.overblik p {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* === DATA-GRID (ejendomsinfo) === */
 
 .data_gruppe {
   display: grid;
@@ -181,64 +191,57 @@ input[type="checkbox"] { width: auto; }
   margin-bottom: 4px;
 }
 
-.data_vaerdi { display: block; }
+/* === KORT-SEKTION (luftfoto + matrikel) === */
 
-/* === KORT (luftfoto + kort) === */
-
-#kort_sektion,
-#modal_kort_sektion {
+.kort_sektion {
   display: flex;
-  gap: 12px;
   flex-wrap: wrap;
+  gap: 12px;
   margin: 16px 0;
 }
 
-#kort_sektion > div,
-#modal_kort_sektion > div { flex: 1; min-width: 200px; }
+.kort_sektion > div {
+  flex: 1;
+  min-width: 200px;
+}
 
-#kort_sektion img,
-#modal_kort_sektion img {
+.kort_sektion img {
   width: 100%;
   display: block;
   border: 1px solid #ddd;
 }
 
-#modal_opdater_knap { margin-top: 16px; }
-
 /* === MODAL === */
 
-#profil_modal {
+.modal {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   background: rgba(0, 0, 0, 0.5);
-  z-index: 100;
   display: flex;
-  align-items: flex-start;
   justify-content: center;
-  padding: 48px 24px;
+  padding: 40px 20px;
   overflow-y: auto;
 }
 
-#profil_modal_indhold {
+.modal_indhold {
   background: #fff;
-  max-width: 680px;
   width: 100%;
-  padding: 28px;
+  max-width: 600px;
+  padding: 24px;
   position: relative;
 }
 
-#profil_modal_luk {
+.luk_knap {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  background: transparent;
+  top: 8px;
+  right: 8px;
   border: none;
+  background: transparent;
   font-size: 20px;
-  cursor: pointer;
 }
-
-#modal_data dt { font-size: 12px; color: #666; text-transform: uppercase; }
-#modal_data dd { font-size: 13px; margin: 0; text-align: right; }
 
 .modal_raekke {
   display: flex;
@@ -247,68 +250,35 @@ input[type="checkbox"] { width: auto; }
   border-bottom: 1px solid #eee;
 }
 
-/* === TABELLER === */
+/* === TABEL === */
 
-#simulering_tabel,
-#sammenligning_tabel {
+table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 16px;
   font-size: 13px;
 }
 
-#simulering_tabel th,
-#sammenligning_tabel th {
+th,
+td {
   padding: 8px 12px;
   text-align: right;
+  border-bottom: 1px solid #eee;
+}
+
+th {
   border-bottom: 2px solid #222;
   font-size: 11px;
   text-transform: uppercase;
 }
 
-#simulering_tabel th:first-child,
-#sammenligning_tabel th:first-child { text-align: left; }
-
-#simulering_tabel td,
-#sammenligning_tabel td {
-  padding: 8px 12px;
-  text-align: right;
-  border-bottom: 1px solid #eee;
-  color: #555;
-}
-
-#simulering_tabel td:first-child { text-align: left; color: #222; }
-
-/* === SAMMENLIGNING === */
-
-.case_valg_item {
-  padding: 10px 0;
-  border-bottom: 1px solid #eee;
-}
-
-.case_valg_item label {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  cursor: pointer;
-  text-transform: none;
-  font-weight: normal;
-  font-size: 13px;
-  margin: 0;
-}
-
-.raekke_label {
-  font-size: 12px;
-  text-transform: uppercase;
-  color: #666;
-  white-space: nowrap;
-  padding-right: 16px;
-  text-align: left !important;
-}
+th:first-child,
+td:first-child { text-align: left; }
 
 /* === STATUSFARVER === */
 
-.positiv { color: #2a7a3b; font-weight: bold; }
-.negativ { color: #900;    font-weight: bold; }
-.succes  { color: #2a7a3b; font-size: 13px; }
-.fejl    { color: #900;    font-size: 13px; }
+.positiv,
+.succes { color: #2a7a3b; }
+
+.negativ,
+.fejl { color: #900; }

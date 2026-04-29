@@ -7,7 +7,7 @@
 </head>
 <body>
 
-  <header id="forside_header">
+  <header id="forside_header" class="forside">
     <h1 id="brand">Propalyze</h1>
   </header>
 
@@ -15,7 +15,7 @@
 
   <!-- Søgefelt og resultater -->
   <input type="text" id="soegefelt" placeholder="Skriv en adresse...">
-  <div id="resultater"></div>
+  <div id="resultater" class="resultater"></div>
 
   <!-- Gemte ejendomsprofiler -->
   <div id="profiler_sektion">
@@ -25,9 +25,9 @@
   </div>
 
   <!-- Ejendomsprofil popup -->
-  <div id="profil_modal" style="display: none;">
-    <div id="profil_modal_indhold">
-      <button id="profil_modal_luk">×</button>
+  <div id="profil_modal" class="modal" style="display: none;">
+    <div id="profil_modal_indhold" class="modal_indhold">
+      <button id="profil_modal_luk" class="luk_knap">×</button>
       <h2 id="modal_adresse"></h2>
       <dl id="modal_data">
         <div class="modal_raekke"><dt>Ejendomstype</dt><dd id="modal_ejendomstype">—</dd></div>
@@ -36,7 +36,7 @@
         <div class="modal_raekke"><dt>Grundareal</dt><dd id="modal_grundareal">—</dd></div>
         <div class="modal_raekke"><dt>Værelser</dt><dd id="modal_vaerelser">—</dd></div>
       </dl>
-      <div id="modal_kort_sektion">
+      <div id="modal_kort_sektion" class="kort_sektion">
         <div>
           <p class="kort_label">Luftfoto</p>
           <img id="modal_luftfoto" style="display: none;">

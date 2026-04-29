@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const KortApi = require('../logic/kortAPI');
+const KortApi = require('../services/kortAPI');
 
 router.get('/', async (req, res) => {
   const lag = req.query.lag;

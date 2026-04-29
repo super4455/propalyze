@@ -2,8 +2,8 @@
 // Orkestrator-klasse der kombinerer lån- og cashflow-beregninger for én investeringscase
 // Holder case-data og beregnede resultater som state
 
-const LoanCalculator = require('./laan');
-const CashflowCalculator = require('./cashflow');
+const LaaneBeregner = require('./laan');
+const CashflowBeregner = require('./cashflow');
 
 class InvesteringsBeregner {
 
@@ -24,8 +24,8 @@ class InvesteringsBeregner {
 
   // Beregner og gemmer månedlige driftsudgifter og driftsindtægter
   beregnDrift() {
-    this.maanedligDrift = CashflowCalculator.beregnMaanedligDrift(this.udgifter);
-    this.maanedligDriftsIndtaegt = CashflowCalculator.beregnMaanedligIndtaegt(this.indtaegter);
+    this.maanedligDrift = CashflowBeregner.beregnMaanedligDrift(this.udgifter);
+    this.maanedligDriftsIndtaegt = CashflowBeregner.beregnMaanedligIndtaegt(this.indtaegter);
     return this;
   }
 
@@ -52,12 +52,12 @@ class InvesteringsBeregner {
     this.simuleringsResultater = [];
 
     for (let aar = 1; aar <= periode; aar++) {
-      const maanedligYdelse  = LoanCalculator.beregnYdelse(laanebeloeb, rente, loebetid, afdragsfriaar, laanetype, aar - 1);
-      const ejendomsvaerdi   = CashflowCalculator.beregnEjendomsvaerdi(ejendomspris, vaerdistigning, aar);
-      const restgaeld        = LoanCalculator.beregnRestgaeld(laanebeloeb, rente, loebetid, laanetype, aar);
-      const egenkapital      = CashflowCalculator.beregnEgenkapital(ejendomsvaerdi, restgaeld);
-      const aarligRenovering = CashflowCalculator.beregnRenoveringForAar(this.renoveringer, aar, startAar);
-      const aarligCashflow   = CashflowCalculator.beregnAarligCashflow(
+      const maanedligYdelse  = LaaneBeregner.beregnYdelse(laanebeloeb, rente, loebetid, afdragsfriaar, laanetype, aar - 1);
+      const ejendomsvaerdi   = CashflowBeregner.beregnEjendomsvaerdi(ejendomspris, vaerdistigning, aar);
+      const restgaeld        = LaaneBeregner.beregnRestgaeld(laanebeloeb, rente, loebetid, laanetype, aar);
+      const egenkapital      = CashflowBeregner.beregnEgenkapital(ejendomsvaerdi, restgaeld);
+      const aarligRenovering = CashflowBeregner.beregnRenoveringForAar(this.renoveringer, aar, startAar);
+      const aarligCashflow   = CashflowBeregner.beregnAarligCashflow(
         maanedligLeje, maanedligUdlejningUdgift, maanedligYdelse,
         this.maanedligDrift, this.maanedligDriftsIndtaegt, aarligRenovering
       );

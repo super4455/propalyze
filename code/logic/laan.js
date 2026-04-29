@@ -1,6 +1,6 @@
 // laan.js - Låneberegninger for annuitetslån, serielån og stående lån
 
-class LoanCalculator {
+class LaaneBeregner {
 
   // Annuitetslån: fast månedlig ydelse, faldende renteandel
   static beregnYdelseAnnuitet(laanebeloeb, renteAarlig, loebetidAar) {
@@ -37,7 +37,7 @@ class LoanCalculator {
     const r = renteAarlig / 100 / 12;
     const n = loebetidAar * 12;
     const fastAfdrag = laanebeloeb / n;
-    const restgaeld = LoanCalculator.beregnRestgaeldSerie(laanebeloeb, loebetidAar, betalteAar);
+    const restgaeld = LaaneBeregner.beregnRestgaeldSerie(laanebeloeb, loebetidAar, betalteAar);
 
     return fastAfdrag + restgaeld * r;
   }
@@ -87,19 +87,19 @@ class LoanCalculator {
     if (betalteAar > loebetidAar) return 0;
 
     if (laanetype === 'Annuitetslaan') {
-      return LoanCalculator.beregnYdelseAnnuitet(laanebeloeb, renteAarlig, loebetidAar);
+      return LaaneBeregner.beregnYdelseAnnuitet(laanebeloeb, renteAarlig, loebetidAar);
     }
 
     if (laanetype === 'Serielaan') {
-      return LoanCalculator.beregnYdelseSerie(laanebeloeb, renteAarlig, loebetidAar, betalteAar);
+      return LaaneBeregner.beregnYdelseSerie(laanebeloeb, renteAarlig, loebetidAar, betalteAar);
     }
 
     if (laanetype === 'Staaende laan') {
-      return LoanCalculator.beregnYdelseStaaende(laanebeloeb, renteAarlig, loebetidAar, betalteAar);
+      return LaaneBeregner.beregnYdelseStaaende(laanebeloeb, renteAarlig, loebetidAar, betalteAar);
     }
 
     console.log('Ukendt lånetype:', laanetype, '- falder tilbage til annuitetslån');
-    return LoanCalculator.beregnYdelseAnnuitet(laanebeloeb, renteAarlig, loebetidAar);
+    return LaaneBeregner.beregnYdelseAnnuitet(laanebeloeb, renteAarlig, loebetidAar);
   }
 
   // Returnerer total rente betalt over hele lånets løbetid
@@ -107,7 +107,7 @@ class LoanCalculator {
     let totalBetalt = 0;
 
     for (let aar = 0; aar < loebetidAar; aar++) {
-      const maanedligYdelse = LoanCalculator.beregnYdelse(
+      const maanedligYdelse = LaaneBeregner.beregnYdelse(
         laanebeloeb, renteAarlig, loebetidAar, afdragsfriAar, laanetype, aar
       );
       totalBetalt += maanedligYdelse * 12;
@@ -126,19 +126,19 @@ class LoanCalculator {
   static beregnRestgaeld(laanebeloeb, renteAarlig, loebetidAar, laanetype, betalteAar) {
 
     if (laanetype === 'Annuitetslaan') {
-      return LoanCalculator.beregnRestgaeldAnnuitet(laanebeloeb, renteAarlig, loebetidAar, betalteAar);
+      return LaaneBeregner.beregnRestgaeldAnnuitet(laanebeloeb, renteAarlig, loebetidAar, betalteAar);
     }
 
     if (laanetype === 'Serielaan') {
-      return LoanCalculator.beregnRestgaeldSerie(laanebeloeb, loebetidAar, betalteAar);
+      return LaaneBeregner.beregnRestgaeldSerie(laanebeloeb, loebetidAar, betalteAar);
     }
 
     if (laanetype === 'Staaende laan') {
-      return LoanCalculator.beregnRestgaeldStaaende(laanebeloeb, loebetidAar, betalteAar);
+      return LaaneBeregner.beregnRestgaeldStaaende(laanebeloeb, loebetidAar, betalteAar);
     }
 
-    return LoanCalculator.beregnRestgaeldAnnuitet(laanebeloeb, renteAarlig, loebetidAar, betalteAar);
+    return LaaneBeregner.beregnRestgaeldAnnuitet(laanebeloeb, renteAarlig, loebetidAar, betalteAar);
   }
 }
 
-module.exports = LoanCalculator;
+module.exports = LaaneBeregner;

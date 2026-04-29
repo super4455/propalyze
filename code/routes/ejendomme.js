@@ -4,7 +4,8 @@
 const express = require('express');
 const router = express.Router();
 const database = require('../database/database');
-const BBRService = require('../logic/BBRapi');
+const BBRService = require('../services/BBRapi');
+const DAWAService = require('../services/DAWAapi');
 
 // GET /api/properties/lookup?dawaId=...
 // Slår en ejendom op via DAWA + BBR og returnerer begge dele samlet
@@ -18,46 +19,7 @@ router.get('/lookup', async (req, res) => {
       return;
     }
 
-    // Slå adressen op i DAWA. Prøv /adresser først (specifik adresse
-    // med etage/dør), fald tilbage til /adgangsadresser (hus-niveau).
-    let dawaSvar = await fetch('https://api.dataforsyningen.dk/adresser/' + dawaId);
-    let erAdgangsadresse = false;
-
-    if (dawaSvar.status === 404) {
-      dawaSvar = await fetch('https://api.dataforsyningen.dk/adgangsadresser/' + dawaId);
-      erAdgangsadresse = true;
-    }
-
-    if (!dawaSvar.ok) {
-      res.status(502).json({ fejl: 'DAWA kunne ikke finde adressen' });
-      return;
-    }
-
-    const dawaRaa = await dawaSvar.json();
-    const adgangsadresse = erAdgangsadresse ? dawaRaa : dawaRaa.adgangsadresse;
-
-    // etage og doer findes kun paa lejligheder (type: adresse).
-    // Huse (type: adgangsadresse) har ikke de felter overhovedet.
-    const dawa = {
-      id: dawaRaa.id,
-      adgangsadresseid: adgangsadresse.id,
-      adresse: dawaRaa.adressebetegnelse,
-      vejnavn: adgangsadresse.vejstykke.navn,
-      husnummer: adgangsadresse.husnr,
-      postnummer: adgangsadresse.postnummer.nr,
-      bynavn: adgangsadresse.postnummer.navn,
-      etage: erAdgangsadresse ? null : dawaRaa.etage,
-      doer: erAdgangsadresse ? null : dawaRaa.dør,
-      // Koordinater i WGS84 [longitude, latitude]
-      koordinater: adgangsadresse.adgangspunkt.koordinater,
-      matrikelnr: adgangsadresse.jordstykke ? adgangsadresse.jordstykke.matrikelnr : null,
-      ejerlavskode: adgangsadresse.jordstykke ? adgangsadresse.jordstykke.ejerlav.kode : null
-    };
-
-    console.log('Slår ejendom op. Etage:', dawa.etage, '| matrikelnr:', dawa.matrikelnr, '| ejerlavskode:', dawa.ejerlavskode);
-    console.log('DAWA jordstykker rådata:', JSON.stringify(adgangsadresse.jordstykker));
-
-    // Hent BBR-data med den rigtige strategi (hus vs. lejlighed)
+    const dawa = await DAWAService.hentAdresse(dawaId);
     const bbr = await BBRService.hentBBR(dawa);
 
     res.status(200).json({ dawa: dawa, bbr: bbr });
@@ -302,6 +264,63 @@ router.put('/:id', async (req, res) => {
 
   } catch (err) {
     console.log('Fejl ved opdatering:', err.message);
+    res.status(500).json({ fejl: err.message });
+  }
+});
+
+
+// POST /api/ejendomme/:id/opdater-data
+// Genhenter BBR-data for en eksisterende ejendomsprofil og opdaterer sidste_data_hentning
+router.post('/:id/opdater-data', async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    const hentSql = `
+      SELECT dawaID FROM Propalyze.ejendomsprofil WHERE ejendomID = @id
+    `;
+    const rækker = await database.query(hentSql, { id: id });
+
+    if (rækker.length === 0) {
+      res.status(404).json({ fejl: 'Ejendomsprofil ikke fundet' });
+      return;
+    }
+
+    const dawaId = rækker[0].dawaID;
+
+    const dawa = await DAWAService.hentAdresse(dawaId);
+    const bbr = await BBRService.hentBBR(dawa);
+
+    const koordinatX = bbr.koordinater && bbr.koordinater[0] ? parseFloat(bbr.koordinater[0]) : null;
+    const koordinatY = bbr.koordinater && bbr.koordinater[1] ? parseFloat(bbr.koordinater[1]) : null;
+
+    const opdaterSql = `
+      UPDATE Propalyze.ejendomsprofil
+      SET ejendomstype = @ejendomstype,
+          byggeaar = @byggeaar,
+          boligareal = @boligareal,
+          grundareal = @grundareal,
+          vaerelser = @vaerelser,
+          koordinat_x = @koordinat_x,
+          koordinat_y = @koordinat_y,
+          sidste_data_hentning = GETDATE()
+      WHERE ejendomID = @id
+    `;
+
+    await database.query(opdaterSql, {
+      id: id,
+      ejendomstype: bbr.ejendomstype,
+      byggeaar: bbr.byggeaar,
+      boligareal: bbr.boligareal,
+      grundareal: bbr.grundareal,
+      vaerelser: bbr.vaerelser,
+      koordinat_x: koordinatX,
+      koordinat_y: koordinatY
+    });
+
+    res.status(200).json({ besked: 'BBR-data opdateret' });
+
+  } catch (err) {
+    console.log('Fejl ved opdatering af BBR-data:', err.message);
     res.status(500).json({ fejl: err.message });
   }
 });

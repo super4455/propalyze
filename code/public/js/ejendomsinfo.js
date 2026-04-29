@@ -19,7 +19,7 @@ class EjendomsInfoView {
     }
 
     try {
-      const svar = await fetch('/api/properties/lookup?dawaId=' + this.dawaId);
+      const svar = await fetch('/api/ejendomme/lookup?dawaId=' + this.dawaId);
 
       if (!svar.ok) {
         const fejl = await svar.json().catch(function() { return {}; });
@@ -98,7 +98,7 @@ class EjendomsInfoView {
     };
 
     try {
-      const svar = await fetch('/api/properties', {
+      const svar = await fetch('/api/ejendomme', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)

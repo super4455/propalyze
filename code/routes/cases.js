@@ -5,8 +5,8 @@ const express = require('express');
 const router = express.Router();
 const database = require('../database/database');
 const InvesteringsBeregner = require('../logic/InvesteringsBeregner');
-const LoanCalculator = require('../logic/laan');
-const CashflowCalculator = require('../logic/cashflow');
+const LaaneBeregner = require('../logic/laan');
+const CashflowBeregner = require('../logic/cashflow');
 
 // POST /api/cases
 // Opretter en ny investeringscase for en ejendom
@@ -507,7 +507,7 @@ router.get('/sammenlign', async (req, res) => {
           { id: driftsbudget[0].driftsbudgetID }
         );
 
-        maanedligDrift = CashflowCalculator.beregnMaanedligDrift(udgifter);
+        maanedligDrift = CashflowBeregner.beregnMaanedligDrift(udgifter);
       }
 
       // Hent udlejning
@@ -517,7 +517,7 @@ router.get('/sammenlign', async (req, res) => {
       );
 
       // Beregn månedlig ydelse for år 1 og total rente over hele løbetiden.
-      // Bruger LoanCalculator så alle lånetyper og afdragsfrihed håndteres korrekt
+      // Bruger LaaneBeregner så alle lånetyper og afdragsfrihed håndteres korrekt
       let maanedligYdelse = 0;
       let totalRente = 0;
       if (finansiering.length > 0) {
@@ -527,8 +527,8 @@ router.get('/sammenlign', async (req, res) => {
         const loebetid = parseInt(f.loebetid_aar);
         const afdragsfri = parseInt(f.afdragsfriaar) || 0;
 
-        maanedligYdelse = LoanCalculator.beregnYdelse(laanebeloeb, rente, loebetid, afdragsfri, f.laanetype, 0);
-        totalRente = LoanCalculator.beregnTotalRente(laanebeloeb, rente, loebetid, afdragsfri, f.laanetype);
+        maanedligYdelse = LaaneBeregner.beregnYdelse(laanebeloeb, rente, loebetid, afdragsfri, f.laanetype, 0);
+        totalRente = LaaneBeregner.beregnTotalRente(laanebeloeb, rente, loebetid, afdragsfri, f.laanetype);
       }
 
       // Beregn månedligt cashflow

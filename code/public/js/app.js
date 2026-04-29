@@ -22,7 +22,7 @@ class AdresseSoegning {
     }
 
     try {
-      const svar = await fetch('/api/addresses/search?q=' + tekst);
+      const svar = await fetch('/api/adresser/search?q=' + tekst);
 
       if (!svar.ok) {
         this.resultater.innerHTML = '<p>Kunne ikke hente forslag</p>';
@@ -49,7 +49,7 @@ class AdresseSoegning {
     for (const f of forslag) {
       const div = document.createElement('div');
       div.className = 'resultat';
-      div.textContent = f.tekst;
+      div.textContent = f.tekst.replace(', ,', ',');
 
       div.addEventListener('click', function() {
         window.location.href = 'ejendomsinfo.html?dawaId=' + f.data.id;
@@ -79,7 +79,7 @@ class EjendomsprofilListe {
 
   async hentGemteProfiler() {
     try {
-      const svar = await fetch('/api/properties');
+      const svar = await fetch('/api/ejendomme');
 
       if (!svar.ok) {
         this.profilListe.innerHTML = '<p>Kunne ikke hente profiler</p>';
@@ -105,7 +105,9 @@ class EjendomsprofilListe {
           + ' · ' + p.boligareal + ' m² · ' + p.vaerelser + ' værelser</p>'
           + '<p>Investeringscases: ' + p.antal_cases + '</p>'
           + '<p class="profil_dato">Oprettet: '
-          + new Date(p.oprettet_dato).toLocaleDateString('da-DK') + '</p>';
+          + new Date(p.oprettet_dato).toLocaleDateString('da-DK') + '</p>'
+          + '<p class="profil_dato">Data hentet: '
+          + new Date(p.sidste_data_hentning).toLocaleDateString('da-DK') + '</p>';
 
         const caseKnap = document.createElement('button');
         caseKnap.className = 'case_knap';
@@ -131,11 +133,11 @@ class EjendomsprofilListe {
         sletKnap.className = 'slet_knap';
         sletKnap.textContent = 'Slet';
         sletKnap.addEventListener('click', async () => {
-          const bekraeft = confirm('Er du sikker på du vil slette denne ejendomsprofil?');
+          const bekraeft = confirm('Er du sikker på du vil slette denne ejendomsprofil?\n\nAlle tilknyttede investeringscases og deres data vil også blive slettet.');
           if (!bekraeft) return;
 
           try {
-            const svar = await fetch('/api/properties/' + p.ejendomID, { method: 'DELETE' });
+            const svar = await fetch('/api/ejendomme/' + p.ejendomID, { method: 'DELETE' });
 
             if (svar.ok) {
               this.hentGemteProfiler();
@@ -199,6 +201,32 @@ class EjendomsprofilListe {
     matrikelLoading.textContent = 'Henter matrikelkort...';
     matrikelLoading.style.display = 'block';
 
+    const opdaterKnap = document.getElementById('modal_opdater_knap');
+    opdaterKnap.textContent = 'Opdatér BBR-data';
+    opdaterKnap.disabled = false;
+    opdaterKnap.onclick = async () => {
+      opdaterKnap.disabled = true;
+      opdaterKnap.textContent = 'Henter...';
+
+      try {
+        const svar = await fetch('/api/ejendomme/' + p.ejendomID + '/opdater-data', { method: 'POST' });
+
+        if (svar.ok) {
+          opdaterKnap.textContent = 'Data opdateret';
+          this.hentGemteProfiler();
+        } else {
+          const fejlData = await svar.json();
+          alert('Fejl: ' + fejlData.fejl);
+          opdaterKnap.disabled = false;
+          opdaterKnap.textContent = 'Opdatér BBR-data';
+        }
+      } catch (fejl) {
+        alert('Kunne ikke kontakte serveren');
+        opdaterKnap.disabled = false;
+        opdaterKnap.textContent = 'Opdatér BBR-data';
+      }
+    };
+
     document.getElementById('profil_modal').style.display = 'flex';
 
     this.indlaesModalKort(p.ejendomID);
@@ -206,7 +234,7 @@ class EjendomsprofilListe {
 
   async indlaesModalKort(ejendomID) {
     try {
-      const svar = await fetch('/api/properties/' + ejendomID);
+      const svar = await fetch('/api/ejendomme/' + ejendomID);
       if (!svar.ok) return;
       const data = await svar.json();
       if (!data.koordinater) return;
@@ -297,7 +325,7 @@ class EjendomsprofilListe {
     };
 
     try {
-      const svar = await fetch('/api/properties/' + ejendomID, {
+      const svar = await fetch('/api/ejendomme/' + ejendomID, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)

@@ -1,11 +1,15 @@
 <!DOCTYPE html>
 <html lang="da">
+
 <head>
   <meta charset="UTF-8">
   <title>Investeringscase - Propalyze</title>
   <link rel="stylesheet" href="/css/style.css">
 </head>
+
 <body>
+
+
 
   <h1>Propalyze</h1>
   <a href="/">← Tilbage til forsiden</a>
@@ -48,7 +52,7 @@
     </div>
 
     <div class="knapper">
-      <button id="gem_koeb_knap">Gem og fortsæt</button>
+      <button id="gem_koeb_knap" class="knap_primaer">Gem og fortsæt</button>
     </div>
     <div id="koeb_besked"></div>
   </div>
@@ -86,7 +90,7 @@
 
     <div class="knapper">
       <button id="forrige_trin2">← Tilbage</button>
-      <button id="gem_finansiering_knap">Gem og fortsæt</button>
+      <button id="gem_finansiering_knap" class="knap_primaer">Gem og fortsæt</button>
     </div>
     <div id="finansiering_besked"></div>
   </div>
@@ -115,7 +119,7 @@
 
     <div class="knapper">
       <button id="forrige_trin3">← Tilbage</button>
-      <button id="naeste_trin3">Fortsæt →</button>
+      <button id="naeste_trin3" class="knap_primaer">Fortsæt →</button>
     </div>
   </div>
 
@@ -150,7 +154,7 @@
 
     <div class="drifts_formular">
       <label for="indtaegt_kategori">Kategori:</label>
-      <input type="text" id="indtaegt_kategori" placeholder="fx Lejeindtægt">
+      <input type="text" id="indtaegt_kategori" placeholder="fx boligstøtte">
 
       <label for="indtaegt_beloeb">Beløb (kr.):</label>
       <input type="number" id="indtaegt_beloeb" placeholder="fx 8000" min="0">
@@ -176,7 +180,7 @@
 
     <div class="knapper">
       <button id="forrige_trin4">← Tilbage</button>
-      <button id="gem_driftsbudget_knap">Gem og fortsæt</button>
+      <button id="gem_driftsbudget_knap" class="knap_primaer">Gem og fortsæt</button>
     </div>
   </div>
 
@@ -201,19 +205,22 @@
       <!-- Overblik over cashflow-påvirkning -->
       <div id="udlejning_overblik" class="overblik">
         <p>Månedligt cashflow fra udlejning:
-          <strong id="maanedlig_cashflow">0 kr.</strong></p>
+          <strong id="maanedlig_cashflow">0 kr.</strong>
+        </p>
         <p>Årligt cashflow fra udlejning:
-          <strong id="aarlig_cashflow">0 kr.</strong></p>
+          <strong id="aarlig_cashflow">0 kr.</strong>
+        </p>
       </div>
     </div>
 
     <div class="knapper">
       <button id="forrige_trin5">← Tilbage</button>
-      <button id="gem_udlejning_knap">Afslut og gem</button>
+      <button id="gem_udlejning_knap" class="knap_primaer">Afslut og gem</button>
     </div>
     <div id="udlejning_besked"></div>
   </div>
 
   <script src="/js/investeringscase.js"></script>
 </body>
+
 </html>

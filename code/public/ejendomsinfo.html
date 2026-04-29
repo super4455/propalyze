@@ -1,47 +1,67 @@
 <!DOCTYPE html>
 <html lang="da">
+
 <head>
   <meta charset="UTF-8">
   <title>Ejendomsinfo</title>
   <link rel="stylesheet" href="/css/style.css">
 </head>
+
 <body>
 
-  <h1>Ejendomsinfo</h1>
-  <p><a href="/">Tilbage til søgning</a></p>
+<p><a href="/">← Tilbage til søgning</a></p>
 
   <div id="fejl"></div>
 
-  <h2 id="adresse">—</h2>
+  <h1 id="adresse">—</h1>
 
-  <dl id="ejendom">
-    <dt>Ejendomstype</dt><dd id="ejendomstype">—</dd>
-    <dt>Byggeår</dt><dd id="byggeaar">—</dd>
-    <dt>Boligareal</dt><dd id="boligareal">—</dd>
-    <div id="grundareal_raekke"><dt>Grundareal</dt><dd id="grundareal">—</dd></div>
-    <dt>Værelser</dt><dd id="vaerelser">—</dd>
-    <dt>Antal etager</dt><dd id="antalEtager">—</dd>
-  </dl>
+  <div class="data_gruppe">
+    <div class="data_felt">
+      <span class="data_label">Ejendomstype</span>
+      <span class="data_vaerdi" id="ejendomstype">—</span>
+    </div>
+    <div class="data_felt">
+      <span class="data_label">Byggeår</span>
+      <span class="data_vaerdi" id="byggeaar">—</span>
+    </div>
+    <div class="data_felt">
+      <span class="data_label">Boligareal</span>
+      <span class="data_vaerdi" id="boligareal">—</span>
+    </div>
+    <div class="data_felt" id="grundareal_raekke">
+      <span class="data_label">Grundareal</span>
+      <span class="data_vaerdi" id="grundareal">—</span>
+    </div>
+    <div class="data_felt">
+      <span class="data_label">Værelser</span>
+      <span class="data_vaerdi" id="vaerelser">—</span>
+    </div>
+    <div class="data_felt">
+      <span class="data_label">Antal etager</span>
+      <span class="data_vaerdi" id="antalEtager">—</span>
+    </div>
+  </div>
 
-  <!-- Kortvisning: begge kort vises samtidig -->
   <div id="kort_sektion">
-    <h3>Luftfoto</h3>
-    <img id="luftfoto_billede" style="display: none; max-width: 100%;">
-    <p id="luftfoto_loading">Henter luftfoto...</p>
-
-    <h3>Matrikelkort</h3>
-    <img id="matrikel_billede" style="display: none; max-width: 100%;">
-    <p id="matrikel_loading">Henter matrikelkort...</p>
+    <div>
+      <h3>Luftfoto</h3>
+      <img id="luftfoto_billede" style="display: none;">
+      <p id="luftfoto_loading">Henter luftfoto...</p>
+    </div>
+    <div>
+      <h3>Matrikelkort</h3>
+      <img id="matrikel_billede" style="display: none;">
+      <p id="matrikel_loading">Henter matrikelkort...</p>
+    </div>
   </div>
 
-  <!-- Knap til at gemme ejendomsprofilen -->
   <div class="knapper">
-    <button id="gem_knap" style="display: none;">Gem ejendomsprofil</button>
+    <button id="gem_knap" class="simulering_knap" style="display: none;">Gem ejendomsprofil</button>
   </div>
 
-  <!-- Besked efter gem -->
   <div id="besked"></div>
 
   <script src="/js/ejendomsinfo.js"></script>
 </body>
+
 </html>

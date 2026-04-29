@@ -1,7 +1,7 @@
 // cashflow.js - Cashflow-beregninger for en investeringscase
 // Beregner månedlige driftsudgifter, driftsindtægter, renoveringsudgifter og samlet cashflow
 
-class CashflowCalculator {
+class CashflowBeregner {
 
   // ==========================================
   // DRIFTSUDGIFTER
@@ -93,4 +93,4 @@ class CashflowCalculator {
   }
 }
 
-module.exports = CashflowCalculator;
+module.exports = CashflowBeregner;

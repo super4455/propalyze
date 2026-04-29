@@ -1,863 +1,314 @@
-/* ==========================================
-   PROPALYZE — Editorial CSS
-   Æstetik: Eksklusiv, redaktionel, rolig
-   Inspireret af eltoftnielsen.dk
-   ========================================== */
-
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Montserrat:wght@300;400;500&display=swap');
-
-/* ==========================================
-   CSS VARIABLER
-   ========================================== */
-
-:root {
-  --baggrund: #F9F8F6;
-  --tekst: #2A2A2A;
-  --tekst-dæmpet: #7A7A7A;
-  --tekst-lys: #AEAEAE;
-  --border: #E2E0DC;
-  --border-fin: #EDED0;
-  --accent: #2A2A2A;
-  --hvid: #FDFDFC;
-  --hover-bg: #F3F2EF;
-  --fejl: #8B3A3A;
-  --succes: #2E5E3E;
-}
-
-/* ==========================================
-   GLOBAL
-   ========================================== */
-
-*, *::before, *::after {
-  box-sizing: border-box;
-}
+*, *::before, *::after { box-sizing: border-box; }
 
 body {
-  font-family: 'Montserrat', sans-serif;
-  font-weight: 300;
+  font-family: sans-serif;
   font-size: 15px;
-  line-height: 1.7;
-  background-color: var(--baggrund);
-  color: var(--tekst);
-  max-width: 780px;
+  line-height: 1.6;
+  max-width: 960px;
   margin: 0 auto;
-  padding: 4em 2.5em 6em 2.5em;
+  padding: 32px;
+  color: #222;
+  background: #fff;
 }
 
-/* Serif til alle overskrifter */
-h1, h2, h3, h4 {
-  font-family: 'Playfair Display', serif;
-  font-weight: 400;
-  letter-spacing: 0.01em;
-  line-height: 1.25;
-  margin: 0 0 0.5em 0;
-  color: var(--tekst);
-}
+/* === TYPOGRAFI === */
 
-h1 {
-  font-size: 2.8em;
-  letter-spacing: -0.02em;
-}
+h1 { font-size: 30px; margin: 0 0 6px; }
+h2 { font-size: 20px; margin: 24px 0 8px; }
+h3 { font-size: 16px; margin: 0 0 6px; }
+h4 { font-size: 11px; text-transform: uppercase; color: #666; margin: 0 0 4px; }
+p  { margin: 4px 0; color: #555; font-size: 13px; }
+hr { border: none; border-top: 1px solid #ddd; margin: 24px 0; }
+a  { color: #222; }
 
-h2 {
-  font-size: 1.6em;
-  margin-top: 2.5em;
-}
-
-h3 {
-  font-size: 1.2em;
-}
-
-h4 {
-  font-size: 1em;
-  font-family: 'Montserrat', sans-serif;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  font-size: 0.72em;
-  color: var(--tekst-dæmpet);
-}
-
-p {
-  margin: 0.4em 0;
-  color: var(--tekst-dæmpet);
-  font-size: 0.9em;
-}
-
-a {
-  color: var(--tekst);
-  text-decoration: none;
-  border-bottom: 1px solid var(--border);
-  padding-bottom: 1px;
-  transition: border-color 0.2s;
-}
-
-a:hover {
-  border-color: var(--tekst);
-}
-
-/* Diskret divider */
-hr {
-  border: none;
-  border-top: 1px solid var(--border);
-  margin: 2.5em 0;
-}
-
-/* ==========================================
-   KNAPPER — Ghost-stil, ingen tunge skygger
-   ========================================== */
+/* === KNAPPER === */
 
 button {
-  font-family: 'Montserrat', sans-serif;
-  font-weight: 400;
-  font-size: 0.78em;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  padding: 0.6em 1.3em;
-  border: 1px solid var(--border);
-  border-radius: 0;
-  background-color: transparent;
-  color: var(--tekst-dæmpet);
+  padding: 8px 16px;
+  border: 1px solid #aaa;
+  background: #fff;
   cursor: pointer;
-  transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+  font-size: 13px;
 }
 
-button:hover {
-  background-color: var(--tekst);
-  color: var(--hvid);
-  border-color: var(--tekst);
+button:hover,
+.knap_primaer {
+  background: #222;
+  color: #fff;
+  border-color: #222;
 }
 
-/* Primær CTA — fyldt men stadig diskret */
-.case_knap,
-#gem_case_knap,
-#start_simulering_knap,
-#gem_koeb_knap,
-#gem_finansiering_knap,
-#naeste_trin3,
-#gem_driftsbudget_knap,
-#gem_udlejning_knap,
-.simulering_knap {
-  background-color: var(--tekst);
-  color: var(--hvid);
-  border-color: var(--tekst);
-}
-
-.case_knap:hover,
-#gem_case_knap:hover,
-#start_simulering_knap:hover,
-#gem_koeb_knap:hover,
-#gem_finansiering_knap:hover,
-#naeste_trin3:hover,
-#gem_driftsbudget_knap:hover,
-#gem_udlejning_knap:hover,
-.simulering_knap:hover {
-  background-color: #444;
-  border-color: #444;
-  color: var(--hvid);
-}
-
-/* Slet — tekst-knap, ingen ramme */
-.slet_knap {
-  border-color: transparent;
-  color: var(--tekst-lys);
-}
-
+.slet_knap,
 .slet_knap:hover {
-  background-color: transparent;
-  color: var(--fejl);
+  background: transparent;
   border-color: transparent;
+  color: #aaa;
 }
 
-/* Tilbageknapper */
-#forrige_trin2,
-#forrige_trin3,
-#forrige_trin4,
-#forrige_trin5 {
-  background-color: transparent;
-  color: var(--tekst-dæmpet);
-  border-color: var(--border);
-}
+.slet_knap:hover { color: #900; }
 
-/* Flex-gruppe af knapper */
-.knapper {
-  display: flex;
-  gap: 0.6em;
-  margin-top: 1.5em;
-  flex-wrap: wrap;
-}
-
+.knapper,
 .knapper_rad {
   display: flex;
-  gap: 0.5em;
-  margin-top: 1em;
+  gap: 8px;
   flex-wrap: wrap;
+  margin-top: 16px;
 }
 
-/* ==========================================
-   SØGNING
-   ========================================== */
+/* === FORMULARER === */
+
+label {
+  display: block;
+  font-size: 12px;
+  color: #666;
+  margin: 12px 0 4px;
+}
+
+input:not([type="checkbox"]),
+select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  font-size: 13px;
+}
+
+input:focus,
+select:focus { outline: 2px solid #222; }
+
+input[type="checkbox"] { width: auto; }
+
+.case_formular {
+  border: 1px solid #ddd;
+  padding: 16px;
+  margin-top: 12px;
+}
+
+.overblik {
+  border-top: 1px solid #ddd;
+  padding-top: 12px;
+  margin-top: 12px;
+}
+
+.overblik p { display: flex; justify-content: space-between; }
+
+#fremskridt {
+  display: inline-block;
+  font-size: 12px;
+  color: #aaa;
+  margin-bottom: 20px;
+}
+
+/* === SØGNING === */
 
 #soegefelt {
   width: 100%;
-  padding: 0.9em 0;
-  font-family: 'Montserrat', sans-serif;
-  font-weight: 300;
-  font-size: 1em;
-  border: none;
-  border-bottom: 1px solid var(--tekst);
-  border-radius: 0;
-  background-color: transparent;
-  color: var(--tekst);
+  padding: 8px;
+  border: 1px solid #ccc;
+  font-size: 15px;
 }
 
-#soegefelt::placeholder {
-  color: var(--tekst-lys);
-  font-style: italic;
-}
-
-#soegefelt:focus {
-  outline: none;
-  border-bottom-color: var(--tekst);
-}
-
-#resultater {
-  margin-top: 0;
-  background-color: var(--hvid);
-  border: 1px solid var(--border);
-  border-top: none;
-}
-
-#resultater:empty {
-  border: none;
-}
+#resultater { border: 1px solid #ccc; border-top: none; }
+#resultater:empty { border: none; }
 
 .resultat {
-  padding: 0.9em 1em;
-  border-bottom: 1px solid var(--border);
+  padding: 10px 14px;
+  border-bottom: 1px solid #eee;
   cursor: pointer;
-  font-size: 0.88em;
-  font-weight: 300;
-  color: var(--tekst-dæmpet);
-  transition: background-color 0.1s;
+  font-size: 13px;
 }
 
-.resultat:last-child {
-  border-bottom: none;
+.resultat:hover { background: #f5f5f5; }
+
+/* === FORSIDE === */
+
+#forside_header {
+  text-align: center;
+  padding: 32px 0;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 32px;
 }
 
-.resultat:hover {
-  background-color: var(--hover-bg);
-  color: var(--tekst);
-}
+#brand   { font-size: 48px; margin: 0; }
+#tagline { font-size: 13px; color: #aaa; margin: 0; }
 
-/* ==========================================
-   GEMTE PROFILER (forsiden)
-   ========================================== */
-
-#profil_liste {
-  margin-top: 2em;
-}
+/* === PROFIL-KORT === */
 
 .profil_kort {
-  background-color: var(--hvid);
-  border: 1px solid var(--border);
-  padding: 2em 2.5em;
-  margin-bottom: 1.5em;
+  border: 1px solid #ddd;
+  padding: 16px;
+  margin-bottom: 10px;
 }
 
-.profil_kort h3 {
-  font-size: 1.35em;
-  margin-bottom: 0.6em;
-}
-
-.profil_kort p {
-  font-size: 0.85em;
-  color: var(--tekst-dæmpet);
-  margin: 0.2em 0;
-}
-
-.profil_dato {
-  font-size: 0.78em;
-  color: var(--tekst-lys);
-  margin-top: 0.4em;
-}
-
-/* ==========================================
-   INVESTERINGSCASES UNDER PROFIL
-   ========================================== */
-
-.cases_liste {
-  margin-top: 1.5em;
-  padding-top: 1.5em;
-  border-top: 1px solid var(--border);
-}
+.profil_dato { font-size: 12px; color: #aaa; }
 
 .case_kort {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1em 0;
-  border-bottom: 1px solid var(--border);
-  gap: 1em;
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+  gap: 12px;
 }
 
-.case_kort:last-child {
-  border-bottom: none;
+.case_kort p { margin: 0; font-size: 13px; }
+
+.cases_liste {
+  border-top: 1px solid #ddd;
+  margin-top: 12px;
+  padding-top: 12px;
 }
 
-.case_kort p {
-  margin: 0;
-  font-size: 0.88em;
-  color: var(--tekst);
-  font-weight: 400;
+/* === EJENDOMSDATA === */
+
+.data_gruppe {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border: 1px solid #ddd;
+  margin: 20px 0;
 }
 
-.case_kort small {
+.data_felt {
+  padding: 14px;
+  border-right: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+}
+
+.data_label {
   display: block;
-  color: var(--tekst-lys);
-  font-size: 0.78em;
-  margin-top: 0.1em;
-}
-
-.case_kort_knapper {
-  display: flex;
-  gap: 0.4em;
-  flex-shrink: 0;
-}
-
-/* ==========================================
-   FORMULARER
-   ========================================== */
-
-.case_formular {
-  background-color: var(--hvid);
-  border: 1px solid var(--border);
-  padding: 2em 2.5em;
-  margin-top: 1.5em;
-}
-
-.case_formular h3 {
-  margin-top: 0;
-  margin-bottom: 1.5em;
-  padding-bottom: 1em;
-  border-bottom: 1px solid var(--border);
-}
-
-/* Labels */
-.case_formular label,
-#trin1 label,
-#trin2 label,
-#trin3 label,
-#trin4 label,
-#trin5 label {
-  display: block;
-  font-size: 0.72em;
-  font-weight: 500;
-  letter-spacing: 0.08em;
+  font-size: 11px;
+  color: #999;
   text-transform: uppercase;
-  color: var(--tekst-dæmpet);
-  margin-top: 1.2em;
-  margin-bottom: 0.4em;
+  margin-bottom: 4px;
 }
 
-/* Inputs og selects */
-.case_formular input,
-.case_formular select,
-#trin1 input,
-#trin2 input,
-#trin2 select,
-#trin3 input,
-#trin4 input,
-#trin4 select,
-#trin5 input {
-  width: 100%;
-  padding: 0.65em 0;
-  font-family: 'Montserrat', sans-serif;
-  font-weight: 300;
-  font-size: 0.95em;
-  border: none;
-  border-bottom: 1px solid var(--border);
-  border-radius: 0;
-  background-color: transparent;
-  color: var(--tekst);
-}
+.data_vaerdi { display: block; }
 
-.case_formular input:focus,
-#trin1 input:focus,
-#trin2 input:focus,
-#trin2 select:focus,
-#trin3 input:focus,
-#trin4 input:focus,
-#trin5 input:focus {
-  outline: none;
-  border-bottom-color: var(--tekst);
-}
+/* === KORT (luftfoto + kort) === */
 
-/* Checkbox - inline */
-input[type="checkbox"] {
-  width: auto;
-  margin-right: 0.5em;
-  accent-color: var(--tekst);
-}
-
-/* Overblik-boks */
-.overblik {
-  border-top: 1px solid var(--border);
-  padding: 1.2em 0 0.5em 0;
-  margin: 1.5em 0 0.5em 0;
-}
-
-.overblik p {
+#kort_sektion,
+#modal_kort_sektion {
   display: flex;
-  justify-content: space-between;
-  font-size: 0.88em;
-  color: var(--tekst-dæmpet);
-  margin: 0.3em 0;
-}
-
-.overblik strong {
-  color: var(--tekst);
-  font-weight: 500;
-}
-
-/* Sub-formularer */
-.renovering_formular,
-.drifts_formular {
-  border-top: 1px solid var(--border);
-  padding-top: 1.2em;
-  margin: 1.5em 0;
-}
-
-/* ==========================================
-   FREMSKRIDT-INDIKATOR
-   ========================================== */
-
-#fremskridt {
-  display: inline-block;
-  font-size: 0.72em;
-  font-weight: 500;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--tekst-lys);
-  padding: 0;
-  margin: 0 0 2em 0;
-}
-
-/* ==========================================
-   BESKEDER
-   ========================================== */
-
-.succes {
-  font-size: 0.82em;
-  color: var(--succes);
-  margin-top: 0.6em;
-  font-style: italic;
-}
-
-.fejl {
-  font-size: 0.82em;
-  color: var(--fejl);
-  margin-top: 0.6em;
-}
-
-/* ==========================================
-   EJENDOMSINFO-SIDEN
-   ========================================== */
-
-#ejendomsdata {
-  margin: 2em 0;
-  padding: 2em 0;
-  border-top: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);
-}
-
-#ejendomsdata p {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.88em;
-  padding: 0.5em 0;
-  border-bottom: 1px solid var(--border);
-  color: var(--tekst-dæmpet);
-  margin: 0;
-}
-
-#ejendomsdata p:last-child {
-  border-bottom: none;
-}
-
-#ejendomsdata strong {
-  color: var(--tekst);
-  font-weight: 400;
-  font-size: 0.85em;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-
-/* Kortvisning side om side */
-#kort_sektion {
-  display: flex;
-  gap: 1.5em;
-  margin: 2em 0;
+  gap: 12px;
   flex-wrap: wrap;
+  margin: 16px 0;
 }
 
-#kort_sektion div {
-  flex: 1;
-  min-width: 200px;
-}
+#kort_sektion > div,
+#modal_kort_sektion > div { flex: 1; min-width: 200px; }
 
-#kort_sektion img {
+#kort_sektion img,
+#modal_kort_sektion img {
   width: 100%;
   display: block;
-  border: 1px solid var(--border);
+  border: 1px solid #ddd;
 }
 
-#kort_sektion p {
-  font-size: 0.75em;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--tekst-lys);
-  margin-top: 0.6em;
-}
+#modal_opdater_knap { margin-top: 16px; }
 
-/* ==========================================
-   EJENDOMSPROFIL MODAL
-   ========================================== */
+/* === MODAL === */
 
 #profil_modal {
   position: fixed;
   inset: 0;
-  background-color: rgba(42, 42, 42, 0.5);
+  background: rgba(0, 0, 0, 0.5);
   z-index: 100;
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding: 4em 2em;
+  padding: 48px 24px;
   overflow-y: auto;
 }
 
 #profil_modal_indhold {
-  background-color: var(--hvid);
+  background: #fff;
   max-width: 680px;
   width: 100%;
-  padding: 3em;
+  padding: 28px;
   position: relative;
 }
 
 #profil_modal_luk {
   position: absolute;
-  top: 1em;
-  right: 1em;
+  top: 12px;
+  right: 12px;
   background: transparent;
   border: none;
-  font-size: 1.4em;
-  color: var(--tekst-lys);
+  font-size: 20px;
   cursor: pointer;
-  padding: 0.2em 0.5em;
-  line-height: 1;
-  letter-spacing: 0;
-  text-transform: none;
 }
 
-#profil_modal_luk:hover {
-  color: var(--tekst);
-  background: transparent;
-}
-
-#profil_modal_indhold h2 {
-  margin-top: 0;
-  margin-bottom: 1.5em;
-  padding-bottom: 0.8em;
-  border-bottom: 1px solid var(--border);
-  padding-right: 2em;
-}
-
-#modal_data {
-  margin: 0 0 2em 0;
-  padding: 0;
-}
+#modal_data dt { font-size: 12px; color: #666; text-transform: uppercase; }
+#modal_data dd { font-size: 13px; margin: 0; text-align: right; }
 
 .modal_raekke {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
-  padding: 0.6em 0;
-  border-bottom: 1px solid var(--border);
-  gap: 1em;
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
 }
 
-.modal_raekke:last-child {
-  border-bottom: none;
-}
+/* === TABELLER === */
 
-#modal_data dt {
-  font-size: 0.72em;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--tekst-dæmpet);
-}
-
-#modal_data dd {
-  font-size: 0.9em;
-  color: var(--tekst);
-  margin: 0;
-  text-align: right;
-}
-
-#modal_kort_sektion {
-  display: flex;
-  gap: 1.5em;
-  flex-wrap: wrap;
-  margin-top: 2em;
-  padding-top: 1.5em;
-  border-top: 1px solid var(--border);
-}
-
-#modal_kort_sektion > div {
-  flex: 1;
-  min-width: 200px;
-}
-
-#modal_kort_sektion img {
-  width: 100%;
-  display: block;
-  border: 1px solid var(--border);
-}
-
-.kort_label {
-  font-size: 0.72em;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--tekst-lys);
-  margin: 0 0 0.5em 0;
-}
-
-/* ==========================================
-   SIMULERING
-   ========================================== */
-
-#simulering_input {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  max-width: 380px;
-  margin: 2em 0;
-}
-
-#simulering_input label {
-  display: block;
-  font-size: 0.72em;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--tekst-dæmpet);
-  margin-top: 1.2em;
-  margin-bottom: 0.4em;
-}
-
-#simulering_input input {
-  width: 100%;
-  padding: 0.65em 0;
-  font-family: 'Montserrat', sans-serif;
-  font-weight: 300;
-  font-size: 0.95em;
-  border: none;
-  border-bottom: 1px solid var(--border);
-  background-color: transparent;
-  color: var(--tekst);
-}
-
-#simulering_input input:focus {
-  outline: none;
-  border-bottom-color: var(--tekst);
-}
-
-#simulering_input button {
-  margin-top: 2em;
-  align-self: flex-start;
-}
-
-#parametre_sektion {
-  margin: 2em 0;
-  padding: 2em 0;
-  border-top: 1px solid var(--border);
-}
-
-#parametre_liste p {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.88em;
-  padding: 0.5em 0;
-  border-bottom: 1px solid var(--border);
-  color: var(--tekst-dæmpet);
-  margin: 0;
-}
-
-#parametre_liste p strong {
-  font-weight: 400;
-  font-size: 0.85em;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--tekst);
-}
-
-#simulering_tabel {
+#simulering_tabel,
+#sammenligning_tabel {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 1.5em;
-  font-size: 0.85em;
+  margin-top: 16px;
+  font-size: 13px;
 }
 
-#simulering_tabel thead {
-  border-bottom: 2px solid var(--tekst);
-}
-
-#simulering_tabel th {
-  background-color: transparent;
-  color: var(--tekst);
-  padding: 0.8em 1em;
+#simulering_tabel th,
+#sammenligning_tabel th {
+  padding: 8px 12px;
   text-align: right;
-  font-family: 'Montserrat', sans-serif;
-  font-weight: 500;
-  font-size: 0.72em;
-  letter-spacing: 0.08em;
+  border-bottom: 2px solid #222;
+  font-size: 11px;
   text-transform: uppercase;
 }
 
-#simulering_tabel th:first-child {
-  text-align: left;
-}
+#simulering_tabel th:first-child,
+#sammenligning_tabel th:first-child { text-align: left; }
 
-#simulering_tabel td {
-  padding: 0.7em 1em;
+#simulering_tabel td,
+#sammenligning_tabel td {
+  padding: 8px 12px;
   text-align: right;
-  border-bottom: 1px solid var(--border);
-  color: var(--tekst-dæmpet);
-  font-weight: 300;
+  border-bottom: 1px solid #eee;
+  color: #555;
 }
 
-#simulering_tabel td:first-child {
-  text-align: left;
-  color: var(--tekst);
-  font-weight: 400;
-}
+#simulering_tabel td:first-child { text-align: left; color: #222; }
 
-#simulering_tabel tr:hover td {
-  background-color: var(--hover-bg);
-}
+/* === SAMMENLIGNING === */
 
-
-
-/* ==========================================
-   SAMMENLIGNING
-   ========================================== */
-
-/* Liste af cases med checkboxes */
 .case_valg_item {
-  padding: 0.8em 0;
-  border-bottom: 1px solid var(--border);
-}
-
-.case_valg_item:last-child {
-  border-bottom: none;
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
 }
 
 .case_valg_item label {
   display: flex;
   align-items: baseline;
-  gap: 0.8em;
+  gap: 8px;
   cursor: pointer;
-  font-size: 0.9em;
+  text-transform: none;
+  font-weight: normal;
+  font-size: 13px;
+  margin: 0;
 }
 
-.case_valg_item input[type="checkbox"] {
-  width: auto;
-  flex-shrink: 0;
-}
-
-.case_valg_navn {
-  font-weight: 500;
-  color: var(--tekst);
-}
-
-.case_valg_ejendom {
-  color: var(--tekst-lys);
-  font-size: 0.85em;
-}
-
-/* Sammenlignings-tabel */
-#sammenligning_tabel {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 1.5em;
-  font-size: 0.85em;
-}
-
-#sammenligning_tabel thead {
-  border-bottom: 2px solid var(--tekst);
-}
-
-#sammenligning_tabel th {
-  padding: 1em;
-  text-align: left;
-  background-color: transparent;
-  color: var(--tekst);
-  font-family: 'Montserrat', sans-serif;
-  font-weight: 500;
-  vertical-align: top;
-}
-
-.tabel_case_navn {
-  display: block;
-  font-size: 0.9em;
-  font-weight: 500;
-  color: var(--tekst);
-}
-
-.tabel_case_ejendom {
-  display: block;
-  font-size: 0.78em;
-  color: var(--tekst-lys);
-  margin-top: 0.2em;
-}
-
-/* Række-labels i venstre kolonne */
 .raekke_label {
-  font-size: 0.78em;
-  font-weight: 500;
-  letter-spacing: 0.06em;
+  font-size: 12px;
   text-transform: uppercase;
-  color: var(--tekst-dæmpet);
+  color: #666;
   white-space: nowrap;
-  padding-right: 2em;
+  padding-right: 16px;
+  text-align: left !important;
 }
 
-#sammenligning_tabel td {
-  padding: 0.7em 1em;
-  border-bottom: 1px solid var(--border);
-  color: var(--tekst-dæmpet);
-  font-weight: 300;
-  text-align: right;
-}
+/* === STATUSFARVER === */
 
-#sammenligning_tabel td.raekke_label {
-  text-align: left;
-}
-
-#sammenligning_tabel tr:hover td {
-  background-color: var(--hover-bg);
-}
-
-/* Cashflow farver */
-.positiv {
-  color: var(--succes);
-  font-weight: 500;
-}
-
-.negativ {
-  color: var(--fejl);
-  font-weight: 500;
-}
+.positiv { color: #2a7a3b; font-weight: bold; }
+.negativ { color: #900;    font-weight: bold; }
+.succes  { color: #2a7a3b; font-size: 13px; }
+.fejl    { color: #900;    font-size: 13px; }

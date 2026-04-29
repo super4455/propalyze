@@ -1,5 +1,5 @@
 body, input, select, button, textarea {
-  font-family: "Comic Sans MS", cursive, sans-serif;
+  font-family: "Times New Roman", Times, serif;
 }
 
 body {
@@ -8,6 +8,9 @@ body {
   padding: 20px;
   line-height: 1.5;
   color: #222;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 h1, h2, h3, h4 {
@@ -77,6 +80,13 @@ button:hover {
   padding: 10px 15px;
   margin: 15px 0;
   border-left: 3px solid #999;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.overblik p {
+  margin: 0;
 }
 
 .data_gruppe {
@@ -86,12 +96,14 @@ button:hover {
 .data_felt {
   padding: 6px 0;
   border-bottom: 1px solid #eee;
+  display: flex;
+  gap: 10px;
 }
 
 .data_label {
   font-weight: bold;
-  display: inline-block;
   width: 150px;
+  flex-shrink: 0;
 }
 
 .kort_sektion {
@@ -122,6 +134,8 @@ button:hover {
 .resultater {
   border: 1px solid #ddd;
   margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
 }
 
 .resultater div {
@@ -134,13 +148,22 @@ button:hover {
   background: #f0f0f0;
 }
 
+#profil_liste,
+#case_valg_liste,
+#renovering_liste,
+#udgift_liste,
+#indtaegt_liste {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 #profil_liste div,
 #case_valg_liste > div,
 #renovering_liste > div,
 #udgift_liste > div,
 #indtaegt_liste > div {
   padding: 8px;
-  margin: 5px 0;
   border: 1px solid #ddd;
 }
 

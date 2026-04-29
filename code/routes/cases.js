@@ -28,7 +28,7 @@ router.post('/', async (req, res) => {
 
     const sqlTekst = `
       INSERT INTO Propalyze.investeringscase
-        (ejendomsID, navn, beskrivelse)
+        (ejendomID, navn, beskrivelse)
       OUTPUT INSERTED.caseID
       VALUES
         (@ejendomsID, @navn, @beskrivelse)
@@ -79,11 +79,11 @@ router.post('/:id/duplikoer', async (req, res) => {
 
     // Opret ny case med samme data - tilføj "Kopi af" til navn
     const nyCase = await database.query(
-      `INSERT INTO Propalyze.investeringscase (ejendomsID, navn, beskrivelse)
+      `INSERT INTO Propalyze.investeringscase (ejendomID, navn, beskrivelse)
        OUTPUT INSERTED.caseID
        VALUES (@ejendomsID, @navn, @beskrivelse)`,
       {
-        ejendomsID: c.ejendomsID,
+        ejendomsID: c.ejendomID,
         navn: 'Kopi af ' + c.navn,
         beskrivelse: c.beskrivelse
       }
@@ -252,7 +252,7 @@ router.get('/alle', async (req, res) => {
       SELECT c.caseID, c.navn, c.beskrivelse, c.start_dato,
              e.vejnavn, e.husnummer, e.bynavn
       FROM Propalyze.investeringscase c
-      JOIN Propalyze.ejendomsprofil e ON c.ejendomsID = e.ejendomID
+      JOIN Propalyze.ejendomsprofil e ON c.ejendomID = e.ejendomID
       ORDER BY c.start_dato DESC
     `;
 
@@ -475,7 +475,7 @@ router.get('/sammenlign', async (req, res) => {
         `SELECT c.caseID, c.navn, c.beskrivelse,
                 e.vejnavn, e.husnummer, e.bynavn
          FROM Propalyze.investeringscase c
-         JOIN Propalyze.ejendomsprofil e ON c.ejendomsID = e.ejendomID
+         JOIN Propalyze.ejendomsprofil e ON c.ejendomID = e.ejendomID
          WHERE c.caseID = @caseID`,
         { caseID: caseID }
       );
@@ -584,7 +584,7 @@ router.get('/', async (req, res) => {
     const sqlTekst = `
       SELECT caseID, navn, beskrivelse, start_dato
       FROM Propalyze.investeringscase
-      WHERE ejendomsID = @ejendomsID
+      WHERE ejendomID = @ejendomsID
       ORDER BY start_dato DESC
     `;
 

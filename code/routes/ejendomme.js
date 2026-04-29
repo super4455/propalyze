@@ -41,7 +41,7 @@ router.get('/', async (req, res) => {
          e.oprettet_dato, e.sidste_data_hentning, e.dawaID,
          COUNT(c.caseID) AS antal_cases
   FROM Propalyze.ejendomsprofil e
-  LEFT JOIN Propalyze.investeringscase c ON e.ejendomID = c.ejendomsID
+  LEFT JOIN Propalyze.investeringscase c ON e.ejendomID = c.ejendomID
   GROUP BY e.ejendomID, e.vejnavn, e.husnummer, e.etage, e.doer, e.postnummer, e.bynavn,
            e.ejendomstype, e.byggeaar, e.boligareal, e.grundareal, e.vaerelser,
            e.oprettet_dato, e.sidste_data_hentning, e.dawaID

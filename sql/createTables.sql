@@ -23,13 +23,13 @@ CREATE TABLE Propalyze.ejendomsprofil (
 -- Dannelse af Investeringscase table
 CREATE TABLE Propalyze.investeringscase (
 	caseID INT IDENTITY(1,1) PRIMARY KEY,
-	ejendomsID INT NOT NULL,
+	ejendomID INT NOT NULL,
 	navn VARCHAR(50),
 	beskrivelse VARCHAR(255),
 	start_dato DATETIME2 NOT NULL DEFAULT GETDATE(),
 
 	CONSTRAINT fk_ejendom
-	FOREIGN KEY (ejendomsID)
+	FOREIGN KEY (ejendomID)
 	REFERENCES Propalyze.ejendomsprofil(ejendomID)
 	ON DELETE CASCADE
 )

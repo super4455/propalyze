@@ -1,217 +1,184 @@
-/* === GRUNDLAYOUT === */
+body, input, select, button, textarea {
+  font-family: "Comic Sans MS", cursive, sans-serif;
+}
 
 body {
-  font-family: sans-serif;
-  max-width: 900px;
+  max-width: 800px;
   margin: 0 auto;
-  padding: 24px;
+  padding: 20px;
+  line-height: 1.5;
   color: #222;
 }
 
-a { color: #222; }
-
-p { margin: 4px 0; color: #555; }
-
-hr {
-  border: none;
-  border-top: 1px solid #ddd;
-  margin: 24px 0;
+h1, h2, h3, h4 {
+  margin-top: 1.2em;
+  margin-bottom: 0.5em;
 }
 
-/* === OVERSKRIFTER === */
-
-h1 { font-size: 28px; }
-h2 { font-size: 20px; margin-top: 24px; }
-h3 { font-size: 16px; }
-h4 {
-  font-size: 11px;
-  text-transform: uppercase;
-  color: #666;
-  margin-bottom: 4px;
+a {
+  color: #0066cc;
 }
 
-/* === FORSIDE === */
-
-.forside {
-  text-align: center;
-  padding: 24px 0;
-  border-bottom: 1px solid #ddd;
-  margin-bottom: 24px;
+p {
+  margin: 0.5em 0;
 }
-
-.forside h1 { font-size: 40px; margin: 0; }
-
-.fremskridt {
-  font-size: 12px;
-  color: #aaa;
-  margin-bottom: 16px;
-}
-
-/* === KNAPPER === */
-
-button {
-  padding: 8px 16px;
-  border: 1px solid #aaa;
-  background: #fff;
-  cursor: pointer;
-  font-size: 13px;
-}
-
-button:hover {
-  background: #222;
-  color: #fff;
-  border-color: #222;
-}
-
-.knap_primaer {
-  background: #222;
-  color: #fff;
-  border-color: #222;
-}
-
-.slet_knap {
-  background: transparent;
-  border: none;
-  color: #aaa;
-}
-
-.slet_knap:hover {
-  background: transparent;
-  color: #900;
-}
-
-.knapper,
-.knapper_rad {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 12px;
-}
-
-/* === FORMULARER === */
 
 label {
   display: block;
-  font-size: 12px;
-  color: #666;
-  margin: 12px 0 4px;
+  margin-top: 10px;
+  margin-bottom: 4px;
 }
 
-input,
+input[type="text"],
+input[type="number"],
 select {
   width: 100%;
-  padding: 8px;
-  border: 1px solid #ccc;
-  font-size: 13px;
+  padding: 6px;
+  border: 1px solid #999;
   box-sizing: border-box;
+  font-size: 14px;
 }
 
-input[type="checkbox"] { width: auto; }
+input[type="checkbox"] {
+  width: auto;
+  margin-right: 6px;
+}
 
-/* === SØGNING === */
+button {
+  padding: 8px 14px;
+  border: 1px solid #999;
+  background: #eee;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+button:hover {
+  background: #ddd;
+}
+
+.knap_primaer {
+  background: #333;
+  color: white;
+  border-color: #333;
+}
+
+.knap_primaer:hover {
+  background: #555;
+}
+
+.knapper {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.overblik {
+  background: #f4f4f4;
+  padding: 10px 15px;
+  margin: 15px 0;
+  border-left: 3px solid #999;
+}
+
+.data_gruppe {
+  margin: 15px 0;
+}
+
+.data_felt {
+  padding: 6px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.data_label {
+  font-weight: bold;
+  display: inline-block;
+  width: 150px;
+}
+
+.kort_sektion {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin: 15px 0;
+}
+
+.kort_sektion img {
+  max-width: 100%;
+  border: 1px solid #ccc;
+}
+
+.kort_label {
+  font-weight: bold;
+}
+
+#soegefelt {
+  width: 100%;
+  padding: 8px;
+  font-size: 16px;
+  border: 1px solid #999;
+  box-sizing: border-box;
+  margin-bottom: 10px;
+}
 
 .resultater {
-  border: 1px solid #ccc;
-  border-top: none;
+  border: 1px solid #ddd;
+  margin-bottom: 15px;
 }
 
-.resultat {
-  padding: 10px 14px;
+.resultater div {
+  padding: 6px 10px;
   border-bottom: 1px solid #eee;
   cursor: pointer;
 }
 
-.resultat:hover { background: #f5f5f5; }
+.resultater div:hover {
+  background: #f0f0f0;
+}
 
-/* === KORT (bordede bokse) === */
-
-.profil_kort,
-.case_formular {
+#profil_liste div,
+#case_valg_liste > div,
+#renovering_liste > div,
+#udgift_liste > div,
+#indtaegt_liste > div {
+  padding: 8px;
+  margin: 5px 0;
   border: 1px solid #ddd;
-  padding: 16px;
-  margin: 12px 0;
 }
 
-.profil_dato {
-  font-size: 12px;
-  color: #aaa;
-}
-
-.cases_liste {
-  border-top: 1px solid #ddd;
-  margin-top: 12px;
-  padding-top: 12px;
-}
-
-.case_kort {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 0;
-  border-bottom: 1px solid #eee;
-}
-
-.case_valg_item {
-  padding: 10px 0;
-  border-bottom: 1px solid #eee;
-}
-
-.overblik {
-  border-top: 1px solid #ddd;
-  margin-top: 12px;
-  padding-top: 12px;
-}
-
-.overblik p {
-  display: flex;
-  justify-content: space-between;
-}
-
-/* === DATA-GRID (ejendomsinfo) === */
-
-.data_gruppe {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  border: 1px solid #ddd;
-  margin: 20px 0;
-}
-
-.data_felt {
-  padding: 14px;
-  border-right: 1px solid #ddd;
-  border-bottom: 1px solid #ddd;
-}
-
-.data_label {
-  display: block;
-  font-size: 11px;
-  color: #999;
-  text-transform: uppercase;
-  margin-bottom: 4px;
-}
-
-/* === KORT-SEKTION (luftfoto + matrikel) === */
-
-.kort_sektion {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin: 16px 0;
-}
-
-.kort_sektion > div {
-  flex: 1;
-  min-width: 200px;
-}
-
-.kort_sektion img {
+table {
   width: 100%;
-  display: block;
-  border: 1px solid #ddd;
+  border-collapse: collapse;
+  margin: 15px 0;
 }
 
-/* === MODAL === */
+th, td {
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  text-align: left;
+}
+
+th {
+  background: #f4f4f4;
+}
+
+.fremskridt {
+  margin: 10px 0;
+  font-style: italic;
+  color: #666;
+}
+
+#fejl {
+  color: #b00;
+}
+
+#besked,
+#koeb_besked,
+#finansiering_besked,
+#renovering_besked,
+#driftsbudget_besked,
+#udlejning_besked {
+  color: #060;
+  margin-top: 10px;
+}
 
 .modal {
   position: fixed;
@@ -221,16 +188,18 @@ input[type="checkbox"] { width: auto; }
   height: 100%;
   background: rgba(0, 0, 0, 0.5);
   display: flex;
+  align-items: center;
   justify-content: center;
-  padding: 40px 20px;
-  overflow-y: auto;
+  z-index: 100;
 }
 
 .modal_indhold {
-  background: #fff;
-  width: 100%;
-  max-width: 600px;
-  padding: 24px;
+  background: white;
+  padding: 20px;
+  max-width: 700px;
+  width: 90%;
+  max-height: 85vh;
+  overflow-y: auto;
   position: relative;
 }
 
@@ -238,47 +207,25 @@ input[type="checkbox"] { width: auto; }
   position: absolute;
   top: 8px;
   right: 8px;
+  background: none;
   border: none;
-  background: transparent;
-  font-size: 20px;
+  font-size: 22px;
+  cursor: pointer;
+  padding: 4px 8px;
 }
 
 .modal_raekke {
   display: flex;
-  justify-content: space-between;
-  padding: 8px 0;
+  padding: 5px 0;
   border-bottom: 1px solid #eee;
 }
 
-/* === TABEL === */
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 16px;
-  font-size: 13px;
+.modal_raekke dt {
+  font-weight: bold;
+  width: 150px;
+  margin: 0;
 }
 
-th,
-td {
-  padding: 8px 12px;
-  text-align: right;
-  border-bottom: 1px solid #eee;
+.modal_raekke dd {
+  margin: 0;
 }
-
-th {
-  border-bottom: 2px solid #222;
-  font-size: 11px;
-  text-transform: uppercase;
-}
-
-th:first-child,
-td:first-child { text-align: left; }
-
-/* === STATUSFARVER === */
-
-.positiv,
-.succes { color: #2a7a3b; }
-
-.negativ,
-.fejl { color: #900; }

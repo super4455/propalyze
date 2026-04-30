@@ -1,7 +1,3 @@
-// renovering.js - Routes til renovering i investeringscase
-// Håndterer oprettelse af renoveringsplaner for en given case
-// En case kan have flere renoveringer
-
 const express = require('express');
 const router = express.Router();
 const database = require('../../database/database');

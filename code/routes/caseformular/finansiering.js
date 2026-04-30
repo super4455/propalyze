@@ -1,6 +1,3 @@
-// finansiering.js - Routes til finansiering i investeringscase
-// Håndterer oprettelse af låneoplysninger for en given case
-
 const express = require('express');
 const router = express.Router();
 const database = require('../../database/database');

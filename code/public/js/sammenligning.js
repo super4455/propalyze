@@ -110,8 +110,7 @@ class SammenligningView {
       { label: 'Månedlig ydelse',    noegle: 'maanedlig_ydelse',   type: 'kr' },
       { label: 'Total renteomk.',    noegle: 'total_rente',        type: 'kr' },
       { label: 'Månedlig drift',     noegle: 'maanedlig_drift',    type: 'kr' },
-      { label: 'Månedlig husleje',   noegle: 'maanedlig_leje',     type: 'kr' },
-      { label: 'Cashflow/måned',     noegle: 'maanedlig_cashflow', type: 'cashflow' }
+      { label: 'Månedlig husleje',   noegle: 'maanedlig_leje',     type: 'kr' }
     ];
 
     for (const raekke of raekker) {
@@ -130,9 +129,6 @@ class SammenligningView {
           visning = vaerdi !== null ? vaerdi + ' år' : '—';
         } else if (raekke.type === 'tekst') {
           visning = vaerdi || '—';
-        } else if (raekke.type === 'cashflow') {
-          const klasse = vaerdi >= 0 ? 'positiv' : 'negativ';
-          visning = '<span class="' + klasse + '">' + SammenligningView.formatKr(vaerdi) + '</span>';
         }
 
         html += '<td>' + visning + '</td>';

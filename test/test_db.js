@@ -1,7 +1,3 @@
-// test_db.js - Midlertidig fil til at teste at databaseforbindelsen virker.
-// Kør med: node test_db.js
-// Slettes når den har bekræftet at alt virker.
-
 const database = require('../code/database/database');
 
 async function test() {

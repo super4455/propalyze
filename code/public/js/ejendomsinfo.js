@@ -19,11 +19,11 @@ class EjendomsInfoView {
     }
 
     try {
-      const svar = await fetch('/api/ejendomme/lookup?dawaId=' + this.dawaId);
+      const svar = await fetch(`/api/ejendomme/lookup?dawaId=${this.dawaId}`);
 
       if (!svar.ok) {
         const fejl = await svar.json().catch(function() { return {}; });
-        fejlFelt.textContent = 'Fejl: ' + (fejl.fejl || 'kunne ikke hente data');
+        fejlFelt.textContent = `Fejl: ${fejl.fejl || 'kunne ikke hente data'}`;
         return;
       }
 
@@ -42,8 +42,8 @@ class EjendomsInfoView {
     document.getElementById('adresse').textContent = dawa.adresse;
     document.getElementById('ejendomstype').textContent = bbr.ejendomstype || '—';
     document.getElementById('byggeaar').textContent = bbr.byggeaar || '—';
-    document.getElementById('boligareal').textContent = bbr.boligareal ? bbr.boligareal + ' m²' : '—';
-    document.getElementById('grundareal').textContent = bbr.grundareal ? bbr.grundareal + ' m²' : '—';
+    document.getElementById('boligareal').textContent = bbr.boligareal ? `${bbr.boligareal} m²` : '—';
+    document.getElementById('grundareal').textContent = bbr.grundareal ? `${bbr.grundareal} m²` : '—';
     document.getElementById('grundareal_raekke').style.display = dawa.etage !== null ? 'none' : '';
     document.getElementById('vaerelser').textContent = bbr.vaerelser || '—';
     document.getElementById('antalEtager').textContent = bbr.antalEtager || '—';
@@ -66,7 +66,7 @@ class EjendomsInfoView {
     const x = this.ejendom.bbr.koordinater[0];
     const y = this.ejendom.bbr.koordinater[1];
 
-    billede.src = '/api/kort?lag=' + lag + '&x=' + x + '&y=' + y;
+    billede.src = `/api/kort?lag=${lag}&x=${x}&y=${y}`;
 
     billede.onload = function() {
       loading.style.display = 'none';
@@ -74,7 +74,7 @@ class EjendomsInfoView {
     };
 
     billede.onerror = function() {
-      loading.textContent = 'Kunne ikke hente ' + lag;
+      loading.textContent = `Kunne ikke hente ${lag}`;
     };
   }
 
@@ -111,7 +111,7 @@ class EjendomsInfoView {
         besked.className = 'succes';
         document.getElementById('gem_knap').disabled = true;
       } else {
-        besked.textContent = 'Fejl: ' + resultat.fejl;
+        besked.textContent = `Fejl: ${resultat.fejl}`;
         besked.className = 'fejl';
       }
 

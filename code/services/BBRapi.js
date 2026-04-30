@@ -1,6 +1,3 @@
-// BBRapi.js
-// Henter ejendomsdata fra BBR via Datafordeleren
-
 const BBR_BASE = 'https://services.datafordeler.dk/BBR/BBRPublic/1/rest';
 const MAT_BASE = 'https://services.datafordeler.dk/Matriklen2/Matrikel/2.0.0/rest';
 
@@ -64,26 +61,18 @@ class BBRService {
     // Byg URL baseret på boligtype
     let url;
     if (erLejlighed) {
-      console.log('Strategi: lejlighed (etage:', dawaData.etage + ')');
-      url = BBR_BASE + '/enhed'
-        + '?username=' + brugernavn
-        + '&password=' + kodeord
-        + '&Format=JSON'
-        + '&AdresseIdentificerer=' + dawaData.id;
+      console.log(`Strategi: lejlighed (etage: ${dawaData.etage})`);
+      url = `${BBR_BASE}/enhed?username=${brugernavn}&password=${kodeord}&Format=JSON&AdresseIdentificerer=${dawaData.id}`;
     } else {
       console.log('Strategi: hus (ingen etage)');
-      url = BBR_BASE + '/bygning'
-        + '?username=' + brugernavn
-        + '&password=' + kodeord
-        + '&Format=JSON'
-        + '&Husnummer=' + dawaData.adgangsadresseid;
+      url = `${BBR_BASE}/bygning?username=${brugernavn}&password=${kodeord}&Format=JSON&Husnummer=${dawaData.adgangsadresseid}`;
     }
 
     // Kald 1: Hent data fra BBR
     const svar = await fetch(url);
 
     if (!svar.ok) {
-      throw new Error('BBR fejlede med status ' + svar.status);
+      throw new Error(`BBR fejlede med status ${svar.status}`);
     }
 
     const tekst = await svar.text();
@@ -116,13 +105,8 @@ class BBRService {
   static async hentGrundareal(matrikelnr, ejerlavskode, brugernavn, kodeord) {
     if (!matrikelnr || !ejerlavskode) return null;
 
-    const url = MAT_BASE + '/SamletFastEjendom'
-      + '?username=' + brugernavn
-      + '&password=' + kodeord
-      + '&Format=JSON'
-      + '&Ejerlavskode=' + ejerlavskode
-      + '&Matrikelnr=' + encodeURIComponent(matrikelnr);
-
+    const url = `${MAT_BASE}/SamletFastEjendom?username=${brugernavn}&password=${kodeord}&Format=JSON&Ejerlavskode=${ejerlavskode}&Matrikelnr=${encodeURIComponent(matrikelnr)}`;
+ 
     const svar = await fetch(url);
     if (!svar.ok) {
       console.log('Matriklen2 fejlede med status', svar.status);
@@ -144,7 +128,7 @@ class BBRService {
     const typeKode = enhed.enh020EnhedensAnvendelse;
 
     const resultat = {
-      ejendomstype: EJENDOMSTYPER[typeKode] || 'Ukendt type (' + typeKode + ')',
+      ejendomstype: EJENDOMSTYPER[typeKode] || `Ukendt type (${typeKode})`,
       boligareal: enhed.enh026EnhedensSamledeAreal,
       vaerelser: enhed.enh031AntalVærelser,
       byggeaar: null,
@@ -154,11 +138,7 @@ class BBRService {
     };
 
     // Kald 2: Hent bygning for byggeår, grundareal, etager og koordinater
-    const bygUrl = BBR_BASE + '/bygning'
-      + '?username=' + brugernavn
-      + '&password=' + kodeord
-      + '&Format=JSON'
-      + '&id=' + enhed.bygning;
+    const bygUrl = `${BBR_BASE}/bygning?username=${brugernavn}&password=${kodeord}&Format=JSON&id=${enhed.bygning}`;
 
     const bygSvar = await fetch(bygUrl);
     if (bygSvar.ok) {
@@ -188,7 +168,7 @@ class BBRService {
     const typeKode = bygning.byg021BygningensAnvendelse;
 
     const resultat = {
-      ejendomstype: EJENDOMSTYPER[typeKode] || 'Ukendt type (' + typeKode + ')',
+      ejendomstype: EJENDOMSTYPER[typeKode] || `Ukendt type (${typeKode})`,
       byggeaar: bygning.byg026Opførelsesår,
       boligareal: bygning.byg039BygningensSamledeBoligAreal || bygning.byg038SamletBygningsareal,
       grundareal: null,
@@ -200,11 +180,7 @@ class BBRService {
     };
 
     // Kald 2: Hent enhed for antal værelser
-    const enhUrl = BBR_BASE + '/enhed'
-      + '?username=' + brugernavn
-      + '&password=' + kodeord
-      + '&Format=JSON'
-      + '&Bygning=' + bygning.id_lokalId;
+    const enhUrl = `${BBR_BASE}/enhed?username=${brugernavn}&password=${kodeord}&Format=JSON&Bygning=${bygning.id_lokalId}`;
 
     const enhSvar = await fetch(enhUrl);
     if (enhSvar.ok) {

@@ -1,6 +1,3 @@
-// properties.js - Routes til ejendomsprofiler
-// Håndterer opslag (DAWA+BBR) og CRUD for ejendomme
-
 const express = require('express');
 const router = express.Router();
 const database = require('../database/database');
@@ -131,7 +128,7 @@ router.delete('/:id', async (req, res) => {
 
 
 
-// POST /api/properties
+// POST /api/ejendomme
 // Opretter en ny ejendomsprofil med data fra DAWA + BBR
 router.post('/', async (req, res) => {
   try {

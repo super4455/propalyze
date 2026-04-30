@@ -22,7 +22,7 @@ class AdresseSoegning {
     }
 
     try {
-      const svar = await fetch('/api/adresser/search?q=' + tekst);
+      const svar = await fetch(`/api/adresser/search?q=${tekst}`);
 
       if (!svar.ok) {
         this.resultater.innerHTML = '<p>Kunne ikke hente forslag</p>';
@@ -52,7 +52,7 @@ class AdresseSoegning {
       div.textContent = f.tekst.replace(', ,', ',');
 
       div.addEventListener('click', function() {
-        window.location.href = 'ejendomsinfo.html?dawaId=' + f.data.id;
+        window.location.href = `ejendomsinfo.html?dawaId=${f.data.id}`;
       });
 
       this.resultater.appendChild(div);
@@ -100,14 +100,11 @@ class EjendomsprofilListe {
         div.className = 'profil_kort';
 
         const info = document.createElement('div');
-        info.innerHTML = '<h3>' + this.formaterAdresse(p) + '</h3>'
-          + '<p>' + p.ejendomstype + ' · ' + p.byggeaar
-          + ' · ' + p.boligareal + ' m² · ' + p.vaerelser + ' værelser</p>'
-          + '<p>Investeringscases: ' + p.antal_cases + '</p>'
-          + '<p class="profil_dato">Oprettet: '
-          + new Date(p.oprettet_dato).toLocaleDateString('da-DK') + '</p>'
-          + '<p class="profil_dato">Data hentet: '
-          + new Date(p.sidste_data_hentning).toLocaleDateString('da-DK') + '</p>';
+        info.innerHTML = `<h3>${this.formaterAdresse(p)}</h3>
+          <p>${p.ejendomstype} · ${p.byggeaar} · ${p.boligareal} m² · ${p.vaerelser} værelser</p>
+          <p>Investeringscases: ${p.antal_cases}</p>
+          <p class="profil_dato">Oprettet: ${new Date(p.oprettet_dato).toLocaleDateString('da-DK')}</p>
+          <p class="profil_dato">Data hentet: ${new Date(p.sidste_data_hentning).toLocaleDateString('da-DK')}</p>`;
 
         const caseKnap = document.createElement('button');
         caseKnap.className = 'case_knap';
@@ -137,13 +134,13 @@ class EjendomsprofilListe {
           if (!bekraeft) return;
 
           try {
-            const svar = await fetch('/api/ejendomme/' + p.ejendomID, { method: 'DELETE' });
+            const svar = await fetch(`/api/ejendomme/${p.ejendomID}`, { method: 'DELETE' });
 
             if (svar.ok) {
               this.hentGemteProfiler();
             } else {
               const fejlData = await svar.json();
-              alert('Fejl: ' + fejlData.fejl);
+              alert(`Fejl: ${fejlData.fejl}`);
             }
           } catch (fejl) {
             alert('Kunne ikke kontakte serveren');
@@ -171,22 +168,22 @@ class EjendomsprofilListe {
   }
 
   formaterAdresse(p) {
-    let adresse = p.vejnavn + ' ' + p.husnummer;
+    let adresse = `${p.vejnavn} ${p.husnummer}`;
     if (p.etage !== null || p.doer !== null) {
       const dele = [];
-      if (p.etage !== null) dele.push(p.etage + '.');
+      if (p.etage !== null) dele.push(`${p.etage}.`);
       if (p.doer !== null) dele.push(p.doer);
-      adresse += ', ' + dele.join(' ');
+      adresse += `, ${dele.join(' ')}`;
     }
-    return adresse + ', ' + p.postnummer + ' ' + p.bynavn;
+    return `${adresse}, ${p.postnummer} ${p.bynavn}`;
   }
 
   visProfilPopup(p) {
     document.getElementById('modal_adresse').textContent = this.formaterAdresse(p);
     document.getElementById('modal_ejendomstype').textContent = p.ejendomstype || '—';
     document.getElementById('modal_byggeaar').textContent = p.byggeaar || '—';
-    document.getElementById('modal_boligareal').textContent = p.boligareal ? p.boligareal + ' m²' : '—';
-    document.getElementById('modal_grundareal').textContent = p.grundareal ? p.grundareal + ' m²' : '—';
+    document.getElementById('modal_boligareal').textContent = p.boligareal ? `${p.boligareal} m²` : '—';
+    document.getElementById('modal_grundareal').textContent = p.grundareal ? `${p.grundareal} m²` : '—';
     document.getElementById('modal_vaerelser').textContent = p.vaerelser || '—';
 
     const luftfoto = document.getElementById('modal_luftfoto');
@@ -209,14 +206,14 @@ class EjendomsprofilListe {
       opdaterKnap.textContent = 'Henter...';
 
       try {
-        const svar = await fetch('/api/ejendomme/' + p.ejendomID + '/opdater-data', { method: 'POST' });
+        const svar = await fetch(`/api/ejendomme/${p.ejendomID}/opdater-data`, { method: 'POST' });
 
         if (svar.ok) {
           opdaterKnap.textContent = 'Data opdateret';
           this.hentGemteProfiler();
         } else {
           const fejlData = await svar.json();
-          alert('Fejl: ' + fejlData.fejl);
+          alert(`Fejl: ${fejlData.fejl}`);
           opdaterKnap.disabled = false;
           opdaterKnap.textContent = 'Opdatér BBR-data';
         }
@@ -234,7 +231,7 @@ class EjendomsprofilListe {
 
   async indlaesModalKort(ejendomID) {
     try {
-      const svar = await fetch('/api/ejendomme/' + ejendomID);
+      const svar = await fetch(`/api/ejendomme/${ejendomID}`);
       if (!svar.ok) return;
       const data = await svar.json();
       if (!data.koordinater) return;
@@ -253,13 +250,13 @@ class EjendomsprofilListe {
     const billede = document.getElementById(billedeId);
     const loading = document.getElementById(loadingId);
 
-    billede.src = '/api/kort?lag=' + lag + '&x=' + x + '&y=' + y;
+    billede.src = `/api/kort?lag=${lag}&x=${x}&y=${y}`;
     billede.onload = function() {
       loading.style.display = 'none';
       billede.style.display = 'block';
     };
     billede.onerror = function() {
-      loading.textContent = 'Kunne ikke hente ' + lag;
+      loading.textContent = `Kunne ikke hente ${lag}`;
     };
   }
 
@@ -271,34 +268,34 @@ class EjendomsprofilListe {
     formular.id = 'rediger_formular';
     formular.className = 'case_formular';
 
-    formular.innerHTML = '<h3>Rediger ejendomsprofil</h3>'
-      + '<label>Vejnavn:</label>'
-      + '<input type="text" id="red_vejnavn" value="' + profil.vejnavn + '">'
-      + '<label>Husnummer:</label>'
-      + '<input type="text" id="red_husnummer" value="' + profil.husnummer + '">'
-      + '<label>Etage:</label>'
-      + '<input type="text" id="red_etage" value="' + (profil.etage !== null ? profil.etage : '') + '">'
-      + '<label>Dør:</label>'
-      + '<input type="text" id="red_doer" value="' + (profil.doer !== null ? profil.doer : '') + '">'
-      + '<label>Postnummer:</label>'
-      + '<input type="text" id="red_postnummer" value="' + profil.postnummer + '">'
-      + '<label>Bynavn:</label>'
-      + '<input type="text" id="red_bynavn" value="' + profil.bynavn + '">'
-      + '<label>Ejendomstype:</label>'
-      + '<input type="text" id="red_ejendomstype" value="' + profil.ejendomstype + '">'
-      + '<label>Byggeår:</label>'
-      + '<input type="number" id="red_byggeaar" value="' + profil.byggeaar + '">'
-      + '<label>Boligareal (m²):</label>'
-      + '<input type="number" id="red_boligareal" value="' + profil.boligareal + '">'
-      + '<label>Grundareal (m²):</label>'
-      + '<input type="number" id="red_grundareal" value="' + profil.grundareal + '">'
-      + '<label>Antal værelser:</label>'
-      + '<input type="number" id="red_vaerelser" value="' + profil.vaerelser + '">'
-      + '<div class="knapper">'
-      + '<button id="gem_redigering_knap">Gem ændringer</button>'
-      + '<button id="annuller_redigering_knap">Annullér</button>'
-      + '</div>'
-      + '<div id="rediger_besked"></div>';
+    formular.innerHTML = `<h3>Rediger ejendomsprofil</h3>
+      <label>Vejnavn:</label>
+      <input type="text" id="red_vejnavn" value="${profil.vejnavn}">
+      <label>Husnummer:</label>
+      <input type="text" id="red_husnummer" value="${profil.husnummer}">
+      <label>Etage:</label>
+      <input type="text" id="red_etage" value="${profil.etage !== null ? profil.etage : ''}">
+      <label>Dør:</label>
+      <input type="text" id="red_doer" value="${profil.doer !== null ? profil.doer : ''}">
+      <label>Postnummer:</label>
+      <input type="text" id="red_postnummer" value="${profil.postnummer}">
+      <label>Bynavn:</label>
+      <input type="text" id="red_bynavn" value="${profil.bynavn}">
+      <label>Ejendomstype:</label>
+      <input type="text" id="red_ejendomstype" value="${profil.ejendomstype}">
+      <label>Byggeår:</label>
+      <input type="number" id="red_byggeaar" value="${profil.byggeaar}">
+      <label>Boligareal (m²):</label>
+      <input type="number" id="red_boligareal" value="${profil.boligareal}">
+      <label>Grundareal (m²):</label>
+      <input type="number" id="red_grundareal" value="${profil.grundareal}">
+      <label>Antal værelser:</label>
+      <input type="number" id="red_vaerelser" value="${profil.vaerelser}">
+      <div class="knapper">
+      <button id="gem_redigering_knap">Gem ændringer</button>
+      <button id="annuller_redigering_knap">Annullér</button>
+      </div>
+      <div id="rediger_besked"></div>`;
 
     profilDiv.appendChild(formular);
 
@@ -439,7 +436,7 @@ class EjendomsprofilListe {
         duplikerKnap.textContent = 'Dupliker';
         duplikerKnap.addEventListener('click', async () => {
           try {
-            const svar = await fetch('/api/cases/' + c.caseID + '/duplikoer', { method: 'POST' });
+            const svar = await fetch('/api/cases/' + c.caseID + '/dupliker', { method: 'POST' });
             const resultat = await svar.json();
 
             if (svar.ok) {

@@ -1,5 +1,3 @@
-// adresser.js - Routes til adressesøgning
-
 const express = require('express');
 const router = express.Router();
 const DAWAService = require('../services/DAWAapi');

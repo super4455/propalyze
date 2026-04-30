@@ -1,8 +1,6 @@
-// laan.js - Låneberegninger for annuitetslån, serielån og stående lån
-
 class LaaneBeregner {
 
-  // Annuitetslån: fast månedlig ydelse, faldende renteandel
+  // Beregning af ydelse på annuitetslån
   static beregnYdelseAnnuitet(laanebeloeb, renteAarlig, loebetidAar) {
     const r = renteAarlig / 100 / 12;
     const n = loebetidAar * 12;
@@ -11,6 +9,7 @@ class LaaneBeregner {
 
     return laanebeloeb * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
   }
+  // Beregning af restgæld på annuitetslån
 
   static beregnRestgaeldAnnuitet(laanebeloeb, renteAarlig, loebetidAar, betalteAar) {
     if (betalteAar >= loebetidAar) return 0;
@@ -24,12 +23,7 @@ class LaaneBeregner {
     return laanebeloeb * (Math.pow(1 + r, n) - Math.pow(1 + r, t)) / (Math.pow(1 + r, n) - 1);
   }
 
-  // ==========================================
-  // SERIELÅN
-  // Fast afdrag hver måned - ydelsen falder over tid fordi renteandelen falder
-  // Fast afdrag = L / n
-  // Månedlig ydelse = fast afdrag + (restgæld * månedlig rente)
-  // ==========================================
+  // Beregning af ydelse på serielån
 
   static beregnYdelseSerie(laanebeloeb, renteAarlig, loebetidAar, betalteAar) {
     if (betalteAar >= loebetidAar) return 0;
@@ -51,11 +45,7 @@ class LaaneBeregner {
     return laanebeloeb * (1 - t / n);
   }
 
-  // ==========================================
-  // STÅENDE LÅN
-  // Ingen afdrag i løbetiden - kun renter betales løbende
-  // Hele lånebeløbet tilbagebetales som ét beløb ved udløb
-  // ==========================================
+  // Beregning af ydelse på stående lån
 
   static beregnYdelseStaaende(laanebeloeb, renteAarlig, loebetidAar, betalteAar) {
     if (betalteAar >= loebetidAar) return 0;
@@ -64,18 +54,17 @@ class LaaneBeregner {
     return laanebeloeb * r;
   }
 
+  // Beregning af restgæld på stående lån
+
   static beregnRestgaeldStaaende(laanebeloeb, loebetidAar, betalteAar) {
     if (betalteAar >= loebetidAar) return 0;
 
     return laanebeloeb;
   }
 
-  // ==========================================
-  // FÆLLES INTERFACE
-  // Kalder den rigtige lånetype baseret på laanetype-parameteret
-  // ==========================================
 
-  // Returnerer månedlig ydelse for det givne år
+  // Beregning af ydelse afhængig af lånetype
+
   static beregnYdelse(laanebeloeb, renteAarlig, loebetidAar, afdragsfriAar, laanetype, betalteAar) {
 
     // I afdragsfri periode betales kun renter uanset lånetype
@@ -102,7 +91,7 @@ class LaaneBeregner {
     return LaaneBeregner.beregnYdelseAnnuitet(laanebeloeb, renteAarlig, loebetidAar);
   }
 
-  // Returnerer total rente betalt over hele lånets løbetid
+  // Beregning af total rente betalt over hele lånets løbetid
   static beregnTotalRente(laanebeloeb, renteAarlig, loebetidAar, afdragsfriAar, laanetype) {
     let totalBetalt = 0;
 
@@ -113,8 +102,8 @@ class LaaneBeregner {
       totalBetalt += maanedligYdelse * 12;
     }
 
-    // Stående lån betaler kun renter løbende - hovedstolen tilbagebetales som
-    // engangsbeløb ved udløb og indgår ikke i ydelsen
+    // Stående lån betaler kun renter løbende - hovedstolen tilbagebetales som engangsbeløb ved udløb af låneperioden
+
     if (laanetype === 'Staaende laan') {
       return totalBetalt;
     }
@@ -122,7 +111,8 @@ class LaaneBeregner {
     return totalBetalt - laanebeloeb;
   }
 
-  // Returnerer restgæld efter det givne antal betalte år
+  // Beregning af restgæld afhængig af lånetype
+
   static beregnRestgaeld(laanebeloeb, renteAarlig, loebetidAar, laanetype, betalteAar) {
 
     if (laanetype === 'Annuitetslaan') {

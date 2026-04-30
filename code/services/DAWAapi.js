@@ -1,12 +1,10 @@
-// DAWAapi.js - Kommunikation med Danmarks Adressers Web API
-
 const DAWA_BASE = 'https://api.dataforsyningen.dk';
 
 class DAWAService {
 
   // Returnerer adresseforslag baseret på søgeord
   static async soegAdresser(soegeord) {
-    const svar = await fetch(DAWA_BASE + '/autocomplete?q=' + soegeord);
+    const svar = await fetch(`${DAWA_BASE}/autocomplete?q=${soegeord}`);
 
     if (!svar.ok) {
       throw new Error('DAWA er ikke tilgængelig');
@@ -18,11 +16,11 @@ class DAWAService {
   // Slår en specifik adresse op via DAWA-id
   // Prøver /adresser først (lejlighed), falder tilbage til /adgangsadresser (hus)
   static async hentAdresse(dawaId) {
-    let svar = await fetch(DAWA_BASE + '/adresser/' + dawaId);
+    let svar = await fetch(`${DAWA_BASE}/adresser/${dawaId}`);
     let erAdgangsadresse = false;
 
     if (svar.status === 404) {
-      svar = await fetch(DAWA_BASE + '/adgangsadresser/' + dawaId);
+      svar = await fetch(`${DAWA_BASE}/adgangsadresser/${dawaId}`);
       erAdgangsadresse = true;
     }
 

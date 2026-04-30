@@ -1,7 +1,3 @@
-// driftsbudget.js - Routes til driftsbudget i investeringscase
-// Håndterer oprettelse af driftsbudget samt udgifter og indtægter
-// Struktur: investeringscase → driftsbudget → udgifter/indtægter
-
 const express = require('express');
 const router = express.Router();
 const database = require('../../database/database');

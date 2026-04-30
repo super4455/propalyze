@@ -1,6 +1,3 @@
-// udlejning.js - Routes til udlejning i investeringscase
-// Håndterer oprettelse af udlejningsoplysninger for en given case
-
 const express = require('express');
 const router = express.Router();
 const database = require('../../database/database');

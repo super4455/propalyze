@@ -1,6 +1,3 @@
-// koeb.js - Routes til køb i investeringscase
-// Håndterer oprettelse af købs-oplysninger for en given case
-
 const express = require('express');
 const router = express.Router();
 const database = require('../../database/database');

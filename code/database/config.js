@@ -1,6 +1,3 @@
-// config.js - Læser database-forbindelsesoplysninger fra .env-filen
-// og eksporterer dem som et objekt der kan bruges af mssql-pakken.
-
 // dotenv læser .env-filen og lægger værdierne ind i process.env
 require('dotenv').config();
 

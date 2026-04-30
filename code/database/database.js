@@ -1,6 +1,3 @@
-// database.js - Database-klasse der håndterer forbindelse til Azure SQL
-// og udstiller metoder til de øvrige moduler i applikationen.
-
 const sql = require('mssql');
 const config = require('./config');
 
@@ -40,7 +37,7 @@ class Database {
 
       // Eksekver SQL'en og returner resultatet
       const result = await request.query(sqlTekst);
-      return result.recordset;
+      return result.recordset; // Result indeholder de returnerede rækker og metadata; vi vil kun have rækkerne.
     } catch (err) {
       console.log('Query fejlede:', err.message);
       throw err;

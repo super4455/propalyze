@@ -23,7 +23,7 @@ router.get('/lookup', async (req, res) => {
 
   } catch (err) {
     console.log('Fejl ved ejendomsopslag:', err.message);
-    res.status(502).json({ fejl: 'Kunne ikke hente ejendomsdata: ' + err.message });
+    res.status(502).json({ fejl: `Kunne ikke hente ejendomsdata: ${err.message}` });
   }
 });
 
@@ -148,8 +148,16 @@ router.post('/', async (req, res) => {
     }
 
     // BBR returnerer koordinater som strings i array [x, y] (UTM 32N)
-    const koordinatX = data.koordinater && data.koordinater[0] ? parseFloat(data.koordinater[0]) : null;
-    const koordinatY = data.koordinater && data.koordinater[1] ? parseFloat(data.koordinater[1]) : null;
+    let koordinatX = null;
+    let koordinatY = null;
+    if (data.koordinater) {
+      if (data.koordinater[0]) {
+        koordinatX = parseFloat(data.koordinater[0]);
+      }
+      if (data.koordinater[1]) {
+        koordinatY = parseFloat(data.koordinater[1]);
+      }
+    }
 
     // Parameteriseret query for at undgå SQL injection
     const sqlTekst = `
@@ -287,8 +295,16 @@ router.post('/:id/opdater-data', async (req, res) => {
     const dawa = await DAWAService.hentAdresse(dawaId);
     const bbr = await BBRService.hentBBR(dawa);
 
-    const koordinatX = bbr.koordinater && bbr.koordinater[0] ? parseFloat(bbr.koordinater[0]) : null;
-    const koordinatY = bbr.koordinater && bbr.koordinater[1] ? parseFloat(bbr.koordinater[1]) : null;
+    let koordinatX = null;
+    let koordinatY = null;
+    if (bbr.koordinater) {
+      if (bbr.koordinater[0]) {
+        koordinatX = parseFloat(bbr.koordinater[0]);
+      }
+      if (bbr.koordinater[1]) {
+        koordinatY = parseFloat(bbr.koordinater[1]);
+      }
+    }
 
     const opdaterSql = `
       UPDATE Propalyze.ejendomsprofil

@@ -35,13 +35,13 @@ class InvesteringsBeregner {
     const laanetype = f.laanetype;
     const ejendomspris = this.koeb.ejendomspris;
 
-    const maanedligLeje = this.udlejning && this.udlejning.udlejning_status
-      ? this.udlejning.maanedlig_husleje
-      : 0;
-
-    const maanedligUdlejningUdgift = this.udlejning && this.udlejning.udlejning_status
-      ? this.udlejning.maanedlig_udgifter
-      : 0;
+    // Hent husleje og udlejningsudgifter hvis ejendommen er udlejet, ellers 0
+    let maanedligLeje = 0;
+    let maanedligUdlejningUdgift = 0;
+    if (this.udlejning && this.udlejning.udlejning_status) {
+      maanedligLeje = this.udlejning.maanedlig_husleje;
+      maanedligUdlejningUdgift = this.udlejning.maanedlig_udgifter;
+    }
 
     const startAar = new Date().getFullYear();
     this.simuleringsResultater = [];

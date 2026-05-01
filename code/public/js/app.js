@@ -182,8 +182,17 @@ class EjendomsprofilListe {
     document.getElementById('modal_adresse').textContent = this.formaterAdresse(p);
     document.getElementById('modal_ejendomstype').textContent = p.ejendomstype || '—';
     document.getElementById('modal_byggeaar').textContent = p.byggeaar || '—';
-    document.getElementById('modal_boligareal').textContent = p.boligareal ? `${p.boligareal} m²` : '—';
-    document.getElementById('modal_grundareal').textContent = p.grundareal ? `${p.grundareal} m²` : '—';
+    let boligarealTekst = '—';
+    if (p.boligareal) {
+      boligarealTekst = `${p.boligareal} m²`;
+    }
+    document.getElementById('modal_boligareal').textContent = boligarealTekst;
+
+    let grundarealTekst = '—';
+    if (p.grundareal) {
+      grundarealTekst = `${p.grundareal} m²`;
+    }
+    document.getElementById('modal_grundareal').textContent = grundarealTekst;
     document.getElementById('modal_vaerelser').textContent = p.vaerelser || '—';
 
     const luftfoto = document.getElementById('modal_luftfoto');
@@ -268,15 +277,25 @@ class EjendomsprofilListe {
     formular.id = 'rediger_formular';
     formular.className = 'case_formular';
 
+    let etageVaerdi = '';
+    if (profil.etage !== null) {
+      etageVaerdi = profil.etage;
+    }
+
+    let doerVaerdi = '';
+    if (profil.doer !== null) {
+      doerVaerdi = profil.doer;
+    }
+
     formular.innerHTML = `<h3>Rediger ejendomsprofil</h3>
       <label>Vejnavn:</label>
       <input type="text" id="red_vejnavn" value="${profil.vejnavn}">
       <label>Husnummer:</label>
       <input type="text" id="red_husnummer" value="${profil.husnummer}">
       <label>Etage:</label>
-      <input type="text" id="red_etage" value="${profil.etage !== null ? profil.etage : ''}">
+      <input type="text" id="red_etage" value="${etageVaerdi}">
       <label>Dør:</label>
-      <input type="text" id="red_doer" value="${profil.doer !== null ? profil.doer : ''}">
+      <input type="text" id="red_doer" value="${doerVaerdi}">
       <label>Postnummer:</label>
       <input type="text" id="red_postnummer" value="${profil.postnummer}">
       <label>Bynavn:</label>
@@ -307,11 +326,21 @@ class EjendomsprofilListe {
     const etageVaerdi = document.getElementById('red_etage').value.trim();
     const doerVaerdi = document.getElementById('red_doer').value.trim();
 
+    let etage = null;
+    if (etageVaerdi !== '') {
+      etage = etageVaerdi;
+    }
+
+    let doer = null;
+    if (doerVaerdi !== '') {
+      doer = doerVaerdi;
+    }
+
     const data = {
       vejnavn: document.getElementById('red_vejnavn').value,
       husnummer: document.getElementById('red_husnummer').value,
-      etage: etageVaerdi !== '' ? etageVaerdi : null,
-      doer: doerVaerdi !== '' ? doerVaerdi : null,
+      etage: etage,
+      doer: doer,
       postnummer: document.getElementById('red_postnummer').value,
       bynavn: document.getElementById('red_bynavn').value,
       ejendomstype: document.getElementById('red_ejendomstype').value,
@@ -322,7 +351,7 @@ class EjendomsprofilListe {
     };
 
     try {
-      const svar = await fetch('/api/ejendomme/' + ejendomID, {
+      const svar = await fetch(`/api/ejendomme/${ejendomID}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
@@ -336,7 +365,7 @@ class EjendomsprofilListe {
         besked.className = 'succes';
         this.hentGemteProfiler();
       } else {
-        besked.textContent = 'Fejl: ' + resultat.fejl;
+        besked.textContent = `Fejl: ${resultat.fejl}`;
         besked.className = 'fejl';
       }
 
@@ -354,16 +383,17 @@ class EjendomsprofilListe {
     formular.id = 'case_formular';
     formular.className = 'case_formular';
 
-    formular.innerHTML = '<h3>Ny investeringscase</h3>'
-      + '<label for="case_navn">Navn:</label>'
-      + '<input type="text" id="case_navn" placeholder="Fx: Lejlighed med udlejning">'
-      + '<label for="case_beskrivelse">Beskrivelse:</label>'
-      + '<input type="text" id="case_beskrivelse" placeholder="Kort beskrivelse af casen">'
-      + '<div class="knapper">'
-      + '<button id="gem_case_knap">Start formular</button>'
-      + '<button id="annuller_case_knap">Annullér</button>'
-      + '</div>'
-      + '<div id="case_besked"></div>';
+    formular.innerHTML = `
+      <h3>Ny investeringscase</h3>
+      <label for="case_navn">Navn:</label>
+      <input type="text" id="case_navn" placeholder="Fx: Lejlighed med udlejning">
+      <label for="case_beskrivelse">Beskrivelse:</label>
+      <input type="text" id="case_beskrivelse" placeholder="Kort beskrivelse af casen">
+      <div class="knapper">
+        <button id="gem_case_knap">Start formular</button>
+        <button id="annuller_case_knap">Annullér</button>
+      </div>
+      <div id="case_besked"></div>`;
 
     profilDiv.appendChild(formular);
 
@@ -396,7 +426,7 @@ class EjendomsprofilListe {
     }
 
     try {
-      const svar = await fetch('/api/cases?ejendomsID=' + ejendomID);
+      const svar = await fetch(`/api/cases?ejendomsID=${ejendomID}`);
       const cases = await svar.json();
 
       const liste = document.createElement('div');
@@ -412,17 +442,21 @@ class EjendomsprofilListe {
         const caseDiv = document.createElement('div');
         caseDiv.className = 'case_kort';
 
+        let beskrivelseTekst = '';
+        if (c.beskrivelse) {
+          beskrivelseTekst = ` — ${c.beskrivelse}`;
+        }
+
+        const oprettetTekst = new Date(c.start_dato).toLocaleDateString('da-DK');
+
         const info = document.createElement('p');
-        info.innerHTML = '<strong>' + c.navn + '</strong>'
-          + (c.beskrivelse ? ' — ' + c.beskrivelse : '')
-          + '<br><small>Oprettet: '
-          + new Date(c.start_dato).toLocaleDateString('da-DK') + '</small>';
+        info.innerHTML = `<strong>${c.navn}</strong>${beskrivelseTekst}<br><small>Oprettet: ${oprettetTekst}</small>`;
 
         const simuleringKnap = document.createElement('button');
         simuleringKnap.className = 'simulering_knap';
         simuleringKnap.textContent = 'Kør simulering';
         simuleringKnap.addEventListener('click', function() {
-          window.location.href = '/simulering.html?caseID=' + c.caseID;
+          window.location.href = `/simulering.html?caseID=${c.caseID}`;
         });
 
         const redigerCaseKnap = document.createElement('button');
@@ -436,14 +470,14 @@ class EjendomsprofilListe {
         duplikerKnap.textContent = 'Dupliker';
         duplikerKnap.addEventListener('click', async () => {
           try {
-            const svar = await fetch('/api/cases/' + c.caseID + '/dupliker', { method: 'POST' });
+            const svar = await fetch(`/api/cases/${c.caseID}/dupliker`, { method: 'POST' });
             const resultat = await svar.json();
 
             if (svar.ok) {
               this.visCases(ejendomID, profilDiv);
               this.visCases(ejendomID, profilDiv);
             } else {
-              alert('Fejl: ' + resultat.fejl);
+              alert(`Fejl: ${resultat.fejl}`);
             }
           } catch (fejl) {
             alert('Kunne ikke kontakte serveren');
@@ -454,18 +488,18 @@ class EjendomsprofilListe {
         sletCaseKnap.className = 'slet_knap';
         sletCaseKnap.textContent = 'Slet';
         sletCaseKnap.addEventListener('click', async () => {
-          const bekraeft = confirm('Er du sikker på du vil slette "' + c.navn + '"?');
+          const bekraeft = confirm(`Er du sikker på du vil slette "${c.navn}"?`);
           if (!bekraeft) return;
 
           try {
-            const svar = await fetch('/api/cases/' + c.caseID, { method: 'DELETE' });
+            const svar = await fetch(`/api/cases/${c.caseID}`, { method: 'DELETE' });
 
             if (svar.ok) {
               this.visCases(ejendomID, profilDiv);
               this.visCases(ejendomID, profilDiv);
             } else {
               const fejlData = await svar.json();
-              alert('Fejl: ' + fejlData.fejl);
+              alert(`Fejl: ${fejlData.fejl}`);
             }
           } catch (fejl) {
             alert('Kunne ikke kontakte serveren');

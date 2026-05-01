@@ -16,7 +16,7 @@ class SimuleringView {
 
   async hentCaseData() {
     try {
-      const svar = await fetch('/api/cases/' + this.caseID + '/data');
+      const svar = await fetch(`/api/cases/${this.caseID}/data`);
 
       if (!svar.ok) {
         document.getElementById('fejl').textContent = 'Kunne ikke hente case-data';
@@ -41,12 +41,12 @@ class SimuleringView {
     const k = this.caseData.koeb;
     const f = this.caseData.finansiering;
 
-    document.getElementById('parametre_liste').innerHTML =
-      '<p><strong>Ejendomspris:</strong> ' + k.ejendomspris.toLocaleString('da-DK') + ' kr.</p>'
-      + '<p><strong>Lånebeløb:</strong> ' + f.laanebeloeb.toLocaleString('da-DK') + ' kr.</p>'
-      + '<p><strong>Rente:</strong> ' + f.rente + '%</p>'
-      + '<p><strong>Løbetid:</strong> ' + f.loebetid_aar + ' år</p>'
-      + '<p><strong>Lånetype:</strong> ' + f.laanetype + '</p>';
+    document.getElementById('parametre_liste').innerHTML = `
+      <p><strong>Ejendomspris:</strong> ${k.ejendomspris.toLocaleString('da-DK')} kr.</p>
+      <p><strong>Lånebeløb:</strong> ${f.laanebeloeb.toLocaleString('da-DK')} kr.</p>
+      <p><strong>Rente:</strong> ${f.rente}%</p>
+      <p><strong>Løbetid:</strong> ${f.loebetid_aar} år</p>
+      <p><strong>Lånetype:</strong> ${f.laanetype}</p>`;
 
     document.getElementById('parametre_sektion').style.display = 'block';
   }
@@ -71,7 +71,7 @@ class SimuleringView {
     }
 
     try {
-      const svar = await fetch('/api/cases/' + this.caseID + '/simuler?periode=' + periode + '&vaerdistigning=' + vaerdistigning);
+      const svar = await fetch(`/api/cases/${this.caseID}/simuler?periode=${periode}&vaerdistigning=${vaerdistigning}`);
 
       if (!svar.ok) {
         const fejlSvar = await svar.json();
@@ -85,11 +85,12 @@ class SimuleringView {
 
       for (const r of resultater) {
         const rad = document.createElement('tr');
-        rad.innerHTML = '<td>' + r.aar + '</td>'
-          + '<td>' + Math.round(r.ejendomsvaerdi).toLocaleString('da-DK') + ' kr.</td>'
-          + '<td>' + Math.round(r.restgaeld).toLocaleString('da-DK') + ' kr.</td>'
-          + '<td>' + Math.round(r.egenkapital).toLocaleString('da-DK') + ' kr.</td>'
-          + '<td>' + Math.round(r.aarligCashflow).toLocaleString('da-DK') + ' kr.</td>';
+        rad.innerHTML = `
+          <td>${r.aar}</td>
+          <td>${Math.round(r.ejendomsvaerdi).toLocaleString('da-DK')} kr.</td>
+          <td>${Math.round(r.restgaeld).toLocaleString('da-DK')} kr.</td>
+          <td>${Math.round(r.egenkapital).toLocaleString('da-DK')} kr.</td>
+          <td>${Math.round(r.aarligCashflow).toLocaleString('da-DK')} kr.</td>`;
         tbody.appendChild(rad);
       }
 

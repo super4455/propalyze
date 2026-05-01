@@ -25,10 +25,10 @@ class InvesteringsCaseFormular {
 
   visTrin(nummer) {
     for (let i = 1; i <= 5; i++) {
-      document.getElementById('trin' + i).style.display = 'none';
+      document.getElementById(`trin${i}`).style.display = 'none';
     }
-    document.getElementById('trin' + nummer).style.display = 'block';
-    document.getElementById('trin_indikator').textContent = 'Trin ' + nummer + ' af 5';
+    document.getElementById(`trin${nummer}`).style.display = 'block';
+    document.getElementById('trin_indikator').textContent = `Trin ${nummer} af 5`;
   }
 
   opsaetNavigation() {
@@ -47,7 +47,7 @@ class InvesteringsCaseFormular {
     const tinglysning = parseFloat(document.getElementById('tinglysning').value) || 0;
 
     const samlet = ejendomspris + koebOmkostninger + advokatUdgifter + tinglysning;
-    document.getElementById('samlet_koeb').textContent = samlet.toLocaleString('da-DK') + ' kr.';
+    document.getElementById('samlet_koeb').textContent = `${samlet.toLocaleString('da-DK')} kr.`;
   }
 
   opsaetTrin1() {
@@ -102,9 +102,9 @@ class InvesteringsCaseFormular {
     const totalRente = (maanedligYdelse * loebetidAar * 12) - laanebeloeb;
 
     document.getElementById('maanedlig_ydelse').textContent =
-      maanedligYdelse.toLocaleString('da-DK') + ' kr.';
+      `${maanedligYdelse.toLocaleString('da-DK')} kr.`;
     document.getElementById('total_rente').textContent =
-      Math.max(0, Math.round(totalRente)).toLocaleString('da-DK') + ' kr.';
+      `${Math.max(0, Math.round(totalRente)).toLocaleString('da-DK')} kr.`;
   }
 
   opsaetTrin2() {
@@ -147,9 +147,7 @@ class InvesteringsCaseFormular {
     liste.innerHTML = '';
     for (const r of this.renoveringer) {
       const p = document.createElement('p');
-      p.textContent = r.type_renovering + ' · '
-        + r.renovering_omkostninger.toLocaleString('da-DK')
-        + ' kr. · År ' + r.planlagt_aar;
+      p.textContent = `${r.type_renovering} · ${r.renovering_omkostninger.toLocaleString('da-DK')} kr. · År ${r.planlagt_aar}`;
       liste.appendChild(p);
     }
   }
@@ -210,13 +208,13 @@ class InvesteringsCaseFormular {
     }
 
     document.getElementById('maanedlig_udgift_total').textContent =
-      Math.round(maanedligUdgift).toLocaleString('da-DK') + ' kr.';
+      `${Math.round(maanedligUdgift).toLocaleString('da-DK')} kr.`;
     document.getElementById('aarlig_udgift_total').textContent =
-      Math.round(aarligUdgift).toLocaleString('da-DK') + ' kr.';
+      `${Math.round(aarligUdgift).toLocaleString('da-DK')} kr.`;
     document.getElementById('maanedlig_indtaegt_total').textContent =
-      Math.round(maanedligIndtaegt).toLocaleString('da-DK') + ' kr.';
+      `${Math.round(maanedligIndtaegt).toLocaleString('da-DK')} kr.`;
     document.getElementById('aarlig_indtaegt_total').textContent =
-      Math.round(aarligIndtaegt).toLocaleString('da-DK') + ' kr.';
+      `${Math.round(aarligIndtaegt).toLocaleString('da-DK')} kr.`;
   }
 
   visUdgiftListe() {
@@ -224,7 +222,7 @@ class InvesteringsCaseFormular {
     liste.innerHTML = '';
     for (const u of this.udgifter) {
       const p = document.createElement('p');
-      p.textContent = u.kategori + ' · ' + u.beloeb.toLocaleString('da-DK') + ' kr. · ' + u.frekvens;
+      p.textContent = `${u.kategori} · ${u.beloeb.toLocaleString('da-DK')} kr. · ${u.frekvens}`;
       liste.appendChild(p);
     }
   }
@@ -234,7 +232,7 @@ class InvesteringsCaseFormular {
     liste.innerHTML = '';
     for (const i of this.indtaegter) {
       const p = document.createElement('p');
-      p.textContent = i.kategori + ' · ' + i.beloeb.toLocaleString('da-DK') + ' kr. · ' + i.frekvens;
+      p.textContent = `${i.kategori} · ${i.beloeb.toLocaleString('da-DK')} kr. · ${i.frekvens}`;
       liste.appendChild(p);
     }
   }
@@ -299,15 +297,18 @@ class InvesteringsCaseFormular {
 
     const maanedligCashflow = husleje - udlejUdgifter;
     document.getElementById('maanedlig_cashflow').textContent =
-      maanedligCashflow.toLocaleString('da-DK') + ' kr.';
+      `${maanedligCashflow.toLocaleString('da-DK')} kr.`;
     document.getElementById('aarlig_cashflow').textContent =
-      (maanedligCashflow * 12).toLocaleString('da-DK') + ' kr.';
+      `${(maanedligCashflow * 12).toLocaleString('da-DK')} kr.`;
   }
 
   opsaetTrin5() {
     document.getElementById('udlejning_status').addEventListener('change', function() {
-      document.getElementById('udlejning_detaljer').style.display =
-        this.checked ? 'block' : 'none';
+      let visning = 'none';
+      if (this.checked) {
+        visning = 'block';
+      }
+      document.getElementById('udlejning_detaljer').style.display = visning;
     });
 
     document.getElementById('maanedlig_husleje').addEventListener('input', () => this.opdaterUdlejningOverblik());
@@ -411,7 +412,7 @@ class InvesteringsCaseFormular {
       besked.className = 'succes';
 
       setTimeout(function() {
-        window.location.href = '/simulering.html?caseID=' + caseID;
+        window.location.href = `/simulering.html?caseID=${caseID}`;
       }, 1500);
 
     } catch (fejl) {

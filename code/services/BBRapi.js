@@ -119,7 +119,12 @@ class BBRService {
 
     const jordstykker = features[0].properties.jordstykke || [];
     console.log('Matriklen2 jordstykke:', JSON.stringify(jordstykker));
-    const areal = jordstykker[0]?.properties?.registreretAreal;
+
+    // Slå arealet op trin-for-trin og bevar null hvis nogen led mangler
+    let areal = null;
+    if (jordstykker[0] && jordstykker[0].properties) {
+      areal = jordstykker[0].properties.registreretAreal;
+    }
     return areal || null;
   }
 
@@ -147,8 +152,11 @@ class BBRService {
         const byg = bygData[0];
         resultat.byggeaar = byg.byg026Opførelsesår;
         resultat.antalEtager = byg.byg054AntalEtager;
-        resultat.koordinater = byg.byg404Koordinat
-          .replace('POINT(', '').replace(')', '').split(' ');
+        // Konverter "POINT(x y)" til ["x", "y"]
+        let koordinatTekst = byg.byg404Koordinat;
+        koordinatTekst = koordinatTekst.replace('POINT(', '');
+        koordinatTekst = koordinatTekst.replace(')', '');
+        resultat.koordinater = koordinatTekst.split(' ');
       }
     }
 
@@ -167,6 +175,15 @@ class BBRService {
     const bygning = data[0];
     const typeKode = bygning.byg021BygningensAnvendelse;
 
+    // Konverter "POINT(x y)" til ["x", "y"], eller null hvis koordinat mangler
+    let koordinater = null;
+    if (bygning.byg404Koordinat) {
+      let koordinatTekst = bygning.byg404Koordinat;
+      koordinatTekst = koordinatTekst.replace('POINT(', '');
+      koordinatTekst = koordinatTekst.replace(')', '');
+      koordinater = koordinatTekst.split(' ');
+    }
+
     const resultat = {
       ejendomstype: EJENDOMSTYPER[typeKode] || `Ukendt type (${typeKode})`,
       byggeaar: bygning.byg026Opførelsesår,
@@ -174,9 +191,7 @@ class BBRService {
       grundareal: null,
       vaerelser: null,
       antalEtager: bygning.byg054AntalEtager,
-      koordinater: bygning.byg404Koordinat
-        ? bygning.byg404Koordinat.replace('POINT(', '').replace(')', '').split(' ')
-        : null,
+      koordinater: koordinater,
     };
 
     // Kald 2: Hent enhed for antal værelser

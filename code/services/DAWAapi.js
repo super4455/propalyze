@@ -29,7 +29,28 @@ class DAWAService {
     }
 
     const raaData = await svar.json();
-    const adgangsadresse = erAdgangsadresse ? raaData : raaData.adgangsadresse;
+
+    let adgangsadresse;
+    if (erAdgangsadresse) {
+      adgangsadresse = raaData;
+    } else {
+      adgangsadresse = raaData.adgangsadresse;
+    }
+
+    // Hent matrikel-info hvis det findes på adressen
+    let matrikelnr = null;
+    let ejerlavskode = null;
+    if (adgangsadresse.jordstykke) {
+      matrikelnr = adgangsadresse.jordstykke.matrikelnr;
+      ejerlavskode = adgangsadresse.jordstykke.ejerlav.kode;
+    }
+
+    let etage = null;
+    let doer = null;
+    if (!erAdgangsadresse) {
+      etage = raaData.etage;
+      doer = raaData.dør;
+    }
 
     return {
       id: raaData.id,
@@ -39,11 +60,11 @@ class DAWAService {
       husnummer: adgangsadresse.husnr,
       postnummer: adgangsadresse.postnummer.nr,
       bynavn: adgangsadresse.postnummer.navn,
-      etage: erAdgangsadresse ? null : raaData.etage,
-      doer: erAdgangsadresse ? null : raaData.dør,
+      etage: etage,
+      doer: doer,
       koordinater: adgangsadresse.adgangspunkt.koordinater,
-      matrikelnr: adgangsadresse.jordstykke ? adgangsadresse.jordstykke.matrikelnr : null,
-      ejerlavskode: adgangsadresse.jordstykke ? adgangsadresse.jordstykke.ejerlav.kode : null
+      matrikelnr: matrikelnr,
+      ejerlavskode: ejerlavskode
     };
   }
 }

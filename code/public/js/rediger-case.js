@@ -25,10 +25,10 @@ class RedigerCaseView {
 
   visTrin(nummer) {
     for (let i = 1; i <= 5; i++) {
-      document.getElementById('trin' + i).style.display = 'none';
+      document.getElementById(`trin${i}`).style.display = 'none';
     }
-    document.getElementById('trin' + nummer).style.display = 'block';
-    document.getElementById('trin_indikator').textContent = 'Trin ' + nummer + ' af 5';
+    document.getElementById(`trin${nummer}`).style.display = 'block';
+    document.getElementById('trin_indikator').textContent = `Trin ${nummer} af 5`;
   }
 
   opsaetNavigation() {
@@ -40,7 +40,7 @@ class RedigerCaseView {
 
   async indlaesData() {
     try {
-      const svar = await fetch('/api/cases/' + this.caseID + '/data');
+      const svar = await fetch(`/api/cases/${this.caseID}/data`);
 
       if (!svar.ok) {
         document.getElementById('fejl').textContent = 'Kunne ikke hente case-data';
@@ -109,7 +109,7 @@ class RedigerCaseView {
     const tinglysning = parseFloat(document.getElementById('tinglysning').value) || 0;
 
     const samlet = ejendomspris + koebOmkostninger + advokatUdgifter + tinglysning;
-    document.getElementById('samlet_koeb').textContent = samlet.toLocaleString('da-DK') + ' kr.';
+    document.getElementById('samlet_koeb').textContent = `${samlet.toLocaleString('da-DK')} kr.`;
   }
 
   opsaetTrin1() {
@@ -164,9 +164,9 @@ class RedigerCaseView {
     const totalRente = (maanedligYdelse * loebetidAar * 12) - laanebeloeb;
 
     document.getElementById('maanedlig_ydelse').textContent =
-      maanedligYdelse.toLocaleString('da-DK') + ' kr.';
+      `${maanedligYdelse.toLocaleString('da-DK')} kr.`;
     document.getElementById('total_rente').textContent =
-      Math.max(0, Math.round(totalRente)).toLocaleString('da-DK') + ' kr.';
+      `${Math.max(0, Math.round(totalRente)).toLocaleString('da-DK')} kr.`;
   }
 
   opsaetTrin2() {
@@ -209,9 +209,7 @@ class RedigerCaseView {
     liste.innerHTML = '';
     for (const r of this.renoveringer) {
       const p = document.createElement('p');
-      p.textContent = r.type_renovering + ' · '
-        + r.renovering_omkostninger.toLocaleString('da-DK')
-        + ' kr. · År ' + r.planlagt_aar;
+      p.textContent = `${r.type_renovering} · ${r.renovering_omkostninger.toLocaleString('da-DK')} kr. · År ${r.planlagt_aar}`;
       liste.appendChild(p);
     }
   }
@@ -249,7 +247,7 @@ class RedigerCaseView {
     liste.innerHTML = '';
     for (const u of this.udgifter) {
       const p = document.createElement('p');
-      p.textContent = u.kategori + ' · ' + u.beloeb.toLocaleString('da-DK') + ' kr. · ' + u.frekvens;
+      p.textContent = `${u.kategori} · ${u.beloeb.toLocaleString('da-DK')} kr. · ${u.frekvens}`;
       liste.appendChild(p);
     }
   }
@@ -259,7 +257,7 @@ class RedigerCaseView {
     liste.innerHTML = '';
     for (const i of this.indtaegter) {
       const p = document.createElement('p');
-      p.textContent = i.kategori + ' · ' + i.beloeb.toLocaleString('da-DK') + ' kr. · ' + i.frekvens;
+      p.textContent = `${i.kategori} · ${i.beloeb.toLocaleString('da-DK')} kr. · ${i.frekvens}`;
       liste.appendChild(p);
     }
   }
@@ -300,8 +298,11 @@ class RedigerCaseView {
 
   opsaetTrin5() {
     document.getElementById('udlejning_status').addEventListener('change', function() {
-      document.getElementById('udlejning_detaljer').style.display =
-        this.checked ? 'block' : 'none';
+      let visning = 'none';
+      if (this.checked) {
+        visning = 'block';
+      }
+      document.getElementById('udlejning_detaljer').style.display = visning;
     });
 
     document.getElementById('gem_alt_knap').addEventListener('click', () => this.gemAlt());
@@ -320,31 +321,31 @@ class RedigerCaseView {
     besked.className = '';
 
     try {
-      await fetch('/api/koeb/' + this.caseID, {
+      await fetch(`/api/koeb/${this.caseID}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(this.koebData)
       });
 
-      await fetch('/api/finansiering/' + this.caseID, {
+      await fetch(`/api/finansiering/${this.caseID}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(this.finansieringData)
       });
 
-      await fetch('/api/renovering/' + this.caseID, {
+      await fetch(`/api/renovering/${this.caseID}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ renoveringer: this.renoveringer })
       });
 
-      await fetch('/api/driftsbudget/' + this.caseID, {
+      await fetch(`/api/driftsbudget/${this.caseID}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ udgifter: this.udgifter, indtaegter: this.indtaegter })
       });
 
-      await fetch('/api/udlejning/' + this.caseID, {
+      await fetch(`/api/udlejning/${this.caseID}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

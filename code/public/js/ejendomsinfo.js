@@ -22,8 +22,19 @@ class EjendomsInfoView {
       const svar = await fetch(`/api/ejendomme/lookup?dawaId=${this.dawaId}`);
 
       if (!svar.ok) {
-        const fejl = await svar.json().catch(function() { return {}; });
-        fejlFelt.textContent = `Fejl: ${fejl.fejl || 'kunne ikke hente data'}`;
+        // Hvis svaret ikke kan parses som JSON, brug et tomt objekt
+        let fejl = {};
+        try {
+          fejl = await svar.json();
+        } catch (parseFejl) {
+          fejl = {};
+        }
+
+        let fejlBesked = 'kunne ikke hente data';
+        if (fejl.fejl) {
+          fejlBesked = fejl.fejl;
+        }
+        fejlFelt.textContent = `Fejl: ${fejlBesked}`;
         return;
       }
 
@@ -42,9 +53,23 @@ class EjendomsInfoView {
     document.getElementById('adresse').textContent = dawa.adresse;
     document.getElementById('ejendomstype').textContent = bbr.ejendomstype || '—';
     document.getElementById('byggeaar').textContent = bbr.byggeaar || '—';
-    document.getElementById('boligareal').textContent = bbr.boligareal ? `${bbr.boligareal} m²` : '—';
-    document.getElementById('grundareal').textContent = bbr.grundareal ? `${bbr.grundareal} m²` : '—';
-    document.getElementById('grundareal_raekke').style.display = dawa.etage !== null ? 'none' : '';
+    let boligarealTekst = '—';
+    if (bbr.boligareal) {
+      boligarealTekst = `${bbr.boligareal} m²`;
+    }
+    document.getElementById('boligareal').textContent = boligarealTekst;
+
+    let grundarealTekst = '—';
+    if (bbr.grundareal) {
+      grundarealTekst = `${bbr.grundareal} m²`;
+    }
+    document.getElementById('grundareal').textContent = grundarealTekst;
+
+    let grundarealVisning = '';
+    if (dawa.etage !== null) {
+      grundarealVisning = 'none';
+    }
+    document.getElementById('grundareal_raekke').style.display = grundarealVisning;
     document.getElementById('vaerelser').textContent = bbr.vaerelser || '—';
     document.getElementById('antalEtager').textContent = bbr.antalEtager || '—';
 

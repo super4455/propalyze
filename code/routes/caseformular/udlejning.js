@@ -22,10 +22,15 @@ router.post('/', async (req, res) => {
         (@caseID, @udlejning_status, @maanedlig_husleje, @maanedlig_udgifter)
     `;
 
+    // BIT-felt: konverter true/false til 1/0
+    let udlejning_status = 0;
+    if (data.udlejning_status) {
+      udlejning_status = 1;
+    }
+
     const parametre = {
       caseID: data.caseID,
-      // BIT-felt: konverter true/false til 1/0
-      udlejning_status: data.udlejning_status ? 1 : 0,
+      udlejning_status: udlejning_status,
       // Hvis ejendommen ikke udlejes sættes beløbene til 0
       maanedlig_husleje: data.maanedlig_husleje || 0,
       maanedlig_udgifter: data.maanedlig_udgifter || 0
@@ -50,6 +55,11 @@ router.put('/:caseID', async (req, res) => {
     const data = req.body;
     const caseID = req.params.caseID;
 
+    let udlejning_status = 0;
+    if (data.udlejning_status) {
+      udlejning_status = 1;
+    }
+
     await database.query(
       `UPDATE Propalyze.udlejning
        SET udlejning_status = @udlejning_status,
@@ -58,7 +68,7 @@ router.put('/:caseID', async (req, res) => {
        WHERE caseID = @caseID`,
       {
         caseID: caseID,
-        udlejning_status: data.udlejning_status ? 1 : 0,
+        udlejning_status: udlejning_status,
         maanedlig_husleje: data.maanedlig_husleje || 0,
         maanedlig_udgifter: data.maanedlig_udgifter || 0
       }

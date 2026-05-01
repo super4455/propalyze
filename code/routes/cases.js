@@ -78,7 +78,7 @@ router.post('/:id/dupliker', async (req, res) => {
        VALUES (@ejendomsID, @navn, @beskrivelse)`,
       {
         ejendomsID: c.ejendomID,
-        navn: 'Kopi af ' + c.navn,
+        navn: `Kopi af ${c.navn}`,
         beskrivelse: c.beskrivelse
       }
     );

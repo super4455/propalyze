@@ -27,14 +27,19 @@ router.post('/', async (req, res) => {
          @tinglysning, @koeber_raadgivning)
     `;
 
+    // BIT-felt: konverter true/false til 1/0
+    let koeber_raadgivning = 0;
+    if (data.koeber_raadgivning) {
+      koeber_raadgivning = 1;
+    }
+
     const parametre = {
       caseID: data.caseID,
       ejendomspris: data.ejendomspris,
       koeb_omkostninger: data.koeb_omkostninger,
       advokat_udgifter: data.advokat_udgifter,
       tinglysning: data.tinglysning,
-      // BIT-felt: konverter true/false til 1/0
-      koeber_raadgivning: data.koeber_raadgivning ? 1 : 0
+      koeber_raadgivning: koeber_raadgivning
     };
 
     const resultat = await database.query(sqlTekst, parametre);
@@ -62,6 +67,11 @@ router.put('/:caseID', async (req, res) => {
       return;
     }
 
+    let koeber_raadgivning = 0;
+    if (data.koeber_raadgivning) {
+      koeber_raadgivning = 1;
+    }
+
     await database.query(
       `UPDATE Propalyze.koeb
        SET ejendomspris = @ejendomspris,
@@ -76,7 +86,7 @@ router.put('/:caseID', async (req, res) => {
         koeb_omkostninger: data.koeb_omkostninger,
         advokat_udgifter: data.advokat_udgifter,
         tinglysning: data.tinglysning,
-        koeber_raadgivning: data.koeber_raadgivning ? 1 : 0
+        koeber_raadgivning: koeber_raadgivning
       }
     );
 

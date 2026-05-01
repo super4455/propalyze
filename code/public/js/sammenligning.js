@@ -7,7 +7,7 @@ class SammenligningView {
 
   static formatKr(tal) {
     if (tal === null || tal === undefined) return '—';
-    return Math.round(tal).toLocaleString('da-DK') + ' kr.';
+    return `${Math.round(tal).toLocaleString('da-DK')} kr.`;
   }
 
   async hentAlleCases() {
@@ -33,13 +33,12 @@ class SammenligningView {
         const div = document.createElement('div');
         div.className = 'case_valg_item';
 
-        div.innerHTML = '<label>'
-          + '<input type="checkbox" class="case_checkbox" value="' + c.caseID + '">'
-          + '<span class="case_valg_navn">' + c.navn + '</span>'
-          + '<span class="case_valg_ejendom">'
-          + c.vejnavn + ' ' + c.husnummer + ', ' + c.bynavn
-          + '</span>'
-          + '</label>';
+        div.innerHTML = `
+          <label>
+            <input type="checkbox" class="case_checkbox" value="${c.caseID}">
+            <span class="case_valg_navn">${c.navn}</span>
+            <span class="case_valg_ejendom">${c.vejnavn} ${c.husnummer}, ${c.bynavn}</span>
+          </label>`;
 
         liste.appendChild(div);
       }
@@ -68,7 +67,7 @@ class SammenligningView {
     }
 
     try {
-      const svar = await fetch('/api/cases/sammenlign?ids=' + ids.join(','));
+      const svar = await fetch(`/api/cases/sammenlign?ids=${ids.join(',')}`);
       const data = await svar.json();
 
       if (!svar.ok) {
@@ -93,10 +92,7 @@ class SammenligningView {
     html += '<th></th>';
 
     for (const c of cases) {
-      html += '<th>'
-        + '<span class="tabel_case_navn">' + c.navn + '</span>'
-        + '<span class="tabel_case_ejendom">' + c.ejendom + '</span>'
-        + '</th>';
+      html += `<th><span class="tabel_case_navn">${c.navn}</span><span class="tabel_case_ejendom">${c.ejendom}</span></th>`;
     }
 
     html += '</tr></thead><tbody>';
@@ -115,7 +111,7 @@ class SammenligningView {
 
     for (const raekke of raekker) {
       html += '<tr>';
-      html += '<td class="raekke_label">' + raekke.label + '</td>';
+      html += `<td class="raekke_label">${raekke.label}</td>`;
 
       for (const c of cases) {
         const vaerdi = c[raekke.noegle];
@@ -124,14 +120,26 @@ class SammenligningView {
         if (raekke.type === 'kr') {
           visning = SammenligningView.formatKr(vaerdi);
         } else if (raekke.type === 'pct') {
-          visning = vaerdi !== null ? vaerdi + '%' : '—';
+          if (vaerdi !== null) {
+            visning = `${vaerdi}%`;
+          } else {
+            visning = '—';
+          }
         } else if (raekke.type === 'aar') {
-          visning = vaerdi !== null ? vaerdi + ' år' : '—';
+          if (vaerdi !== null) {
+            visning = `${vaerdi} år`;
+          } else {
+            visning = '—';
+          }
         } else if (raekke.type === 'tekst') {
-          visning = vaerdi || '—';
+          if (vaerdi) {
+            visning = vaerdi;
+          } else {
+            visning = '—';
+          }
         }
 
-        html += '<td>' + visning + '</td>';
+        html += `<td>${visning}</td>`;
       }
 
       html += '</tr>';

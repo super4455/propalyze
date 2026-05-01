@@ -17,9 +17,15 @@ router.get('/sammenlign', async (req, res) => {
     }
 
     // Split "1,2,3" til [1, 2, 3] og fjern ugyldige værdier
-    const ids = idsTekst.split(',')
-      .map(function (id) { return parseInt(id); })
-      .filter(function (id) { return !isNaN(id); });
+    const idsTekstListe = idsTekst.split(',');
+    const ids = [];
+
+    for (const idTekst of idsTekstListe) {
+      const id = parseInt(idTekst);
+      if (!isNaN(id)) {
+        ids.push(id);
+      }
+    }
 
     if (ids.length < 2) {
       res.status(400).json({ fejl: 'Vælg mindst to cases for at sammenligne' });
@@ -99,16 +105,34 @@ router.get('/sammenlign', async (req, res) => {
         maanedligLeje = 0;
       }
 
+      // Hent køb-værdier hvis køb findes
+      let ejendomspris = null;
+      if (koeb.length > 0) {
+        ejendomspris = koeb[0].ejendomspris;
+      }
+
+      // Hent finansieringsværdier hvis finansiering findes
+      let laanebeloeb = null;
+      let rente = null;
+      let loebetid_aar = null;
+      let laanetype = null;
+      if (finansiering.length > 0) {
+        laanebeloeb = finansiering[0].laanebeloeb;
+        rente = finansiering[0].rente;
+        loebetid_aar = finansiering[0].loebetid_aar;
+        laanetype = finansiering[0].laanetype;
+      }
+
       // Saml nøgletal for denne case
       resultater.push({
         caseID: caseID,
         navn: cases[0].navn,
-        ejendom: cases[0].vejnavn + ' ' + cases[0].husnummer + ', ' + cases[0].bynavn,
-        ejendomspris: koeb.length > 0 ? koeb[0].ejendomspris : null,
-        laanebeloeb: finansiering.length > 0 ? finansiering[0].laanebeloeb : null,
-        rente: finansiering.length > 0 ? finansiering[0].rente : null,
-        loebetid_aar: finansiering.length > 0 ? finansiering[0].loebetid_aar : null,
-        laanetype: finansiering.length > 0 ? finansiering[0].laanetype : null,
+        ejendom: `${cases[0].vejnavn} ${cases[0].husnummer}, ${cases[0].bynavn}`,
+        ejendomspris: ejendomspris,
+        laanebeloeb: laanebeloeb,
+        rente: rente,
+        loebetid_aar: loebetid_aar,
+        laanetype: laanetype,
         maanedlig_ydelse: Math.round(maanedligYdelse),
         total_rente: Math.round(totalRente),
         maanedlig_drift: Math.round(maanedligDrift),

@@ -127,7 +127,6 @@ class LaaneBeregner {
       return LaaneBeregner.beregnRestgaeldStaaende(laanebeloeb, loebetidAar, betalteAar);
     }
 
-    return LaaneBeregner.beregnRestgaeldAnnuitet(laanebeloeb, renteAarlig, loebetidAar, betalteAar);
   }
 }
 

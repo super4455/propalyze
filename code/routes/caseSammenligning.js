@@ -39,9 +39,10 @@ router.get('/sammenlign', async (req, res) => {
       // Hent case-navn
       const cases = await database.query(
         `SELECT c.caseID, c.navn, c.beskrivelse,
-                e.vejnavn, e.husnummer, e.bynavn
+                e.vejnavn, e.husnummer, p.bynavn
          FROM Propalyze.investeringscase c
          JOIN Propalyze.ejendomsprofil e ON c.ejendomID = e.ejendomID
+         JOIN Propalyze.postnummer p ON e.postnummer = p.postnummer
          WHERE c.caseID = @caseID`,
         { caseID: caseID }
       );

@@ -33,13 +33,14 @@ router.get('/lookup', async (req, res) => {
 router.get('/', async (req, res) => {
   try {
     const sqlTekst = `
-  SELECT e.ejendomID, e.vejnavn, e.husnummer, e.etage, e.doer, e.postnummer, e.bynavn,
+  SELECT e.ejendomID, e.vejnavn, e.husnummer, e.etage, e.doer, e.postnummer, p.bynavn,
          e.ejendomstype, e.byggeaar, e.boligareal, e.grundareal, e.vaerelser,
          e.oprettet_dato, e.sidste_data_hentning, e.dawaID,
          COUNT(c.caseID) AS antal_cases
   FROM Propalyze.ejendomsprofil e
+  JOIN Propalyze.postnummer p ON e.postnummer = p.postnummer
   LEFT JOIN Propalyze.investeringscase c ON e.ejendomID = c.ejendomID
-  GROUP BY e.ejendomID, e.vejnavn, e.husnummer, e.etage, e.doer, e.postnummer, e.bynavn,
+  GROUP BY e.ejendomID, e.vejnavn, e.husnummer, e.etage, e.doer, e.postnummer, p.bynavn,
            e.ejendomstype, e.byggeaar, e.boligareal, e.grundareal, e.vaerelser,
            e.oprettet_dato, e.sidste_data_hentning, e.dawaID
   ORDER BY e.oprettet_dato DESC
@@ -62,11 +63,12 @@ router.get('/:id', async (req, res) => {
     const id = req.params.id;
 
     const sqlTekst = `
-      SELECT ejendomID, vejnavn, husnummer, etage, doer, postnummer, bynavn,
-             ejendomstype, byggeaar, boligareal, grundareal, vaerelser, dawaID,
-             koordinat_x, koordinat_y
-      FROM Propalyze.ejendomsprofil
-      WHERE ejendomID = @id
+      SELECT e.ejendomID, e.vejnavn, e.husnummer, e.etage, e.doer, e.postnummer, p.bynavn,
+             e.ejendomstype, e.byggeaar, e.boligareal, e.grundareal, e.vaerelser, e.dawaID,
+             e.koordinat_x, e.koordinat_y
+      FROM Propalyze.ejendomsprofil e
+      JOIN Propalyze.postnummer p ON e.postnummer = p.postnummer
+      WHERE e.ejendomID = @id
     `;
 
     const rækker = await database.query(sqlTekst, { id: id });
@@ -159,15 +161,19 @@ router.post('/', async (req, res) => {
       }
     }
 
-    // Parameteriseret query for at undgå SQL injection
+    await database.query(`
+      IF NOT EXISTS (SELECT 1 FROM Propalyze.postnummer WHERE postnummer = @postnummer)
+        INSERT INTO Propalyze.postnummer (postnummer, bynavn) VALUES (@postnummer, @bynavn)
+    `, { postnummer: data.postnummer, bynavn: data.bynavn });
+
     const sqlTekst = `
       INSERT INTO Propalyze.ejendomsprofil
-        (vejnavn, husnummer, etage, doer, postnummer, bynavn, ejendomstype,
+        (vejnavn, husnummer, etage, doer, postnummer, ejendomstype,
          byggeaar, boligareal, grundareal, vaerelser, dawaID,
          koordinat_x, koordinat_y, sidste_data_hentning)
       OUTPUT INSERTED.ejendomID
       VALUES
-        (@vejnavn, @husnummer, @etage, @doer, @postnummer, @bynavn, @ejendomstype,
+        (@vejnavn, @husnummer, @etage, @doer, @postnummer, @ejendomstype,
          @byggeaar, @boligareal, @grundareal, @vaerelser, @dawaID,
          @koordinat_x, @koordinat_y, GETDATE())
     `;
@@ -178,7 +184,6 @@ router.post('/', async (req, res) => {
       etage: data.etage,
       doer: data.doer,
       postnummer: data.postnummer,
-      bynavn: data.bynavn,
       ejendomstype: data.ejendomstype,
       byggeaar: data.byggeaar,
       boligareal: data.boligareal,
@@ -232,6 +237,11 @@ router.put('/:id', async (req, res) => {
       return;
     }
 
+    await database.query(`
+      IF NOT EXISTS (SELECT 1 FROM Propalyze.postnummer WHERE postnummer = @postnummer)
+        INSERT INTO Propalyze.postnummer (postnummer, bynavn) VALUES (@postnummer, @bynavn)
+    `, { postnummer: data.postnummer, bynavn: data.bynavn });
+
     const sqlTekst = `
       UPDATE Propalyze.ejendomsprofil
       SET vejnavn = @vejnavn,
@@ -239,7 +249,6 @@ router.put('/:id', async (req, res) => {
           etage = @etage,
           doer = @doer,
           postnummer = @postnummer,
-          bynavn = @bynavn,
           ejendomstype = @ejendomstype,
           byggeaar = @byggeaar,
           boligareal = @boligareal,
@@ -255,7 +264,6 @@ router.put('/:id', async (req, res) => {
       etage: data.etage,
       doer: data.doer,
       postnummer: data.postnummer,
-      bynavn: data.bynavn,
       ejendomstype: data.ejendomstype,
       byggeaar: data.byggeaar,
       boligareal: data.boligareal,

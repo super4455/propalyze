@@ -244,9 +244,10 @@ router.get('/alle', async (req, res) => {
   try {
     const sqlTekst = `
       SELECT c.caseID, c.navn, c.beskrivelse, c.start_dato,
-             e.vejnavn, e.husnummer, e.bynavn
+             e.vejnavn, e.husnummer, p.bynavn
       FROM Propalyze.investeringscase c
       JOIN Propalyze.ejendomsprofil e ON c.ejendomID = e.ejendomID
+      JOIN Propalyze.postnummer p ON e.postnummer = p.postnummer
       ORDER BY c.start_dato DESC
     `;
 
@@ -289,42 +290,13 @@ router.get('/', async (req, res) => {
 });
 
 // DELETE /api/cases/:id
-// Sletter en investeringscase og alle tilknyttede data
-// Rækkefølgen er vigtig - FK-afhængige tabeller slettes først
+// Sletter en investeringscase. Tilknyttede rækker (koeb, finansiering, renovering,
+// driftsbudget, udgift, indtaegt, udlejning) fjernes automatisk via ON DELETE CASCADE.
 router.delete('/:id', async (req, res) => {
   try {
     const caseID = req.params.id;
     console.log('Sletter case:', caseID);
 
-    // Hent driftsbudgetID så vi kan slette udgifter og indtægter
-    const driftsbudget = await database.query(
-      'SELECT driftsbudgetID FROM Propalyze.driftsbudget WHERE caseID = @caseID',
-      { caseID: caseID }
-    );
-
-    // Slet udgifter og indtægter hvis driftsbudget eksisterer
-    if (driftsbudget.length > 0) {
-      const driftsbudgetID = driftsbudget[0].driftsbudgetID;
-
-      await database.query(
-        'DELETE FROM Propalyze.udgift WHERE driftsbudgetID = @driftsbudgetID',
-        { driftsbudgetID: driftsbudgetID }
-      );
-
-      await database.query(
-        'DELETE FROM Propalyze.indtaegt WHERE driftsbudgetID = @driftsbudgetID',
-        { driftsbudgetID: driftsbudgetID }
-      );
-    }
-
-    // Slet de resterende FK-tabeller
-    await database.query('DELETE FROM Propalyze.driftsbudget WHERE caseID = @caseID', { caseID: caseID });
-    await database.query('DELETE FROM Propalyze.koeb WHERE caseID = @caseID', { caseID: caseID });
-    await database.query('DELETE FROM Propalyze.finansiering WHERE caseID = @caseID', { caseID: caseID });
-    await database.query('DELETE FROM Propalyze.renovering WHERE caseID = @caseID', { caseID: caseID });
-    await database.query('DELETE FROM Propalyze.udlejning WHERE caseID = @caseID', { caseID: caseID });
-
-    // Slet selve casen til sidst
     await database.query(
       'DELETE FROM Propalyze.investeringscase WHERE caseID = @caseID',
       { caseID: caseID }

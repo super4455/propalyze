@@ -1,9 +1,14 @@
--- Dannelse af Ejendomsprofil table
+-- Dannelse af Postnummer table
+CREATE TABLE Propalyze.postnummer (
+	postnummer CHAR(4) PRIMARY KEY,
+	bynavn VARCHAR(50) NOT NULL
+)
 
+
+-- Dannelse af Ejendomsprofil table
 CREATE TABLE Propalyze.ejendomsprofil (
 	ejendomID INT IDENTITY(1,1) PRIMARY KEY,
 	husnummer VARCHAR(10) NOT NULL,
-	bynavn VARCHAR(50) NOT NULL,
 	ejendomstype VARCHAR(50) NOT NULL,
 	byggeaar INT NOT NULL CHECK (byggeaar BETWEEN 1000 AND 2100),
 	boligareal INT NOT NULL CHECK (boligareal > 0),
@@ -17,8 +22,13 @@ CREATE TABLE Propalyze.ejendomsprofil (
 	doer VARCHAR(10),
 	etage INT,
 	koordinat_x DECIMAL(12,4) NULL,
-	koordinat_y DECIMAL(12,4) NULL
+	koordinat_y DECIMAL(12,4) NULL,
+
+	CONSTRAINT fk_ejendomsprofil_postnummer
+	FOREIGN KEY (postnummer)
+	REFERENCES Propalyze.postnummer(postnummer)
 )
+
 
 -- Dannelse af Investeringscase table
 CREATE TABLE Propalyze.investeringscase (

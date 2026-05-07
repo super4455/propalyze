@@ -1,4 +1,4 @@
-const DAWAService = require('../../code/services/DAWAapi');
+const DAWAService = require('../../services/DAWAapi');
 
 // Unit: DAWAService — kritisk fordi det er systemets indgang; uden gyldig adresse kan ingen investeringscase oprettes
 

@@ -14,8 +14,5 @@
     "express": "^5.2.1",
     "jest": "^30.3.0",
     "mssql": "^7.2.0"
-  },
-  "jest": {
-    "roots": ["<rootDir>/../test"]
   }
 }

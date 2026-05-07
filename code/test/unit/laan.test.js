@@ -1,4 +1,4 @@
-const LaaneBeregner = require('../../code/logic/laan');
+const LaaneBeregner = require('../../logic/laan');
 
 // Unit: LaaneBeregner — kritisk fordi alle simuleringsresultater for ydelse og restgæld bygger herpå
 

@@ -1,4 +1,4 @@
-const CashflowBeregner = require('../../code/logic/cashflow');
+const CashflowBeregner = require('../../logic/cashflow');
 
 // Unit: CashflowBeregner — kritisk fordi cashflow er det primære nøgletal brugeren evaluerer investeringen på
 

@@ -9,13 +9,14 @@ beforeEach(() => fetch.mockClear());
 describe('soegAdresser', () => {
   test('returnerer adresseforslag fra DAWA ved gyldig søgning', async () => {
     // Arrange
+    const soegord = 'jagtvej';
     const mockForslag = [
       { tekst: 'Jagtvej 155, 2200 København N', data: { id: 'abc123' } }
     ];
     fetch.mockResolvedValueOnce({ ok: true, json: async () => mockForslag });
 
     // Act
-    const resultat = await DAWAService.soegAdresser('jagtvej');
+    const resultat = await DAWAService.soegAdresser(soegord);
 
     // Assert
     expect(resultat).toEqual(mockForslag);
@@ -25,17 +26,20 @@ describe('soegAdresser', () => {
   });
 
   test('kaster fejl når DAWA returnerer HTTP-fejl (ok: false)', async () => {
-    // Edge case: API utilgængeligt eller serverfejl
+
+    const soegord = 'jagtvej';
     fetch.mockResolvedValueOnce({ ok: false });
 
-    await expect(DAWAService.soegAdresser('jagtvej')).rejects.toThrow('DAWA er ikke tilgængelig');
+    // Act & Assert — kald og forventet fejl testes samlet fordi fejlen smides under selve kaldet
+    await expect(DAWAService.soegAdresser(soegord)).rejects.toThrow('DAWA er ikke tilgængelig');
   });
 
   test('returnerer tom liste når ingen adresser matcher søgeordet', async () => {
-    // Edge case: DAWA svarer korrekt men finder ingen resultater
+    const soegord = 'xyzxyzxyz';
     fetch.mockResolvedValueOnce({ ok: true, json: async () => [] });
 
-    const resultat = await DAWAService.soegAdresser('xyzxyzxyz');
+    const resultat = await DAWAService.soegAdresser(soegord);
+
     expect(resultat).toEqual([]);
   });
 });

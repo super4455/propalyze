@@ -1,4 +1,4 @@
-const LaaneBeregner = require('../../code/logic/laan');
+const LaaneBeregner = require('../../logic/laan');
 
 test('beregner korrekt månedlig ydelse på annuitetslån', () => {
   // 2.000.000 kr., 4% rente, 30 år → ~9.548 kr./md.

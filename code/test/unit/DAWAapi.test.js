@@ -1,4 +1,4 @@
-const DAWAService = require('../../code/services/DAWAapi');
+const DAWAService = require('../../services/DAWAapi');
 
 global.fetch = jest.fn();
 

@@ -34,6 +34,7 @@ class InvesteringsBeregner {
     const afdragsfriaar = f.afdragsfriaar || 0;
     const laanetype = f.laanetype;
     const ejendomspris = this.koeb.ejendomspris;
+    const anskaffelsesomkostninger = (this.koeb.koeb_omkostninger || 0) + (this.koeb.advokat_udgifter || 0) + (this.koeb.tinglysning || 0);
 
     // Hent husleje og udlejningsudgifter hvis ejendommen er udlejet, ellers 0
     let maanedligLeje = 0;
@@ -52,9 +53,10 @@ class InvesteringsBeregner {
       const restgaeld = LaaneBeregner.beregnRestgaeld(laanebeloeb, rente, loebetid, laanetype, aar);
       const egenkapital = CashflowBeregner.beregnEgenkapital(ejendomsvaerdi, restgaeld);
       const aarligRenovering = CashflowBeregner.beregnRenoveringForAar(this.renoveringer, aar, startAar);
+      const engangsomkostning = aar === 1 ? anskaffelsesomkostninger : 0;
       const aarligCashflow = CashflowBeregner.beregnAarligCashflow(
         maanedligLeje, maanedligUdlejningUdgift, maanedligYdelse,
-        this.maanedligDrift, this.maanedligDriftsIndtaegt, aarligRenovering
+        this.maanedligDrift, this.maanedligDriftsIndtaegt, aarligRenovering + engangsomkostning
       );
 
       this.simuleringsResultater.push({ aar, ejendomsvaerdi, restgaeld, egenkapital, aarligCashflow });

@@ -2,8 +2,7 @@ const express = require('express');
 const router = express.Router();
 const database = require('../database/database');
 
-// POST /api/cases
-// Opretter en ny investeringscase for en ejendom
+// Opretter en ny investeringscase for en ejendom ved at gemme data i databasen
 router.post('/', async (req, res) => {
   try {
     const data = req.body;
@@ -50,9 +49,7 @@ router.post('/', async (req, res) => {
 });
 
 
-// POST /api/cases/:id/dupliker
-// Opretter en komplet kopi af en eksisterende investeringscase
-// Kopierer: case, køb, finansiering, renovering, driftsbudget, udgifter, indtægter, udlejning
+// Opretter en kopi af en eksisterende investeringscase, ved at hente data fra databasen om den originale case, og opretter en ny case med samme data
 router.post('/:id/dupliker', async (req, res) => {
   try {
     const originalID = req.params.id;
@@ -238,8 +235,7 @@ router.post('/:id/dupliker', async (req, res) => {
 });
 
 
-// GET /api/cases/alle
-// Henter alle investeringscases på tværs af alle ejendomsprofiler
+// Henter alle investeringscases. Bruges til oversigt
 router.get('/alle', async (req, res) => {
   try {
     const sqlTekst = `
@@ -262,8 +258,7 @@ router.get('/alle', async (req, res) => {
 
 
 
-// GET /api/cases?ejendomsID=X
-// Henter alle investeringscases for en given ejendomsprofil
+// Henter alle investeringscases for en given ejendomsprofil. Bruges når man skal vise cases relateret til en specifik ejendom
 router.get('/', async (req, res) => {
   try {
     const ejendomsID = req.query.ejendomsID;
@@ -289,9 +284,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-// DELETE /api/cases/:id
-// Sletter en investeringscase. Tilknyttede rækker (koeb, finansiering, renovering,
-// driftsbudget, udgift, indtaegt, udlejning) fjernes automatisk via ON DELETE CASCADE.
+// Sletter en investeringscase - fjerner også tilknyttede data, hvis der er nogen, ved hjælp af ON DELETE CASCADE i databasen
 router.delete('/:id', async (req, res) => {
   try {
     const caseID = req.params.id;
@@ -311,8 +304,7 @@ router.delete('/:id', async (req, res) => {
 });
 
 
-// PUT /api/cases/:id
-// Opdaterer navn og beskrivelse for en investeringscase
+// Opdaterer en eksisterende investeringscase, ved at ændre navn og beskrivelse
 router.put('/:id', async (req, res) => {
   try {
     const data = req.body;

@@ -4,29 +4,27 @@ const config = require('./config');
 class Database {
 
   constructor() {
-    // Holder pool-objektet når vi har forbundet.
-    // En pool genbruger forbindelser i stedet for at oprette en ny pr. query.
+    // Connection-pooling gør, at vi kan håndtere flere samtidige forespørgsler mere effektivt.
+    // Ved at oprette et pool objekt kan vi genbruge forbindelser
     this.pool = null;
   }
 
   // Opretter forbindelse til databasen. Kaldes én gang når serveren starter.
   async connect() {
     try {
-      // Opretter en connection pool og gemmer den
+      // .connect metoden opretter forbindelsen og tilhører mssql biblioteket
       this.pool = await sql.connect(config);
       console.log('Forbundet til Azure SQL');
     } catch (err) {
-      // Hvis forbindelsen fejler, log det og kast fejlen videre
       console.log('Database-forbindelse fejlede:', err.message);
       throw err;
     }
   }
 
-  // Generel query-metode med support for parametre.
-  // Bruges af de mere specifikke metoder herunder.
+  // Generel query metode, der bruges af andre services til at lave SQL-forespørgsler
   async query(sqlTekst, parametre = {}) {
     try {
-      // Lav et "request"-objekt - det er sådan mssql laver queries
+      // Et request-objekt oprettes, så vi kan lave en SQL-forespørgsel
       const request = this.pool.request();
 
       // Tilføj alle parametre til requesten

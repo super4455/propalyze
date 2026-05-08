@@ -1,10 +1,9 @@
 const CashflowBeregner = require('../../logic/cashflow');
 
 // Unit: CashflowBeregner — kritisk fordi cashflow er det primære nøgletal brugeren evaluerer investeringen på
-
+// Alle test følger Arrange - Act - Assert princippet
 describe('beregnAarligCashflow', () => {
   test('beregner positivt cashflow korrekt (leje > udgifter)', () => {
-    // Arrange
     const maanedligLeje = 10000;
     const maanedligUdlejningUdgift = 2000;
     const maanedligYdelse = 5000;
@@ -12,13 +11,12 @@ describe('beregnAarligCashflow', () => {
     const maanedligDriftsIndtaegt = 0;
     const aarligRenovering = 0;
 
-    // Act
     const cashflow = CashflowBeregner.beregnAarligCashflow(
       maanedligLeje, maanedligUdlejningUdgift, maanedligYdelse,
       maanedligDrift, maanedligDriftsIndtaegt, aarligRenovering
     );
 
-    // Assert — (10.000 - 2.000 - 5.000 - 1.000) × 12 = 24.000
+    // Facit er udregnet på følgende vis:  — (10.000 - 2.000 - 5.000 - 1.000) × 12 = 24.000
     expect(cashflow).toBeCloseTo(24000, 0);
   });
 
@@ -68,7 +66,7 @@ describe('beregnAarligCashflow', () => {
     );
 
     expect(cashflow).toBeCloseTo(-50000, 0);
-  });
+  });JE
 });
 
 describe('beregnMaanedligDriftsomkostning', () => {

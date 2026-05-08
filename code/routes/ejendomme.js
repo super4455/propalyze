@@ -4,7 +4,6 @@ const database = require('../database/database');
 const BBRService = require('../services/BBRapi');
 const DAWAService = require('../services/DAWAapi');
 
-// GET /api/properties/lookup?dawaId=...
 // Slår en ejendom op via DAWA + BBR og returnerer begge dele samlet
 // Gemmer IKKE noget i databasen - bruges til preview
 router.get('/lookup', async (req, res) => {
@@ -28,8 +27,7 @@ router.get('/lookup', async (req, res) => {
 });
 
 
-// GET /api/properties
-// Henter alle gemte ejendomsprofiler fra databasen
+// Henter alle gemte ejendomsprofiler fra databasen. Bruges i metoden 
 router.get('/', async (req, res) => {
   try {
     const sqlTekst = `
@@ -56,7 +54,6 @@ router.get('/', async (req, res) => {
 });
 
 
-// GET /api/properties/:id
 // Henter én gemt ejendomsprofil med koordinater til kortvisning
 router.get('/:id', async (req, res) => {
   try {
@@ -106,8 +103,7 @@ router.get('/:id', async (req, res) => {
 });
 
 
-// DELETE /api/properties/:id
-// Sletter en ejendomsprofil fra databasen
+// Sletter en ejendomsprofil fra databasen. Sletter også tilknyttede data grundet ON DELETE CASCADE
 router.delete('/:id', async (req, res) => {
   try {
     const id = req.params.id;
@@ -130,7 +126,7 @@ router.delete('/:id', async (req, res) => {
 
 
 
-// POST /api/ejendomme
+
 // Opretter en ny ejendomsprofil med data fra DAWA + BBR
 router.post('/', async (req, res) => {
   try {
@@ -160,7 +156,7 @@ router.post('/', async (req, res) => {
         koordinatY = parseFloat(data.koordinater[1]);
       }
     }
-
+    // Hvis postnummer ikke findes, opret det i databasen
     await database.query(`
       IF NOT EXISTS (SELECT 1 FROM Propalyze.postnummer WHERE postnummer = @postnummer)
         INSERT INTO Propalyze.postnummer (postnummer, bynavn) VALUES (@postnummer, @bynavn)
@@ -218,7 +214,6 @@ router.post('/', async (req, res) => {
 
 
 
-// PUT /api/properties/:id
 // Opdaterer en eksisterende ejendomsprofil i databasen
 router.put('/:id', async (req, res) => {
   try {
@@ -282,7 +277,7 @@ router.put('/:id', async (req, res) => {
 });
 
 
-// POST /api/ejendomme/:id/opdater-data
+
 // Genhenter BBR-data for en eksisterende ejendomsprofil og opdaterer sidste_data_hentning
 router.post('/:id/opdater-data', async (req, res) => {
   try {

@@ -4,9 +4,7 @@ const database = require('../database/database');
 const LaaneBeregner = require('../logic/laan');
 const CashflowBeregner = require('../logic/cashflow');
 
-// GET /api/cases/sammenlign?ids=1,2,3
-// Henter nøgletal for flere cases til sammenligning
-// ids er kommaseparerede caseID'er i query-parameteret
+// Sammenligner flere investeringscases, baseret på deres nøgletal
 router.get('/sammenlign', async (req, res) => {
   try {
     const idsTekst = req.query.ids;

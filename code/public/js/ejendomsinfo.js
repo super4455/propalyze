@@ -2,13 +2,17 @@ class EjendomsInfoView {
 
   constructor() {
     this.ejendom = null;
-
+    // URLSearchParams bruges til at parse query string fra URL'en, 
+    // eksempel: ?dawaId=12345, så vil this.dawaId være 12345
+    // window.location.search indeholder hele query stringen
     const params = new URLSearchParams(window.location.search);
     this.dawaId = params.get('dawaId');
 
     document.getElementById('gem_knap').addEventListener('click', () => this.gemEjendom());
     this.indlaes();
   }
+
+  // Asynkron metode der henter ejendomsdata fra serveren, ved at lave en GET-anmodning til serveren.
 
   async indlaes() {
     const fejlFelt = document.getElementById('fejl');
@@ -46,7 +50,7 @@ class EjendomsInfoView {
       document.getElementById('fejl').textContent = 'Kunne ikke hente ejendomsdata.';
     }
   }
-
+  // Viser ejendomsdata i UI'en ved at opdatere tekstindholdet i forskellige HTML-elementer.
   vis(dawa, bbr) {
     this.ejendom = { dawa: dawa, bbr: bbr };
 
@@ -78,7 +82,7 @@ class EjendomsInfoView {
     this.visKort('luftfoto', 'luftfoto_billede', 'luftfoto_loading');
     this.visKort('matrikel', 'matrikel_billede', 'matrikel_loading');
   }
-
+  // Viser kortbilleder i UI'en
   visKort(lag, billedeId, loadingId) {
     const billede = document.getElementById(billedeId);
     const loading = document.getElementById(loadingId);
@@ -93,16 +97,16 @@ class EjendomsInfoView {
 
     billede.src = `/api/kort?lag=${lag}&x=${x}&y=${y}`;
 
-    billede.onload = function() {
+    billede.onload = function () {
       loading.style.display = 'none';
       billede.style.display = 'block';
     };
 
-    billede.onerror = function() {
+    billede.onerror = function () {
       loading.textContent = `Kunne ikke hente ${lag}`;
     };
   }
-
+  // Gemmer ejendomsdata til serveren, ved at lave en POST-anmodning med ejendommens data
   async gemEjendom() {
     const besked = document.getElementById('besked');
 

@@ -17,6 +17,7 @@ body {
   gap: 12px;
 }
 
+/* em er relativ til elementets egen skriftstørrelse — h1 får derfor større margin end h4 automatisk. havde vi brugt px, ville elementerne have samme margin */
 h1,
 h2,
 h3,
@@ -30,7 +31,7 @@ a {
 }
 
 p {
-  margin: 0.5em 0;
+  margin: 8px 0;
 }
 
 label {

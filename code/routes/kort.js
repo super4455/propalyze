@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const KortApi = require('../services/kortAPI');
 
+// Henter kortdata fra kortAPI'et. Bruges til at vise kort i ejendomsvinduet
+
 router.get('/', async (req, res) => {
   const lag = req.query.lag;
   const x = parseFloat(req.query.x);

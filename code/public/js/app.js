@@ -7,12 +7,12 @@ class AdresseSoegning {
 
     this.soegefelt.addEventListener('input', () => this.haandterInput());
   }
-
+  // Håndterer input i søgefeltet, ved at debounce søgningen
   haandterInput() {
     clearTimeout(this.timer);
     this.timer = setTimeout(() => this.soeg(), 300);
   }
-
+  // Asynkron søgning, der henter data fra serveren ved at bruge fetch API'et. Hvis værdien i søgefæltet er mindre end 2 tegn, vises ingen resultater
   async soeg() {
     const tekst = this.soegefelt.value;
 
@@ -37,7 +37,7 @@ class AdresseSoegning {
       this.resultater.innerHTML = '<p>Der opstod en fejl</p>';
     }
   }
-
+  // metode der viser søgeresultater ved at opdatere DOM'en ved brug af innerHTML, createElement og appendChild
   visForslag(forslag) {
     if (forslag.length === 0) {
       this.resultater.innerHTML = '<p>Ingen adresser fundet</p>';
@@ -51,7 +51,7 @@ class AdresseSoegning {
       div.className = 'resultat';
       div.textContent = f.tekst.replace(', ,', ',');
 
-      div.addEventListener('click', function() {
+      div.addEventListener('click', function () {
         window.location.href = `ejendomsinfo.html?dawaId=${f.data.id}`;
       });
 
@@ -60,7 +60,7 @@ class AdresseSoegning {
   }
 }
 
-
+// Klasse til at håndtere listen af ejendomsprofiler
 class EjendomsprofilListe {
 
   constructor() {
@@ -77,6 +77,7 @@ class EjendomsprofilListe {
     });
   }
 
+  // Henter gemte ejendomsprofiler fra serveren ved hjælp af fetch API'et. Denne metode kaldes i konstruktøren for at indlæse profilerne ved opstart.
   async hentGemteProfiler() {
     try {
       const svar = await fetch('/api/ejendomme');
@@ -166,7 +167,7 @@ class EjendomsprofilListe {
       this.profilListe.innerHTML = '<p>Der opstod en fejl</p>';
     }
   }
-
+  // Sammensætter dele af adressen med postnummer og bynavn, så den kan vises korrekt i UI'en
   formaterAdresse(p) {
     let adresse = `${p.vejnavn} ${p.husnummer}`;
     if (p.etage !== null || p.doer !== null) {
@@ -177,7 +178,7 @@ class EjendomsprofilListe {
     }
     return `${adresse}, ${p.postnummer} ${p.bynavn}`;
   }
-
+  // Viser ejendomsprofil i en modal, når brugeren klikker på "Se ejendomsprofil". 
   visProfilPopup(p) {
     document.getElementById('modal_adresse').textContent = this.formaterAdresse(p);
     document.getElementById('modal_ejendomstype').textContent = p.ejendomstype || '—';
@@ -237,7 +238,7 @@ class EjendomsprofilListe {
 
     this.indlaesModalKort(p.ejendomID);
   }
-
+  // Asynkron metode der indlæser kortdata for en given ejendom i modalvinduet. Kaldes i visProfilPopup. Er udelukkende ansvarlig for at hente og bruger visModalKort til at vise kortet i modalvinduet.
   async indlaesModalKort(ejendomID) {
     try {
       const svar = await fetch(`/api/ejendomme/${ejendomID}`);
@@ -254,21 +255,21 @@ class EjendomsprofilListe {
       console.log('Kunne ikke hente kortdata:', fejl);
     }
   }
-
+  // Metode der viser kortet i modalvinduet
   visModalKort(lag, x, y, billedeId, loadingId) {
     const billede = document.getElementById(billedeId);
     const loading = document.getElementById(loadingId);
 
     billede.src = `/api/kort?lag=${lag}&x=${x}&y=${y}`;
-    billede.onload = function() {
+    billede.onload = function () {
       loading.style.display = 'none';
       billede.style.display = 'block';
     };
-    billede.onerror = function() {
+    billede.onerror = function () {
       loading.textContent = `Kunne ikke hente ${lag}`;
     };
   }
-
+  // Metode der viser redigeringsformularen for en given ejendom
   visRedigerFormular(profil, profilDiv) {
     const eksisterende = document.getElementById('rediger_formular');
     if (eksisterende) eksisterende.remove();
@@ -319,9 +320,9 @@ class EjendomsprofilListe {
     profilDiv.appendChild(formular);
 
     document.getElementById('gem_redigering_knap').addEventListener('click', () => this.gemRedigering(profil.ejendomID));
-    document.getElementById('annuller_redigering_knap').addEventListener('click', function() { formular.remove(); });
+    document.getElementById('annuller_redigering_knap').addEventListener('click', function () { formular.remove(); });
   }
-
+  // Metode der gemmer ændringer i ejendomsprofilen, ved at lave en PUT-anmodning til serveren
   async gemRedigering(ejendomID) {
     const etageVaerdi = document.getElementById('red_etage').value.trim();
     const doerVaerdi = document.getElementById('red_doer').value.trim();
@@ -374,7 +375,7 @@ class EjendomsprofilListe {
       document.getElementById('rediger_besked').className = 'fejl';
     }
   }
-
+  // Metode der viser formularen for at oprette en ny investeringscase. 
   visOpretCase(ejendomID, profilDiv) {
     const eksisterende = document.getElementById('case_formular');
     if (eksisterende) eksisterende.remove();
@@ -397,7 +398,7 @@ class EjendomsprofilListe {
 
     profilDiv.appendChild(formular);
 
-    document.getElementById('gem_case_knap').addEventListener('click', function() {
+    document.getElementById('gem_case_knap').addEventListener('click', function () {
       const navn = document.getElementById('case_navn').value;
       const beskrivelse = document.getElementById('case_beskrivelse').value;
       const caseBesked = document.getElementById('case_besked');
@@ -407,7 +408,7 @@ class EjendomsprofilListe {
         caseBesked.className = 'fejl';
         return;
       }
-
+      // sessionStorage gemmer data midlertidigt i browseren og bruges her til at sende værdierne videre til investeringscase.html
       sessionStorage.setItem('caseNavn', navn);
       sessionStorage.setItem('caseBeskrivelse', beskrivelse);
       sessionStorage.setItem('ejendomsID', ejendomID);
@@ -415,9 +416,9 @@ class EjendomsprofilListe {
       window.location.href = '/investeringscase.html';
     });
 
-    document.getElementById('annuller_case_knap').addEventListener('click', function() { formular.remove(); });
+    document.getElementById('annuller_case_knap').addEventListener('click', function () { formular.remove(); });
   }
-
+  // Asynkron metode der henter og viser investeringscases for en given ejendom, ved at lave en GET-anmodning til serveren. 
   async visCases(ejendomID, profilDiv) {
     const eksisterende = profilDiv.querySelector('.cases_liste');
     if (eksisterende) {
@@ -455,13 +456,13 @@ class EjendomsprofilListe {
         const simuleringKnap = document.createElement('button');
         simuleringKnap.className = 'simulering_knap';
         simuleringKnap.textContent = 'Kør simulering';
-        simuleringKnap.addEventListener('click', function() {
+        simuleringKnap.addEventListener('click', function () {
           window.location.href = `/simulering.html?caseID=${c.caseID}`;
         });
 
         const redigerCaseKnap = document.createElement('button');
         redigerCaseKnap.textContent = 'Rediger';
-        redigerCaseKnap.addEventListener('click', function() {
+        redigerCaseKnap.addEventListener('click', function () {
           sessionStorage.setItem('redigerCaseID', c.caseID);
           window.location.href = '/rediger-case.html';
         });

@@ -1,8 +1,8 @@
 // dotenv læser .env-filen og lægger værdierne ind i process.env
 require('dotenv').config();
 
-// Konfigurations-objekt som mssql forventer
-// Felterne her skal hedde præcis user, password, server, database, port
+// Vi har her brugt Microsofts quickstart guide til, hvordan man bruger Node.js til at lave database querys.
+// Henvisning: https://learn.microsoft.com/en-us/azure/azure-sql/database/connect-query-nodejs
 const config = {
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
@@ -13,9 +13,7 @@ const config = {
   // Options er specifikt til Azure SQL
   options: {
     // Azure kræver krypteret forbindelse
-    encrypt: true,
-    // Vi stoler på Azures certifikat
-    trustServerCertificate: false
+    encrypt: true
   }
 };
 

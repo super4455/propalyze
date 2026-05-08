@@ -1,18 +1,15 @@
 const LaaneBeregner = require('../../logic/laan');
 
 // Unit: LaaneBeregner — kritisk fordi alle simuleringsresultater for ydelse og restgæld bygger herpå
-
+// Alle test følger Arrange - Act - Assert princippet
 describe('beregnYdelseAnnuitet', () => {
   test('beregner korrekt månedlig ydelse ved normal rente', () => {
-    // Arrange
     const laanebeloeb = 2000000;
     const rente = 4;
     const loebetidAar = 30;
 
-    // Act
     const ydelse = LaaneBeregner.beregnYdelseAnnuitet(laanebeloeb, rente, loebetidAar);
 
-    // Assert
     expect(ydelse).toBeCloseTo(9548, 0);
   });
 

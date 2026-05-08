@@ -1,24 +1,21 @@
 const DAWAService = require('../../services/DAWAapi');
 
 // Unit: DAWAService — kritisk fordi det er systemets indgang; uden gyldig adresse kan ingen investeringscase oprettes
-
+// Alle test følger Arrange - Act - Assert princippet
 global.fetch = jest.fn();
 
 beforeEach(() => fetch.mockClear());
 
 describe('soegAdresser', () => {
   test('returnerer adresseforslag fra DAWA ved gyldig søgning', async () => {
-    // Arrange
     const soegeord = 'jagtvej';
     const mockForslag = [
       { tekst: 'Jagtvej 155, 2200 København N', data: { id: '123' } }
     ];
     fetch.mockResolvedValueOnce({ ok: true, json: async () => mockForslag });
 
-    // Act
     const resultat = await DAWAService.soegAdresser(soegeord);
-
-    // Assert
+    
     expect(resultat).toEqual(mockForslag);
     expect(fetch).toHaveBeenCalledWith(
       'https://api.dataforsyningen.dk/autocomplete?q=jagtvej'

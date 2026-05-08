@@ -1,10 +1,12 @@
 class InvesteringsCaseFormular {
 
   constructor() {
+    // Henter de værdier der blev gemt i sessionStorage da brugeren oprettede casen på forsiden
     this.ejendomsID = parseInt(sessionStorage.getItem('ejendomsID'));
     this.caseNavn = sessionStorage.getItem('caseNavn');
     this.caseBeskrivelse = sessionStorage.getItem('caseBeskrivelse');
 
+    // Data fra hvert trin gemmes her midlertidigt indtil alt sendes til databasen i trin 5
     this.koebData = null;
     this.finansieringData = null;
     this.renoveringer = [];
@@ -23,6 +25,7 @@ class InvesteringsCaseFormular {
     this.opsaetTrin5();
   }
 
+  // Skjuler alle trin og viser kun det valgte
   visTrin(nummer) {
     for (let i = 1; i <= 5; i++) {
       document.getElementById(`trin${i}`).style.display = 'none';
@@ -31,6 +34,7 @@ class InvesteringsCaseFormular {
     document.getElementById('trin_indikator').textContent = `Trin ${nummer} af 5`;
   }
 
+  // Knapperne "Forrige" i hvert trin sender brugeren tilbage til det foregående trin
   opsaetNavigation() {
     document.getElementById('forrige_trin2').addEventListener('click', () => this.visTrin(1));
     document.getElementById('forrige_trin3').addEventListener('click', () => this.visTrin(2));
@@ -38,8 +42,9 @@ class InvesteringsCaseFormular {
     document.getElementById('forrige_trin5').addEventListener('click', () => this.visTrin(4));
   }
 
-  // === TRIN 1: KØB ===
+  // Trin 1: Køb
 
+  // Beregner og viser den samlede købspris løbende mens brugeren taster
   opdaterKoebOverblik() {
     const ejendomspris = parseFloat(document.getElementById('ejendomspris').value) || 0;
     const koebOmkostninger = parseFloat(document.getElementById('koeb_omkostninger').value) || 0;
@@ -50,6 +55,7 @@ class InvesteringsCaseFormular {
     document.getElementById('samlet_koeb').textContent = `${samlet.toLocaleString('da-DK')} kr.`;
   }
 
+  // Lytter på inputfelterne og gem-knappen i trin 1
   opsaetTrin1() {
     document.getElementById('ejendomspris').addEventListener('input', () => this.opdaterKoebOverblik());
     document.getElementById('koeb_omkostninger').addEventListener('input', () => this.opdaterKoebOverblik());
@@ -69,6 +75,7 @@ class InvesteringsCaseFormular {
         return;
       }
 
+      // Gem købsdata midlertidigt — sendes til databasen først når hele formularen er udfyldt i trin 5
       this.koebData = {
         ejendomspris: ejendomspris,
         koeb_omkostninger: koebOmkostninger,
@@ -83,22 +90,42 @@ class InvesteringsCaseFormular {
     });
   }
 
-  // === TRIN 2: FINANSIERING ===
+  // Trin 2: Finansiering
 
-  static beregnMaanedligYdelse(laanebeloeb, renteAarlig, loebetidAar) {
-    if (!laanebeloeb || !renteAarlig || !loebetidAar) return 0;
+  // Beregner månedlig ydelse for år 1 baseret på lånetype og afdragsfrihed — bruges til live preview.
+  // Vigtigt: Logikken er kopieret fra laan.js (backend), da browser-JS ikke kan importere Node.js-moduler.
+  static beregnMaanedligYdelse(laanebeloeb, renteAarlig, loebetidAar, afdragsfriaar, laanetype) {
+    if (!laanebeloeb || !loebetidAar) return 0;
     const r = renteAarlig / 100 / 12;
     const n = loebetidAar * 12;
-    if (r === 0) return laanebeloeb / n;
+
+    // I afdragsfri periode betales kun renter uanset lånetype
+    if (afdragsfriaar > 0) return Math.round(laanebeloeb * r);
+
+    if (laanetype === 'Serielaan') {
+      const fastAfdrag = laanebeloeb / n;
+      return Math.round(fastAfdrag + laanebeloeb * r);
+    }
+
+    if (laanetype === 'Staaende laan') {
+      return Math.round(laanebeloeb * r);
+    }
+
+    // Annuitetslån (default)
+    if (r === 0) return Math.round(laanebeloeb / n);
     return Math.round(laanebeloeb * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1));
   }
 
+  // Opdaterer preview med månedlig ydelse og samlet renteomkostning mens brugeren taster
   opdaterFinansieringOverblik() {
     const laanebeloeb = parseFloat(document.getElementById('laanebeloeb').value) || 0;
     const rente = parseFloat(document.getElementById('rente').value) || 0;
     const loebetidAar = parseInt(document.getElementById('loebetid_aar').value) || 0;
+    const afdragsfriaar = parseInt(document.getElementById('afdragsfriaar').value) || 0;
+    const laanetype = document.getElementById('laanetype').value;
 
-    const maanedligYdelse = InvesteringsCaseFormular.beregnMaanedligYdelse(laanebeloeb, rente, loebetidAar);
+    const maanedligYdelse = InvesteringsCaseFormular.beregnMaanedligYdelse(laanebeloeb, rente, loebetidAar, afdragsfriaar, laanetype);
+    // Total rente = alle betalinger over løbetiden minus selve lånebeløbet
     const totalRente = (maanedligYdelse * loebetidAar * 12) - laanebeloeb;
 
     document.getElementById('maanedlig_ydelse').textContent =
@@ -107,10 +134,13 @@ class InvesteringsCaseFormular {
       `${Math.max(0, Math.round(totalRente)).toLocaleString('da-DK')} kr.`;
   }
 
+  // Lytter på alle finansieringsfelter så preview opdateres løbende
   opsaetTrin2() {
     document.getElementById('laanebeloeb').addEventListener('input', () => this.opdaterFinansieringOverblik());
     document.getElementById('rente').addEventListener('input', () => this.opdaterFinansieringOverblik());
     document.getElementById('loebetid_aar').addEventListener('input', () => this.opdaterFinansieringOverblik());
+    document.getElementById('afdragsfriaar').addEventListener('input', () => this.opdaterFinansieringOverblik());
+    document.getElementById('laanetype').addEventListener('change', () => this.opdaterFinansieringOverblik());
 
     document.getElementById('gem_finansiering_knap').addEventListener('click', () => {
       const laanebeloeb = parseFloat(document.getElementById('laanebeloeb').value);
@@ -140,8 +170,9 @@ class InvesteringsCaseFormular {
     });
   }
 
-  // === TRIN 3: RENOVERING ===
+  // Trin 3: Renovering
 
+  // Tegner listen af tilføjede renoveringer op på ny hver gang der tilføjes en ny
   visRenoveringListe() {
     const liste = document.getElementById('renovering_liste');
     liste.innerHTML = '';
@@ -152,6 +183,7 @@ class InvesteringsCaseFormular {
     }
   }
 
+  // Håndterer tilføjelse af renoveringer og videresendelse til trin 4
   opsaetTrin3() {
     document.getElementById('tilfoej_renovering_knap').addEventListener('click', () => {
       const type = document.getElementById('type_renovering').value;
@@ -179,8 +211,10 @@ class InvesteringsCaseFormular {
     document.getElementById('naeste_trin3').addEventListener('click', () => this.visTrin(4));
   }
 
-  // === TRIN 4: DRIFTSBUDGET ===
+  // Trin 4: Driftsbudget
 
+  // Beregner og viser månedlige og årlige totaler for udgifter og indtægter
+  // Poster kan være månedlige eller årlige — begge omregnes til begge visninger
   opdaterDriftsOverblik() {
     let maanedligUdgift = 0;
     let aarligUdgift = 0;
@@ -217,6 +251,7 @@ class InvesteringsCaseFormular {
       `${Math.round(aarligIndtaegt).toLocaleString('da-DK')} kr.`;
   }
 
+  // Tegner listen af udgifter op på ny
   visUdgiftListe() {
     const liste = document.getElementById('udgift_liste');
     liste.innerHTML = '';
@@ -227,6 +262,7 @@ class InvesteringsCaseFormular {
     }
   }
 
+  // Tegner listen af indtægter op på ny
   visIndtaegtListe() {
     const liste = document.getElementById('indtaegt_liste');
     liste.innerHTML = '';
@@ -237,6 +273,7 @@ class InvesteringsCaseFormular {
     }
   }
 
+  // Håndterer tilføjelse af udgifter og indtægter samt videresendelse til trin 5
   opsaetTrin4() {
     document.getElementById('tilfoej_udgift_knap').addEventListener('click', () => {
       const kategori = document.getElementById('udgift_kategori').value;
@@ -289,8 +326,9 @@ class InvesteringsCaseFormular {
     });
   }
 
-  // === TRIN 5: UDLEJNING + GEM ALT ===
+  // Trin 5: Udlejning + gem alt
 
+  // Beregner og viser månedligt og årligt cashflow fra udlejning mens brugeren taster
   opdaterUdlejningOverblik() {
     const husleje = parseFloat(document.getElementById('maanedlig_husleje').value) || 0;
     const udlejUdgifter = parseFloat(document.getElementById('maanedlig_udlejning_udgifter').value) || 0;
@@ -303,6 +341,7 @@ class InvesteringsCaseFormular {
   }
 
   opsaetTrin5() {
+    // Bruger function() i stedet for arrow function fordi this skal pege på checkboxen, ikke klassen
     document.getElementById('udlejning_status').addEventListener('change', function() {
       let visning = 'none';
       if (this.checked) {
@@ -317,6 +356,8 @@ class InvesteringsCaseFormular {
     document.getElementById('gem_udlejning_knap').addEventListener('click', () => this.gemAlt());
   }
 
+  // Sender alle data fra trin 1-5 til databasen i den rigtige rækkefølge
+  // Rækkefølgen er vigtig: case skal oprettes først for at få et caseID, driftsbudget for at få driftsbudgetID
   async gemAlt() {
     const besked = document.getElementById('udlejning_besked');
 
@@ -336,6 +377,7 @@ class InvesteringsCaseFormular {
     besked.className = '';
 
     try {
+      // Opret selve casen og gem det returnerede caseID
       const caseSvar = await fetch('/api/cases', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -349,6 +391,7 @@ class InvesteringsCaseFormular {
       const caseResultat = await caseSvar.json();
       const caseID = caseResultat.caseID;
 
+      // ...this.koebData spreder objektets felter ud som individuelle parametre
       await fetch('/api/koeb', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -369,6 +412,7 @@ class InvesteringsCaseFormular {
         });
       }
 
+      // Driftsbudget oprettes først for at få driftsbudgetID til udgifter og indtægter
       const dbSvar = await fetch('/api/driftsbudget', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -404,6 +448,7 @@ class InvesteringsCaseFormular {
         })
       });
 
+      // Ryd sessionStorage nu data er gemt i databasen
       sessionStorage.removeItem('caseNavn');
       sessionStorage.removeItem('caseBeskrivelse');
       sessionStorage.removeItem('ejendomsID');
@@ -411,6 +456,7 @@ class InvesteringsCaseFormular {
       besked.textContent = 'Investeringscase gemt! Åbner simulering...';
       besked.className = 'succes';
 
+      // Kort forsinkelse så brugeren når at læse beskeden inden redirect
       setTimeout(function() {
         window.location.href = `/simulering.html?caseID=${caseID}`;
       }, 1500);

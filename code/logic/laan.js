@@ -111,7 +111,7 @@ class LaaneBeregner {
     return totalBetalt - laanebeloeb;
   }
 
-  // Beregning af restgæld afhængig af lånetype
+  // Beregning af restgæld afhængig af lånetype; samler de forskellige metoder for restgældsberegning
 
   static beregnRestgaeld(laanebeloeb, renteAarlig, loebetidAar, laanetype, betalteAar) {
 

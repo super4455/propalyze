@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const DAWAService = require('../services/DAWAapi');
 
-// GET /api/adresser/search?q=jagtvej
+// Søger efter adresser baseret på et søgeord. Bruger DAWA API'et.
 router.get('/search', async (req, res) => {
   try {
     const soegeord = req.query.q;

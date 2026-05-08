@@ -9,14 +9,14 @@ beforeEach(() => fetch.mockClear());
 describe('soegAdresser', () => {
   test('returnerer adresseforslag fra DAWA ved gyldig søgning', async () => {
     // Arrange
-    const soegord = 'jagtvej';
+    const soegeord = 'jagtvej';
     const mockForslag = [
-      { tekst: 'Jagtvej 155, 2200 København N', data: { id: 'abc123' } }
+      { tekst: 'Jagtvej 155, 2200 København N', data: { id: '123' } }
     ];
     fetch.mockResolvedValueOnce({ ok: true, json: async () => mockForslag });
 
     // Act
-    const resultat = await DAWAService.soegAdresser(soegord);
+    const resultat = await DAWAService.soegAdresser(soegeord);
 
     // Assert
     expect(resultat).toEqual(mockForslag);
@@ -26,19 +26,17 @@ describe('soegAdresser', () => {
   });
 
   test('kaster fejl når DAWA returnerer HTTP-fejl (ok: false)', async () => {
-
-    const soegord = 'jagtvej';
+    const soegeord = 'jagtvej';
     fetch.mockResolvedValueOnce({ ok: false });
 
-    // Act & Assert — kald og forventet fejl testes samlet fordi fejlen smides under selve kaldet
-    await expect(DAWAService.soegAdresser(soegord)).rejects.toThrow('DAWA er ikke tilgængelig');
+    await expect(DAWAService.soegAdresser(soegeord)).rejects.toThrow('DAWA er ikke tilgængelig');
   });
 
   test('returnerer tom liste når ingen adresser matcher søgeordet', async () => {
-    const soegord = 'xyzxyzxyz';
+    const soegeord = 'xyzxyzxyz';
     fetch.mockResolvedValueOnce({ ok: true, json: async () => [] });
 
-    const resultat = await DAWAService.soegAdresser(soegord);
+    const resultat = await DAWAService.soegAdresser(soegeord);
 
     expect(resultat).toEqual([]);
   });

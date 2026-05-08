@@ -4,8 +4,8 @@ const database = require('../database/database');
 const BBRService = require('../services/BBRapi');
 const DAWAService = require('../services/DAWAapi');
 
-// Slår en ejendom op via DAWA + BBR og returnerer begge dele samlet
-// Gemmer IKKE noget i databasen - bruges til preview
+// Slår en ejendom op via DAWA + BBR og returnerer begge dele samlet (gemmer IKKE i databasen)
+// Kaldes fra: ejendomsinfo.js:26 (preview før brugeren beslutter om ejendommen skal oprettes)
 router.get('/lookup', async (req, res) => {
   try {
     const dawaId = req.query.dawaId;
@@ -27,7 +27,8 @@ router.get('/lookup', async (req, res) => {
 });
 
 
-// Henter alle gemte ejendomsprofiler fra databasen. Bruges i metoden 
+// Henter alle gemte ejendomsprofiler fra databasen med antal tilknyttede cases
+// Kaldes fra: app.js:83 (visCases — listen af ejendomme på forsiden)
 router.get('/', async (req, res) => {
   try {
     const sqlTekst = `
@@ -55,6 +56,7 @@ router.get('/', async (req, res) => {
 
 
 // Henter én gemt ejendomsprofil med koordinater til kortvisning
+// Kaldes fra: app.js:244 (indlaesModalKort henter koordinater til kortbillederne i ejendomsmodalen)
 router.get('/:id', async (req, res) => {
   try {
     const id = req.params.id;
@@ -103,7 +105,8 @@ router.get('/:id', async (req, res) => {
 });
 
 
-// Sletter en ejendomsprofil fra databasen. Sletter også tilknyttede data grundet ON DELETE CASCADE
+// Sletter en ejendomsprofil fra databasen (ON DELETE CASCADE fjerner også cases mv.)
+// Kaldes fra: app.js:138 (slet-knap på en ejendom i oversigten)
 router.delete('/:id', async (req, res) => {
   try {
     const id = req.params.id;
@@ -128,6 +131,7 @@ router.delete('/:id', async (req, res) => {
 
 
 // Opretter en ny ejendomsprofil med data fra DAWA + BBR
+// Kaldes fra: ejendomsinfo.js:130 ("Gem ejendom"-knappen i ejendomsinfo-siden)
 router.post('/', async (req, res) => {
   try {
     const data = req.body;
@@ -215,6 +219,7 @@ router.post('/', async (req, res) => {
 
 
 // Opdaterer en eksisterende ejendomsprofil i databasen
+// Kaldes fra: app.js:355 (gem-knap i rediger-ejendom-modalen på forsiden)
 router.put('/:id', async (req, res) => {
   try {
     const id = req.params.id;
@@ -279,6 +284,7 @@ router.put('/:id', async (req, res) => {
 
 
 // Genhenter BBR-data for en eksisterende ejendomsprofil og opdaterer sidste_data_hentning
+// Kaldes fra: app.js:219 ("Opdater BBR-data"-knappen i ejendomsmodalen)
 router.post('/:id/opdater-data', async (req, res) => {
   try {
     const id = req.params.id;

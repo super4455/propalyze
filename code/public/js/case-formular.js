@@ -1,10 +1,29 @@
-class InvesteringsCaseFormular {
+// Fælles formular for både oprettelse og redigering af en investeringscase.
+// Tilstand styrer kun init (sessionStorage-nøgler), om data hentes fra databasen
+// og om gemAlt() POST'er nye rækker eller PUT'er eksisterende.
+class CaseFormular {
 
-  constructor() {
-    // Henter de værdier der blev gemt i sessionStorage da brugeren oprettede casen på forsiden
-    this.ejendomsID = parseInt(sessionStorage.getItem('ejendomsID'));
-    this.caseNavn = sessionStorage.getItem('caseNavn');
-    this.caseBeskrivelse = sessionStorage.getItem('caseBeskrivelse');
+  constructor(tilstand) {
+    this.tilstand = tilstand;
+
+    // De to tilstande starter fra forskellige sessionStorage-nøgler:
+    // 'opret' kommer fra forsiden med en valgt ejendom, 'rediger' kommer fra case-listen
+    if (tilstand === 'opret') {
+      this.ejendomsID = parseInt(sessionStorage.getItem('ejendomsID'));
+      this.caseNavn = sessionStorage.getItem('caseNavn');
+      this.caseBeskrivelse = sessionStorage.getItem('caseBeskrivelse');
+
+      if (!this.ejendomsID) {
+        document.getElementById('fejl').textContent = 'Ingen ejendom valgt.';
+      }
+    } else {
+      this.caseID = sessionStorage.getItem('redigerCaseID');
+
+      if (!this.caseID) {
+        document.getElementById('fejl').textContent = 'Ingen investeringscase valgt.';
+        return;
+      }
+    }
 
     // Data fra hvert trin gemmes her midlertidigt indtil alt sendes til databasen i trin 5
     this.koebData = null;
@@ -13,16 +32,17 @@ class InvesteringsCaseFormular {
     this.udgifter = [];
     this.indtaegter = [];
 
-    if (!this.ejendomsID) {
-      document.getElementById('fejl').textContent = 'Ingen ejendom valgt.';
-    }
-
     this.opsaetNavigation();
     this.opsaetTrin1();
     this.opsaetTrin2();
     this.opsaetTrin3();
     this.opsaetTrin4();
     this.opsaetTrin5();
+
+    // I rediger-tilstand henter vi de eksisterende data og fylder formularen ud
+    if (tilstand === 'rediger') {
+      this.indlaesData();
+    }
   }
 
   // Skjuler alle trin og viser kun det valgte
@@ -40,6 +60,71 @@ class InvesteringsCaseFormular {
     document.getElementById('forrige_trin3').addEventListener('click', () => this.visTrin(2));
     document.getElementById('forrige_trin4').addEventListener('click', () => this.visTrin(3));
     document.getElementById('forrige_trin5').addEventListener('click', () => this.visTrin(4));
+  }
+
+  // Henter alle eksisterende data for casen og fylder formularfelterne ud (kun rediger-tilstand)
+  async indlaesData() {
+    try {
+      const svar = await fetch(`/api/cases/${this.caseID}/data`);
+
+      if (!svar.ok) {
+        document.getElementById('fejl').textContent = 'Kunne ikke hente case-data';
+        return;
+      }
+
+      const data = await svar.json();
+
+      if (data.koeb) {
+        document.getElementById('ejendomspris').value = data.koeb.ejendomspris;
+        document.getElementById('koeb_omkostninger').value = data.koeb.koeb_omkostninger;
+        document.getElementById('advokat_udgifter').value = data.koeb.advokat_udgifter;
+        document.getElementById('tinglysning').value = data.koeb.tinglysning;
+        document.getElementById('koeber_raadgivning').checked = data.koeb.koeber_raadgivning;
+        this.opdaterKoebOverblik();
+      }
+
+      if (data.finansiering) {
+        document.getElementById('laanebeloeb').value = data.finansiering.laanebeloeb;
+        document.getElementById('rente').value = data.finansiering.rente;
+        document.getElementById('loebetid_aar').value = data.finansiering.loebetid_aar;
+        document.getElementById('afdragsfriaar').value = data.finansiering.afdragsfriaar;
+        document.getElementById('laanetype').value = data.finansiering.laanetype;
+        this.opdaterFinansieringOverblik();
+      }
+
+      for (const r of data.renoveringer) {
+        this.renoveringer.push({
+          type_renovering: r.type_renovering,
+          renovering_omkostninger: parseFloat(r.renovering_omkostninger),
+          planlagt_aar: parseInt(r.planlagt_aar)
+        });
+      }
+      this.visRenoveringListe();
+
+      for (const u of data.udgifter) {
+        this.udgifter.push({ kategori: u.kategori, beloeb: parseFloat(u.beloeb), frekvens: u.frekvens });
+      }
+      for (const i of data.indtaegter) {
+        this.indtaegter.push({ kategori: i.kategori, beloeb: parseFloat(i.beloeb), frekvens: i.frekvens });
+      }
+      this.visUdgiftListe();
+      this.visIndtaegtListe();
+      this.opdaterDriftsOverblik();
+
+      if (data.udlejning) {
+        document.getElementById('udlejning_status').checked = data.udlejning.udlejning_status;
+        if (data.udlejning.udlejning_status) {
+          document.getElementById('udlejning_detaljer').style.display = 'block';
+          document.getElementById('maanedlig_husleje').value = data.udlejning.maanedlig_husleje;
+          document.getElementById('maanedlig_udlejning_udgifter').value = data.udlejning.maanedlig_udgifter;
+          this.opdaterUdlejningOverblik();
+        }
+      }
+
+    } catch (fejl) {
+      console.log('Fejl ved indlæsning:', fejl);
+      document.getElementById('fejl').textContent = 'Kunne ikke indlæse data';
+    }
   }
 
   // Trin 1: Køb
@@ -124,7 +209,7 @@ class InvesteringsCaseFormular {
     const afdragsfriaar = parseInt(document.getElementById('afdragsfriaar').value) || 0;
     const laanetype = document.getElementById('laanetype').value;
 
-    const maanedligYdelse = InvesteringsCaseFormular.beregnMaanedligYdelse(laanebeloeb, rente, loebetidAar, afdragsfriaar, laanetype);
+    const maanedligYdelse = CaseFormular.beregnMaanedligYdelse(laanebeloeb, rente, loebetidAar, afdragsfriaar, laanetype);
     // Total rente = alle betalinger over løbetiden minus selve lånebeløbet
     const totalRente = (maanedligYdelse * loebetidAar * 12) - laanebeloeb;
 
@@ -319,7 +404,7 @@ class InvesteringsCaseFormular {
       besked.className = 'succes';
     });
 
-    document.getElementById('gem_driftsbudget_knap').addEventListener('click', () => {
+    document.getElementById('gem_drift_knap').addEventListener('click', () => {
       document.getElementById('driftsbudget_besked').textContent = 'Driftsbudget registreret';
       document.getElementById('driftsbudget_besked').className = 'succes';
       this.visTrin(5);
@@ -353,12 +438,22 @@ class InvesteringsCaseFormular {
     document.getElementById('maanedlig_husleje').addEventListener('input', () => this.opdaterUdlejningOverblik());
     document.getElementById('maanedlig_udlejning_udgifter').addEventListener('input', () => this.opdaterUdlejningOverblik());
 
-    document.getElementById('gem_udlejning_knap').addEventListener('click', () => this.gemAlt());
+    document.getElementById('gem_alt_knap').addEventListener('click', () => this.gemAlt());
+  }
+
+  // Den eneste reelle forskel mellem opret og rediger: hvilken HTTP-metode der bruges
+  // og hvor brugeren sendes hen bagefter.
+  async gemAlt() {
+    if (this.tilstand === 'opret') {
+      await this.gemSomNy();
+    } else {
+      await this.gemSomOpdatering();
+    }
   }
 
   // Sender alle data fra trin 1-5 til databasen i den rigtige rækkefølge
   // Rækkefølgen er vigtig: case skal oprettes først for at få et caseID, driftsbudget for at få driftsbudgetID
-  async gemAlt() {
+  async gemSomNy() {
     const besked = document.getElementById('udlejning_besked');
 
     if (!this.koebData) {
@@ -467,6 +562,70 @@ class InvesteringsCaseFormular {
       besked.className = 'fejl';
     }
   }
-}
 
-new InvesteringsCaseFormular();
+  // Sender alle ændringer til databasen via PUT — opdaterer eksisterende rækker i stedet for at oprette nye
+  async gemSomOpdatering() {
+    const besked = document.getElementById('udlejning_besked');
+
+    if (!this.koebData || !this.finansieringData) {
+      besked.textContent = 'Gå tilbage og udfyld trin 1 og 2';
+      besked.className = 'fejl';
+      return;
+    }
+
+    besked.textContent = 'Gemmer ændringer...';
+    besked.className = '';
+
+    try {
+      await fetch(`/api/koeb/${this.caseID}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(this.koebData)
+      });
+
+      await fetch(`/api/finansiering/${this.caseID}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(this.finansieringData)
+      });
+
+      // Renovering og driftsbudget bruger replace-strategi: slet alle eksisterende og indsæt de nye
+      await fetch(`/api/renovering/${this.caseID}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ renoveringer: this.renoveringer })
+      });
+
+      await fetch(`/api/driftsbudget/${this.caseID}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ udgifter: this.udgifter, indtaegter: this.indtaegter })
+      });
+
+      await fetch(`/api/udlejning/${this.caseID}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          udlejning_status: document.getElementById('udlejning_status').checked,
+          maanedlig_husleje: parseFloat(document.getElementById('maanedlig_husleje').value) || 0,
+          maanedlig_udgifter: parseFloat(document.getElementById('maanedlig_udlejning_udgifter').value) || 0
+        })
+      });
+
+      sessionStorage.removeItem('redigerCaseID');
+
+      besked.textContent = 'Ændringer gemt!';
+      besked.className = 'succes';
+
+      // Kort forsinkelse så brugeren når at læse beskeden inden redirect
+      setTimeout(function() {
+        window.location.href = '/';
+      }, 1500);
+
+    } catch (fejl) {
+      console.log('Fejl ved gem:', fejl);
+      besked.textContent = 'Noget gik galt. Prøv igen.';
+      besked.className = 'fejl';
+    }
+  }
+}

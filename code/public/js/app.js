@@ -198,15 +198,12 @@ class EjendomsprofilListe {
 
     const luftfoto = document.getElementById('modal_luftfoto');
     const matrikel = document.getElementById('modal_matrikel');
-    const luftfotoLoading = document.getElementById('modal_luftfoto_loading');
-    const matrikelLoading = document.getElementById('modal_matrikel_loading');
+    const kortLoading = document.getElementById('modal_kort_loading');
 
     luftfoto.style.display = 'none';
     matrikel.style.display = 'none';
-    luftfotoLoading.textContent = 'Henter luftfoto...';
-    luftfotoLoading.style.display = 'block';
-    matrikelLoading.textContent = 'Henter matrikelkort...';
-    matrikelLoading.style.display = 'block';
+    kortLoading.textContent = 'Henter luftfoto og matrikelkort...';
+    kortLoading.style.display = 'block';
 
     const opdaterKnap = document.getElementById('modal_opdater_knap');
     opdaterKnap.textContent = 'Opdatér BBR-data';
@@ -249,8 +246,8 @@ class EjendomsprofilListe {
       const x = data.koordinater[0];
       const y = data.koordinater[1];
 
-      this.visModalKort('luftfoto', x, y, 'modal_luftfoto', 'modal_luftfoto_loading');
-      this.visModalKort('matrikel', x, y, 'modal_matrikel', 'modal_matrikel_loading');
+      this.visModalKort('luftfoto', x, y, 'modal_luftfoto', 'modal_kort_loading');
+      this.visModalKort('matrikel', x, y, 'modal_matrikel', 'modal_kort_loading');
     } catch (fejl) {
       console.log('Kunne ikke hente kortdata:', fejl);
     }

@@ -4,7 +4,8 @@ const database = require('../database/database');
 const LaaneBeregner = require('../logic/laan');
 const CashflowBeregner = require('../logic/cashflow');
 
-// Sammenligner flere investeringscases, baseret på deres nøgletal
+// Beregner og returnerer nøgletal (ydelse, total rente, drift, leje) for hver valgt case så de kan stilles op side om side
+// Kaldes fra: sammenligning.js:71 ("Sammenlign valgte"-knappen efter at brugeren har afkrydset mindst to cases)
 router.get('/sammenlign', async (req, res) => {
   try {
     const idsTekst = req.query.ids;

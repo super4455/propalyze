@@ -51,7 +51,7 @@ class DAWAService {
       etage = raaData.etage;
       doer = raaData.dør;
     }
-
+    // Returnerer et objekt med de relevante adresseoplysninger, der hentes fra DAWA
     return {
       id: raaData.id,
       adgangsadresseid: adgangsadresse.id,

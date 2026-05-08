@@ -3,7 +3,8 @@ const router = express.Router();
 const database = require('../database/database');
 const InvesteringsBeregner = require('../logic/InvesteringsBeregner');
 
-// Henter data for en specifik investeringscase - bruges til at vise alle data i redigeringsvinduet, og som input til simulering
+// Henter alle data for én case samlet (køb, finansiering, renoveringer, drift, udlejning) i ét kald
+// Kaldes fra: simulering.js:22 (parameter-overblik) og case-formular.js:68 (rediger-tilstand fylder formularen ud)
 router.get('/:id/data', async (req, res) => {
   try {
     const caseID = req.params.id;
@@ -84,7 +85,8 @@ router.get('/:id/data', async (req, res) => {
   }
 });
 
-// Henter data for simulering af en specifik investeringscase. Bruges når man skal vise data i simuleringen
+// Kører år-for-år simulering på en case og returnerer en liste med ejendomsværdi, restgæld, egenkapital og cashflow pr. år
+// Kaldes fra: simulering.js:81 ("Kør simulering"-knappen)
 router.get('/:id/simuler', async (req, res) => {
   try {
     const caseID = req.params.id;

@@ -3,7 +3,8 @@ const router = express.Router();
 const database = require('../../database/database');
 
 // POST /api/renovering
-// Gemmer én renovering for en investeringscase
+// Gemmer én renovering for en investeringscase (kaldes en gang pr. renovering i listen)
+// Kaldes fra: case-formular.js:503 (gemSomNy — løkke gennem alle tilføjede renoveringer)
 router.post('/', async (req, res) => {
   try {
     const data = req.body;
@@ -46,7 +47,8 @@ router.post('/', async (req, res) => {
 
 
 // PUT /api/renovering/:caseID
-// Erstatter alle renoveringer for en case - sletter eksisterende og indsætter nye
+// Erstatter alle renoveringer for en case (replace-strategi: slet alle eksisterende og indsæt nye)
+// Kaldes fra: case-formular.js:593 (gemSomOpdatering — rediger-tilstand)
 router.put('/:caseID', async (req, res) => {
   try {
     const caseID = req.params.caseID;

@@ -1,6 +1,8 @@
 class SimuleringView {
 
   constructor() {
+    // caseID hentes fra URL (?caseID=...) i stedet for sessionStorage,
+    // så siden kan bookmarkes og åbnes direkte efter en redirect fra gem-flowet
     const params = new URLSearchParams(window.location.search);
     this.caseID = params.get('caseID');
     this.caseData = null;
@@ -14,6 +16,7 @@ class SimuleringView {
     this.hentCaseData();
   }
 
+  // Henter alle data for casen (køb, finansiering, renoveringer, drift, udlejning) i ét kald
   async hentCaseData() {
     try {
       const svar = await fetch(`/api/cases/${this.caseID}/data`);
@@ -32,7 +35,9 @@ class SimuleringView {
     }
   }
 
+  // Viser et kort overblik over de centrale parametre fra casen før brugeren starter simuleringen
   visParametre() {
+    // Køb og finansiering er minimumskrav — uden dem kan simuleringen ikke køre
     if (!this.caseData || !this.caseData.finansiering || !this.caseData.koeb) {
       document.getElementById('fejl').textContent = 'Case mangler køb eller finansiering';
       return;
@@ -51,6 +56,7 @@ class SimuleringView {
     document.getElementById('parametre_sektion').style.display = 'block';
   }
 
+  // Sender simuleringsforespørgsel til serveren og tegner resultatet ind i tabellen
   async startSimulering() {
     if (!this.caseData || !this.caseData.finansiering || !this.caseData.koeb) {
       document.getElementById('fejl').textContent = 'Manglende data - kan ikke simulere';
@@ -60,6 +66,7 @@ class SimuleringView {
     const periode = parseInt(document.getElementById('periode').value);
     const vaerdistigning = parseFloat(document.getElementById('vaerdistigning').value);
 
+    // Minimum 30 år sikrer at simuleringen dækker en typisk lånelevetid
     if (periode < 30) {
       document.getElementById('fejl').textContent = 'Perioden skal være mindst 30 år';
       return;
@@ -83,6 +90,7 @@ class SimuleringView {
       const tbody = document.getElementById('simulering_tbody');
       tbody.innerHTML = '';
 
+      // Hver række er ét år i simuleringen: ejendomsværdi, restgæld, egenkapital og årligt cashflow
       for (const r of resultater) {
         const rad = document.createElement('tr');
         rad.innerHTML = `

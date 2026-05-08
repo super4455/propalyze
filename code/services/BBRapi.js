@@ -101,7 +101,7 @@ class BBRService {
     console.log('BBR-data samlet:', resultat);
     return resultat;
   }
-
+  // Henter grundareal for en given matrikel og ejerlav via Matriklen2
   static async hentGrundareal(matrikelnr, ejerlavskode, brugernavn, kodeord) {
     if (!matrikelnr || !ejerlavskode) return null;
 

@@ -4,6 +4,7 @@ const database = require('../../database/database');
 
 // POST /api/finansiering
 // Gemmer finansieringsoplysninger for en investeringscase
+// Kaldes fra: case-formular.js:496 (gemSomNy — opretter finansiering efter casen er oprettet)
 router.post('/', async (req, res) => {
   try {
     const data = req.body;
@@ -50,6 +51,7 @@ router.post('/', async (req, res) => {
 
 // PUT /api/finansiering/:caseID
 // Opdaterer finansieringsoplysninger for en eksisterende case
+// Kaldes fra: case-formular.js:586 (gemSomOpdatering — rediger-tilstand)
 router.put('/:caseID', async (req, res) => {
   try {
     const data = req.body;

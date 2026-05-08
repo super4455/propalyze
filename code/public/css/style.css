@@ -114,20 +114,23 @@ button:hover {
   flex-shrink: 0;
 }
 
-.kort_sektion {
-  display: flex;
-  gap: 15px;
-  flex-wrap: wrap;
+.kort_overlay {
+  position: relative;
+  display: inline-block;
   margin: 15px 0;
 }
 
-.kort_sektion img {
+.kort_overlay img {
+  display: block;
   max-width: 100%;
   border: 1px solid #ccc;
+  box-sizing: border-box;
 }
 
-.kort_label {
-  font-weight: bold;
+.kort_overlay img + img {
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 #soegefelt {

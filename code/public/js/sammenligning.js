@@ -5,11 +5,12 @@ class SammenligningView {
     this.hentAlleCases();
   }
 
+  // Formaterer tal til kr.-format
   static formatKr(tal) {
     if (tal === null || tal === undefined) return '—';
     return `${Math.round(tal).toLocaleString('da-DK')} kr.`;
   }
-
+  // Henter alle investeringscases ved fetch, og opdaterer UI
   async hentAlleCases() {
     try {
       const svar = await fetch('/api/cases/alle');
@@ -48,7 +49,7 @@ class SammenligningView {
       document.getElementById('fejl').textContent = 'Kunne ikke kontakte serveren';
     }
   }
-
+  // Sammenligner udvalgte investeringscases ved at samle ids og sende dem som query-parameter, og kalder derefter vissammenligning(data)
   async sammenlign() {
     const fejlDiv = document.getElementById('fejl');
     fejlDiv.textContent = '';
@@ -84,7 +85,7 @@ class SammenligningView {
       fejlDiv.className = 'fejl';
     }
   }
-
+  // Viser sammenligningen i tabellen ved at bygge HTML dynamisk baseret på de modtagne cases og deres nøgletal
   vissammenligning(cases) {
     const container = document.getElementById('sammenligning_tabel_container');
 
@@ -98,15 +99,15 @@ class SammenligningView {
     html += '</tr></thead><tbody>';
 
     const raekker = [
-      { label: 'Ejendomspris',       noegle: 'ejendomspris',       type: 'kr' },
-      { label: 'Lånebeløb',          noegle: 'laanebeloeb',        type: 'kr' },
-      { label: 'Rente',              noegle: 'rente',              type: 'pct' },
-      { label: 'Løbetid',            noegle: 'loebetid_aar',       type: 'aar' },
-      { label: 'Lånetype',           noegle: 'laanetype',          type: 'tekst' },
-      { label: 'Månedlig ydelse',    noegle: 'maanedlig_ydelse',   type: 'kr' },
-      { label: 'Total renteomk.',    noegle: 'total_rente',        type: 'kr' },
-      { label: 'Månedlig drift',     noegle: 'maanedlig_drift',    type: 'kr' },
-      { label: 'Månedlig husleje',   noegle: 'maanedlig_leje',     type: 'kr' }
+      { label: 'Ejendomspris', noegle: 'ejendomspris', type: 'kr' },
+      { label: 'Lånebeløb', noegle: 'laanebeloeb', type: 'kr' },
+      { label: 'Rente', noegle: 'rente', type: 'pct' },
+      { label: 'Løbetid', noegle: 'loebetid_aar', type: 'aar' },
+      { label: 'Lånetype', noegle: 'laanetype', type: 'tekst' },
+      { label: 'Månedlig ydelse', noegle: 'maanedlig_ydelse', type: 'kr' },
+      { label: 'Total renteomk.', noegle: 'total_rente', type: 'kr' },
+      { label: 'Månedlig drift', noegle: 'maanedlig_drift', type: 'kr' },
+      { label: 'Månedlig husleje', noegle: 'maanedlig_leje', type: 'kr' }
     ];
 
     for (const raekke of raekker) {

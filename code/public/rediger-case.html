@@ -160,11 +160,15 @@
         <div id="drifts_overblik" class="overblik">
             <p>Månedlige udgifter: <strong id="maanedlig_udgift_total">0 kr.</strong></p>
             <p>Månedlige indtægter: <strong id="maanedlig_indtaegt_total">0 kr.</strong></p>
+            <p>Årlige udgifter: <strong id="aarlig_udgift_total">0 kr.</strong></p>
+            <p>Årlige indtægter: <strong id="aarlig_indtaegt_total">0 kr.</strong></p>
         </div>
+
+        <div id="driftsbudget_besked"></div>
 
         <div class="knapper">
             <button id="forrige_trin4">← Tilbage</button>
-            <button id="naeste_trin4" class="knap_primaer">Fortsæt →</button>
+            <button id="gem_drift_knap" class="knap_primaer">Fortsæt →</button>
         </div>
     </div>
 
@@ -183,6 +187,15 @@
 
             <label for="maanedlig_udlejning_udgifter">Månedlige udgifter ved udlejning (kr.):</label>
             <input type="number" id="maanedlig_udlejning_udgifter" min="0">
+
+            <div id="udlejning_overblik" class="overblik">
+                <p>Månedligt cashflow fra udlejning:
+                    <strong id="maanedlig_cashflow">0 kr.</strong>
+                </p>
+                <p>Årligt cashflow fra udlejning:
+                    <strong id="aarlig_cashflow">0 kr.</strong>
+                </p>
+            </div>
         </div>
 
         <div class="knapper">
@@ -192,7 +205,8 @@
         <div id="udlejning_besked"></div>
     </div>
 
-    <script src="/js/rediger-case.js"></script>
+    <script src="/js/case-formular.js"></script>
+    <script>new CaseFormular('rediger');</script>
 </body>
 
 </html>

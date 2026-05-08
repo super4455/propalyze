@@ -3,7 +3,8 @@ const router = express.Router();
 const database = require('../../database/database');
 
 // POST /api/driftsbudget
-// Opretter et driftsbudget for en investeringscase
+// Opretter et tomt driftsbudget for en case og returnerer driftsbudgetID til brug ved oprettelse af udgifter/indtægter
+// Kaldes fra: case-formular.js:511 (gemSomNy — driftsbudget skal eksistere før der kan tilføjes udgifter/indtægter)
 router.post('/', async (req, res) => {
   try {
     const data = req.body;
@@ -33,7 +34,8 @@ router.post('/', async (req, res) => {
 });
 
 // POST /api/driftsbudget/udgift
-// Tilføjer en udgift til et driftsbudget
+// Tilføjer en udgift til et driftsbudget (kaldes en gang pr. udgift i listen)
+// Kaldes fra: case-formular.js:520 (gemSomNy — løkke gennem alle tilføjede udgifter)
 router.post('/udgift', async (req, res) => {
   try {
     const data = req.body;
@@ -72,7 +74,8 @@ router.post('/udgift', async (req, res) => {
 });
 
 // POST /api/driftsbudget/indtaegt
-// Tilføjer en indtægt til et driftsbudget
+// Tilføjer en indtægt til et driftsbudget (kaldes en gang pr. indtægt i listen)
+// Kaldes fra: case-formular.js:528 (gemSomNy — løkke gennem alle tilføjede indtægter)
 router.post('/indtaegt', async (req, res) => {
   try {
     const data = req.body;
@@ -112,7 +115,8 @@ router.post('/indtaegt', async (req, res) => {
 
 
 // PUT /api/driftsbudget/:caseID
-// Erstatter alle udgifter og indtægter for en case
+// Erstatter alle udgifter og indtægter for en case (replace-strategi: slet eksisterende og indsæt nye)
+// Kaldes fra: case-formular.js:599 (gemSomOpdatering — rediger-tilstand)
 router.put('/:caseID', async (req, res) => {
   try {
     const caseID = req.params.caseID;

@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 const database = require('../database/database');
 
-// Opretter en ny investeringscase for en ejendom ved at gemme data i databasen
+// Opretter en ny investeringscase for en ejendom (kun navn + beskrivelse — øvrige data sendes til /api/koeb mv. bagefter)
+// Kaldes fra: case-formular.js:476 (gemSomNy — første kald i opret-flowet)
 router.post('/', async (req, res) => {
   try {
     const data = req.body;
@@ -49,7 +50,8 @@ router.post('/', async (req, res) => {
 });
 
 
-// Opretter en kopi af en eksisterende investeringscase, ved at hente data fra databasen om den originale case, og opretter en ny case med samme data
+// Duplikerer en eksisterende case — henter alle data og indsætter dem som en ny case med "Kopi af " foran navnet
+// Kaldes fra: app.js:474 ("Duplikér"-knappen i case-listen for en ejendom)
 router.post('/:id/dupliker', async (req, res) => {
   try {
     const originalID = req.params.id;
@@ -235,7 +237,8 @@ router.post('/:id/dupliker', async (req, res) => {
 });
 
 
-// Henter alle investeringscases. Bruges til oversigt
+// Henter alle investeringscases på tværs af ejendomme — bruges til sammenligningssiden
+// Kaldes fra: sammenligning.js:16 (fyldte case-listen med checkbokse)
 router.get('/alle', async (req, res) => {
   try {
     const sqlTekst = `
@@ -258,7 +261,8 @@ router.get('/alle', async (req, res) => {
 
 
 
-// Henter alle investeringscases for en given ejendomsprofil. Bruges når man skal vise cases relateret til en specifik ejendom
+// Henter alle investeringscases for en given ejendomsprofil
+// Kaldes fra: app.js:430 (visCases — listen af cases inde i ejendomsmodalen)
 router.get('/', async (req, res) => {
   try {
     const ejendomsID = req.query.ejendomsID;
@@ -284,7 +288,8 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Sletter en investeringscase - fjerner også tilknyttede data, hvis der er nogen, ved hjælp af ON DELETE CASCADE i databasen
+// Sletter en investeringscase (ON DELETE CASCADE fjerner også køb, finansiering, drift mv.)
+// Kaldes fra: app.js:496 ("Slet case"-knappen i case-listen)
 router.delete('/:id', async (req, res) => {
   try {
     const caseID = req.params.id;
@@ -302,38 +307,6 @@ router.delete('/:id', async (req, res) => {
     res.status(500).json({ fejl: err.message });
   }
 });
-
-
-// Opdaterer en eksisterende investeringscase, ved at ændre navn og beskrivelse
-router.put('/:id', async (req, res) => {
-  try {
-    const data = req.body;
-    const caseID = req.params.id;
-
-    if (!data.navn) {
-      res.status(400).json({ fejl: 'Navn er påkrævet' });
-      return;
-    }
-
-    await database.query(
-      `UPDATE Propalyze.investeringscase
-       SET navn = @navn, beskrivelse = @beskrivelse
-       WHERE caseID = @caseID`,
-      {
-        caseID: caseID,
-        navn: data.navn,
-        beskrivelse: data.beskrivelse || ''
-      }
-    );
-
-    res.status(200).json({ besked: 'Case opdateret' });
-
-  } catch (err) {
-    console.log('Fejl ved opdatering af case:', err.message);
-    res.status(500).json({ fejl: err.message });
-  }
-});
-
 
 
 module.exports = router;

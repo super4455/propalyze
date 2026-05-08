@@ -79,8 +79,8 @@ class EjendomsInfoView {
 
     document.getElementById('gem_knap').style.display = 'block';
 
-    this.visKort('luftfoto', 'luftfoto_billede', 'luftfoto_loading');
-    this.visKort('matrikel', 'matrikel_billede', 'matrikel_loading');
+    this.visKort('luftfoto', 'luftfoto_billede', 'kort_loading');
+    this.visKort('matrikel', 'matrikel_billede', 'kort_loading');
   }
   // Viser kortbilleder i UI'en
   visKort(lag, billedeId, loadingId) {

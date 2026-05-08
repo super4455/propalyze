@@ -3,7 +3,8 @@ const router = express.Router();
 const database = require('../../database/database');
 
 // POST /api/udlejning
-// Gemmer udlejningsoplysninger for en investeringscase
+// Gemmer udlejningsoplysninger for en investeringscase (sidste skridt i opret-flowet)
+// Kaldes fra: case-formular.js:535 (gemSomNy)
 router.post('/', async (req, res) => {
   try {
     const data = req.body;
@@ -50,6 +51,7 @@ router.post('/', async (req, res) => {
 
 // PUT /api/udlejning/:caseID
 // Opdaterer udlejningsoplysninger for en eksisterende case
+// Kaldes fra: case-formular.js:605 (gemSomOpdatering — rediger-tilstand)
 router.put('/:caseID', async (req, res) => {
   try {
     const data = req.body;

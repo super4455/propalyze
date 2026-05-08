@@ -2,8 +2,8 @@ const express = require('express');
 const router = express.Router();
 const KortApi = require('../services/kortAPI');
 
-// Henter kortdata fra kortAPI'et. Bruges til at vise kort i ejendomsvinduet
-
+// Returnerer et kortbillede (PNG) fra Dataforsyningen for et givet lag og koordinat
+// Kaldes fra: ejendomsinfo.js:98 og app.js:263 (img.src på kortbilleder ved ejendomsvisning)
 router.get('/', async (req, res) => {
   const lag = req.query.lag;
   const x = parseFloat(req.query.x);
@@ -15,6 +15,8 @@ router.get('/', async (req, res) => {
   }
 
   try {
+    // hentKort returnerer billedet som rå bytes (buffer) plus billedformat (fx "image/png").
+    // Content-Type-headeren skal sættes manuelt så browseren ved at det er et billede og ikke tekst/JSON.
     const { buffer, contentType } = await KortApi.hentKort(lag, x, y);
     res.set('Content-Type', contentType);
     res.send(buffer);

@@ -4,6 +4,7 @@ const database = require('../../database/database');
 
 // POST /api/koeb
 // Gemmer købs-oplysninger for en investeringscase
+// Kaldes fra: case-formular.js:490 (gemSomNy — opretter køb efter casen er oprettet)
 router.post('/', async (req, res) => {
   try {
     const data = req.body;
@@ -57,6 +58,7 @@ router.post('/', async (req, res) => {
 
 // PUT /api/koeb/:caseID
 // Opdaterer købsoplysninger for en eksisterende case
+// Kaldes fra: case-formular.js:580 (gemSomOpdatering — rediger-tilstand)
 router.put('/:caseID', async (req, res) => {
   try {
     const data = req.body;

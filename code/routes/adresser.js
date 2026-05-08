@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 const DAWAService = require('../services/DAWAapi');
 
-// Søger efter adresser baseret på et søgeord. Bruger DAWA API'et.
+// Søger efter adresser baseret på et søgeord via DAWA API'et
+// Kaldes fra: app.js:25 (autocomplete i søgefeltet på forsiden)
 router.get('/search', async (req, res) => {
   try {
     const soegeord = req.query.q;

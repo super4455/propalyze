@@ -3,7 +3,7 @@ input,
 select,
 button,
 textarea {
-  font-family: "Times New Roman", Times, serif;
+  font-family: system-ui, sans-serif;
 }
 
 body {
@@ -11,7 +11,8 @@ body {
   margin: 0 auto;
   padding: 20px;
   line-height: 1.5;
-  color: #222;
+  color: #2d2a26;
+  background: #f5f1ea;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -24,10 +25,11 @@ h3,
 h4 {
   margin-top: 1.2em;
   margin-bottom: 0.5em;
+  color: #4a5d3a;
 }
 
 a {
-  color: #0066cc;
+  color: #4a5d3a;
 }
 
 p {
@@ -44,8 +46,10 @@ input[type="text"],
 input[type="number"],
 select {
   width: 100%;
-  padding: 6px;
-  border: 1px solid #999;
+  padding: 8px;
+  border: 1px solid #e0d9cc;
+  border-radius: 8px;
+  background: white;
   box-sizing: border-box;
   font-size: 14px;
 }
@@ -57,24 +61,25 @@ input[type="checkbox"] {
 
 button {
   padding: 8px 14px;
-  border: 1px solid #999;
-  background: #eee;
+  border: 1px solid #e0d9cc;
+  border-radius: 8px;
+  background: white;
   cursor: pointer;
   font-size: 14px;
 }
 
 button:hover {
-  background: #ddd;
+  background: #efeae0;
 }
 
 .knap_primaer {
-  background: #333;
+  background: #4a5d3a;
   color: white;
-  border-color: #333;
+  border-color: #4a5d3a;
 }
 
 .knap_primaer:hover {
-  background: #555;
+  background: #3a4a2d;
 }
 
 .knapper {
@@ -84,10 +89,11 @@ button:hover {
 }
 
 .overblik {
-  background: #f4f4f4;
-  padding: 10px 15px;
+  background: white;
+  padding: 12px 16px;
   margin: 15px 0;
-  border-left: 3px solid #999;
+  border-radius: 8px;
+  border-left: 3px solid #b8860b;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -135,15 +141,19 @@ button:hover {
 
 #soegefelt {
   width: 100%;
-  padding: 8px;
+  padding: 10px;
   font-size: 16px;
-  border: 1px solid #999;
+  border: 1px solid #e0d9cc;
+  border-radius: 8px;
+  background: white;
   box-sizing: border-box;
   margin-bottom: 10px;
 }
 
 .resultater {
-  border: 1px solid #ddd;
+  background: white;
+  border: 1px solid #e0d9cc;
+  border-radius: 8px;
   margin-bottom: 15px;
   display: flex;
   flex-direction: column;
@@ -174,8 +184,10 @@ button:hover {
 #renovering_liste>div,
 #udgift_liste>div,
 #indtaegt_liste>div {
-  padding: 8px;
-  border: 1px solid #ddd;
+  padding: 12px;
+  background: white;
+  border: 1px solid #e0d9cc;
+  border-radius: 8px;
 }
 
 table {
@@ -230,12 +242,13 @@ th {
 
 .modal_indhold {
   background: white;
-  padding: 20px;
+  padding: 24px;
   max-width: 700px;
   width: 90%;
   max-height: 85vh;
   overflow-y: auto;
   position: relative;
+  border-radius: 8px;
 }
 
 .luk_knap {

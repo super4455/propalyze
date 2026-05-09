@@ -32,6 +32,10 @@ class CaseFormular {
     this.udgifter = [];
     this.indtaegter = [];
 
+    // Debounce-timere til live preview — forhindrer et API-kald pr. tastetryk
+    this.finansieringTimer = null;
+    this.driftTimer = null;
+
     this.opsaetNavigation();
     this.opsaetTrin1();
     this.opsaetTrin2();
@@ -177,46 +181,36 @@ class CaseFormular {
 
   // Trin 2: Finansiering
 
-  // Beregner månedlig ydelse for år 1 baseret på lånetype og afdragsfrihed — bruges til live preview.
-  // Vigtigt: Logikken er kopieret fra laan.js (backend), da browser-JS ikke kan importere Node.js-moduler.
-  static beregnMaanedligYdelse(laanebeloeb, renteAarlig, loebetidAar, afdragsfriaar, laanetype) {
-    if (!laanebeloeb || !loebetidAar) return 0;
-    const r = renteAarlig / 100 / 12;
-    const n = loebetidAar * 12;
-
-    // I afdragsfri periode betales kun renter uanset lånetype
-    if (afdragsfriaar > 0) return Math.round(laanebeloeb * r);
-
-    if (laanetype === 'Serielaan') {
-      const fastAfdrag = laanebeloeb / n;
-      return Math.round(fastAfdrag + laanebeloeb * r);
-    }
-
-    if (laanetype === 'Staaende laan') {
-      return Math.round(laanebeloeb * r);
-    }
-
-    // Annuitetslån (default)
-    if (r === 0) return Math.round(laanebeloeb / n);
-    return Math.round(laanebeloeb * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1));
-  }
-
-  // Opdaterer preview med månedlig ydelse og samlet renteomkostning mens brugeren taster
+  // Henter beregnet månedlig ydelse og total rente fra backend med debouncing
   opdaterFinansieringOverblik() {
-    const laanebeloeb = parseFloat(document.getElementById('laanebeloeb').value) || 0;
-    const rente = parseFloat(document.getElementById('rente').value) || 0;
-    const loebetidAar = parseInt(document.getElementById('loebetid_aar').value) || 0;
-    const afdragsfriaar = parseInt(document.getElementById('afdragsfriaar').value) || 0;
-    const laanetype = document.getElementById('laanetype').value;
+    clearTimeout(this.finansieringTimer);
+    this.finansieringTimer = setTimeout(async () => {
+      const laanebeloeb = parseFloat(document.getElementById('laanebeloeb').value) || 0;
+      const rente = parseFloat(document.getElementById('rente').value) || 0;
+      const loebetidAar = parseInt(document.getElementById('loebetid_aar').value) || 0;
+      const afdragsfriaar = parseInt(document.getElementById('afdragsfriaar').value) || 0;
+      const laanetype = document.getElementById('laanetype').value;
 
-    const maanedligYdelse = CaseFormular.beregnMaanedligYdelse(laanebeloeb, rente, loebetidAar, afdragsfriaar, laanetype);
-    // Total rente = alle betalinger over løbetiden minus selve lånebeløbet
-    const totalRente = (maanedligYdelse * loebetidAar * 12) - laanebeloeb;
+      if (!laanebeloeb || !loebetidAar || !laanetype) return;
 
-    document.getElementById('maanedlig_ydelse').textContent =
-      `${maanedligYdelse.toLocaleString('da-DK')} kr.`;
-    document.getElementById('total_rente').textContent =
-      `${Math.max(0, Math.round(totalRente)).toLocaleString('da-DK')} kr.`;
+      try {
+        const svar = await fetch('/api/beregn/ydelse', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ laanebeloeb, rente, loebetid_aar: loebetidAar, afdragsfriaar, laanetype })
+        });
+
+        if (!svar.ok) return;
+
+        const resultat = await svar.json();
+        document.getElementById('maanedlig_ydelse').textContent =
+          `${resultat.maanedligYdelse.toLocaleString('da-DK')} kr.`;
+        document.getElementById('total_rente').textContent =
+          `${resultat.totalRente.toLocaleString('da-DK')} kr.`;
+      } catch (fejl) {
+        console.log('Fejl ved beregning af ydelse:', fejl);
+      }
+    }, 300);
   }
 
   // Lytter på alle finansieringsfelter så preview opdateres løbende
@@ -298,42 +292,32 @@ class CaseFormular {
 
   // Trin 4: Driftsbudget
 
-  // Beregner og viser månedlige og årlige totaler for udgifter og indtægter
-  // Poster kan være månedlige eller årlige — begge omregnes til begge visninger
+  // Henter beregnede driftstotaler fra backend med debouncing
   opdaterDriftsOverblik() {
-    let maanedligUdgift = 0;
-    let aarligUdgift = 0;
-    let maanedligIndtaegt = 0;
-    let aarligIndtaegt = 0;
+    clearTimeout(this.driftTimer);
+    this.driftTimer = setTimeout(async () => {
+      try {
+        const svar = await fetch('/api/beregn/drift', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ udgifter: this.udgifter, indtaegter: this.indtaegter })
+        });
 
-    for (const u of this.udgifter) {
-      if (u.frekvens === 'maanedlig') {
-        maanedligUdgift += u.beloeb;
-        aarligUdgift += u.beloeb * 12;
-      } else {
-        aarligUdgift += u.beloeb;
-        maanedligUdgift += u.beloeb / 12;
+        if (!svar.ok) return;
+
+        const resultat = await svar.json();
+        document.getElementById('maanedlig_udgift_total').textContent =
+          `${resultat.maanedligUdgift.toLocaleString('da-DK')} kr.`;
+        document.getElementById('aarlig_udgift_total').textContent =
+          `${resultat.aarligUdgift.toLocaleString('da-DK')} kr.`;
+        document.getElementById('maanedlig_indtaegt_total').textContent =
+          `${resultat.maanedligIndtaegt.toLocaleString('da-DK')} kr.`;
+        document.getElementById('aarlig_indtaegt_total').textContent =
+          `${resultat.aarligIndtaegt.toLocaleString('da-DK')} kr.`;
+      } catch (fejl) {
+        console.log('Fejl ved beregning af drift:', fejl);
       }
-    }
-
-    for (const i of this.indtaegter) {
-      if (i.frekvens === 'maanedlig') {
-        maanedligIndtaegt += i.beloeb;
-        aarligIndtaegt += i.beloeb * 12;
-      } else {
-        aarligIndtaegt += i.beloeb;
-        maanedligIndtaegt += i.beloeb / 12;
-      }
-    }
-
-    document.getElementById('maanedlig_udgift_total').textContent =
-      `${Math.round(maanedligUdgift).toLocaleString('da-DK')} kr.`;
-    document.getElementById('aarlig_udgift_total').textContent =
-      `${Math.round(aarligUdgift).toLocaleString('da-DK')} kr.`;
-    document.getElementById('maanedlig_indtaegt_total').textContent =
-      `${Math.round(maanedligIndtaegt).toLocaleString('da-DK')} kr.`;
-    document.getElementById('aarlig_indtaegt_total').textContent =
-      `${Math.round(aarligIndtaegt).toLocaleString('da-DK')} kr.`;
+    }, 300);
   }
 
   // Tegner listen af udgifter op på ny

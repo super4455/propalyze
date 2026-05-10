@@ -4,7 +4,7 @@ Webapplikation til analyse og simulering af ejendomsinvesteringscases. Backend i
 
 ## Forudsætninger
 
-For at web-applikationen skal køres, skal man have installeres Node.js og Node Package Manager (npm)
+For at web-applikationen skal køres, skal man have installeret Node.js og Node Package Manager (npm)
 
 Desuden skal man have adgang til en Azure SQL-database. Loginoplysninger skal ligges i `/code/.env`.
 

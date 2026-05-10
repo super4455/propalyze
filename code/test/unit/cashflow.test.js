@@ -66,7 +66,7 @@ describe('beregnAarligCashflow', () => {
     );
 
     expect(cashflow).toBeCloseTo(-50000, 0);
-  });JE
+  });
 });
 
 describe('beregnMaanedligDriftsomkostning', () => {

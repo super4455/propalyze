@@ -408,7 +408,7 @@ class EjendomsprofilListe {
       // sessionStorage gemmer data midlertidigt i browseren og bruges her til at sende værdierne videre til investeringscase.html
       sessionStorage.setItem('caseNavn', navn);
       sessionStorage.setItem('caseBeskrivelse', beskrivelse);
-      sessionStorage.setItem('ejendomsID', ejendomID);
+      sessionStorage.setItem('ejendomID', ejendomID);
 
       window.location.href = '/investeringscase.html';
     });
@@ -424,7 +424,7 @@ class EjendomsprofilListe {
     }
 
     try {
-      const svar = await fetch(`/api/cases?ejendomsID=${ejendomID}`);
+      const svar = await fetch(`/api/cases?ejendomID=${ejendomID}`);
       const cases = await svar.json();
 
       const liste = document.createElement('div');

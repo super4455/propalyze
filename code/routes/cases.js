@@ -10,8 +10,8 @@ router.post('/', async (req, res) => {
     console.log('Opretter investeringscase:', data);
 
     // Validér input
-    if (!data.ejendomsID) {
-      res.status(400).json({ fejl: 'EjendomsID mangler' });
+    if (!data.ejendomID) {
+      res.status(400).json({ fejl: 'EjendomID mangler' });
       return;
     }
 
@@ -25,11 +25,11 @@ router.post('/', async (req, res) => {
         (ejendomID, navn, beskrivelse)
       OUTPUT INSERTED.caseID
       VALUES
-        (@ejendomsID, @navn, @beskrivelse)
+        (@ejendomID, @navn, @beskrivelse)
     `;
 
     const parametre = {
-      ejendomsID: data.ejendomsID,
+      ejendomID: data.ejendomID,
       navn: data.navn,
       beskrivelse: data.beskrivelse || ''
     };
@@ -74,9 +74,9 @@ router.post('/:id/dupliker', async (req, res) => {
     const nyCase = await database.query(
       `INSERT INTO Propalyze.investeringscase (ejendomID, navn, beskrivelse)
        OUTPUT INSERTED.caseID
-       VALUES (@ejendomsID, @navn, @beskrivelse)`,
+       VALUES (@ejendomID, @navn, @beskrivelse)`,
       {
-        ejendomsID: c.ejendomID,
+        ejendomID: c.ejendomID,
         navn: `Kopi af ${c.navn}`,
         beskrivelse: c.beskrivelse
       }
@@ -265,21 +265,21 @@ router.get('/alle', async (req, res) => {
 // Kaldes fra: app.js:430 (visCases — listen af cases inde i ejendomsmodalen)
 router.get('/', async (req, res) => {
   try {
-    const ejendomsID = req.query.ejendomsID;
+    const ejendomID = req.query.ejendomID;
 
-    if (!ejendomsID) {
-      res.status(400).json({ fejl: 'Manglende ejendomsID' });
+    if (!ejendomID) {
+      res.status(400).json({ fejl: 'Manglende ejendomID' });
       return;
     }
 
     const sqlTekst = `
       SELECT caseID, navn, beskrivelse, start_dato
       FROM Propalyze.investeringscase
-      WHERE ejendomID = @ejendomsID
+      WHERE ejendomID = @ejendomID
       ORDER BY start_dato DESC
     `;
 
-    const resultat = await database.query(sqlTekst, { ejendomsID: ejendomsID });
+    const resultat = await database.query(sqlTekst, { ejendomID: ejendomID });
     res.status(200).json(resultat);
 
   } catch (err) {

@@ -9,11 +9,11 @@ class CaseFormular {
     // De to tilstande starter fra forskellige sessionStorage-nøgler:
     // 'opret' kommer fra forsiden med en valgt ejendom, 'rediger' kommer fra case-listen
     if (tilstand === 'opret') {
-      this.ejendomsID = parseInt(sessionStorage.getItem('ejendomsID'));
+      this.ejendomID = parseInt(sessionStorage.getItem('ejendomID'));
       this.caseNavn = sessionStorage.getItem('caseNavn');
       this.caseBeskrivelse = sessionStorage.getItem('caseBeskrivelse');
 
-      if (!this.ejendomsID) {
+      if (!this.ejendomID) {
         document.getElementById('fejl').textContent = 'Ingen ejendom valgt.';
       }
     } else {
@@ -461,7 +461,7 @@ class CaseFormular {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          ejendomsID: this.ejendomsID,
+          ejendomID: this.ejendomID,
           navn: this.caseNavn,
           beskrivelse: this.caseBeskrivelse
         })
@@ -530,7 +530,7 @@ class CaseFormular {
       // Ryd sessionStorage nu data er gemt i databasen
       sessionStorage.removeItem('caseNavn');
       sessionStorage.removeItem('caseBeskrivelse');
-      sessionStorage.removeItem('ejendomsID');
+      sessionStorage.removeItem('ejendomID');
 
       besked.textContent = 'Investeringscase gemt! Åbner simulering...';
       besked.className = 'succes';

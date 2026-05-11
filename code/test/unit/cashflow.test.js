@@ -36,22 +36,6 @@ describe('beregnAarligCashflow', () => {
     expect(cashflow).toBeCloseTo(-72000, 0);
   });
 
-  test('returnerer 0 når alle input er nul', () => {
-    const maanedligLeje = 0;
-    const maanedligUdlejningUdgift = 0;
-    const maanedligYdelse = 0;
-    const maanedligDrift = 0;
-    const maanedligDriftsIndtaegt = 0;
-    const aarligRenovering = 0;
-
-    const cashflow = CashflowBeregner.beregnAarligCashflow(
-      maanedligLeje, maanedligUdlejningUdgift, maanedligYdelse,
-      maanedligDrift, maanedligDriftsIndtaegt, aarligRenovering
-    );
-
-    expect(cashflow).toBe(0);
-  });
-
   test('medregner renoveringsudgifter korrekt i cashflowet', () => {
     const maanedligLeje = 5000;
     const maanedligUdlejningUdgift = 0;

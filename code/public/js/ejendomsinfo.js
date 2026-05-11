@@ -26,13 +26,7 @@ class EjendomsInfoView {
       const svar = await fetch(`/api/ejendomme/lookup?dawaId=${this.dawaId}`);
 
       if (!svar.ok) {
-        // Hvis svaret ikke kan parses som JSON, brug et tomt objekt
-        let fejl = {};
-        try {
-          fejl = await svar.json();
-        } catch (parseFejl) {
-          fejl = {};
-        }
+        const fejl = await svar.json();
 
         let fejlBesked = 'kunne ikke hente data';
         if (fejl.fejl) {
